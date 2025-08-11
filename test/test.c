@@ -34,7 +34,7 @@ int test_mrs_strings_strstr(void)
 	};
 	MRT_ctx_append_case(t_ctx, test_case);
 
-	MRS_strcpy(b, "52");
+	MRS_setstr(b, "52");
 	test_case = (struct MRT_Case){
 		.description = "11151111111111111231 | 52",
 		.pass = MRT_ASSERT_NULL(MRS_strstr(a, b, 0))
@@ -62,15 +62,15 @@ int test_mrs_strings_filter(void)
 				   .pass = !MRS_strcmp(expected, actual) };
 	MRT_ctx_append_case(t_ctx, test_case);
 
-	MRS_strcpy(actual, "2222");
-	MRS_strcpy(expected, "");
+	MRS_setstr(actual, "2222");
+	MRS_setstr(expected, "");
 	MRS_filter(actual, '2');
 	test_case = (struct MRT_Case){ .description = "2222 | 2",
 				       .pass = !MRS_strcmp(expected, actual) };
 	MRT_ctx_append_case(t_ctx, test_case);
 
-	MRS_strcpy(actual, "2222");
-	MRS_strcpy(expected, "2222");
+	MRS_setstr(actual, "2222");
+	MRS_setstr(expected, "2222");
 	MRS_filter(actual, '3');
 	test_case = (struct MRT_Case){ .description = "2222 | 3",
 				       .pass = !MRS_strcmp(expected, actual) };
@@ -98,42 +98,42 @@ int test_mrs_strings_strcat(void)
 				   .pass = !MRS_strcmp(expected, actual) };
 	MRT_ctx_append_case(t_ctx, test_case);
 
-	MRS_strcpy(actual, "123456789");
-	MRS_strcpy(append, "10");
+	MRS_setstr(actual, "123456789");
+	MRS_setstr(append, "10");
 	test_case =
 		(struct MRT_Case){ .description =
 					   "123456789 | 10 over capacity",
 				   .pass = 0 == !MRS_strcat(actual, append) };
 	MRT_ctx_append_case(t_ctx, test_case);
 
-	MRS_strcpy(actual, "123456789");
-	MRS_strcpy(append, "0");
-	MRS_strcpy(expected, "1234567890");
+	MRS_setstr(actual, "123456789");
+	MRS_setstr(append, "0");
+	MRS_setstr(expected, "1234567890");
 	MRS_strcat(actual, append);
 	test_case = (struct MRT_Case){ .description =
 					       "123456789 | 1 exactly capacity",
 				       .pass = !MRS_strcmp(expected, actual) };
 	MRT_ctx_append_case(t_ctx, test_case);
 
-	MRS_strcpy(actual, "123456789");
-	MRS_strcpy(append, "");
-	MRS_strcpy(expected, "123456789");
+	MRS_setstr(actual, "123456789");
+	MRS_setstr(append, "");
+	MRS_setstr(expected, "123456789");
 	MRS_strcat(actual, append);
 	test_case = (struct MRT_Case){ .description = "123456789 | empty src",
 				       .pass = !MRS_strcmp(expected, actual) };
 	MRT_ctx_append_case(t_ctx, test_case);
 
-	MRS_strcpy(actual, "");
-	MRS_strcpy(append, "123");
-	MRS_strcpy(expected, "123");
+	MRS_setstr(actual, "");
+	MRS_setstr(append, "123");
+	MRS_setstr(expected, "123");
 	MRS_strcat(actual, append);
 	test_case = (struct MRT_Case){ .description = "123456789 | empty dest",
 				       .pass = !MRS_strcmp(expected, actual) };
 	MRT_ctx_append_case(t_ctx, test_case);
 
-	MRS_strcpy(actual, "");
-	MRS_strcpy(append, "");
-	MRS_strcpy(expected, "");
+	MRS_setstr(actual, "");
+	MRS_setstr(append, "");
+	MRS_setstr(expected, "");
 	MRS_strcat(actual, append);
 	test_case = (struct MRT_Case){ .description = "empty dest and src",
 				       .pass = !MRS_strcmp(expected, actual) };

@@ -19,7 +19,7 @@ MRS_String *MRS_init(size_t capacity, const char *value)
 	}
 
 	MRS_String *out = MRS_create(capacity);
-	if (MRS_strncpy(out, value, strlen(value))) {
+	if (MRS_setstrn(out, value, strlen(value))) {
 		MRS_free(out);
 		return NULL;
 	}
@@ -43,10 +43,10 @@ void MRS_filter(MRS_String *string, const char remove_me)
 		}
 	}
 	string->len = filtered_len;
-	MRS_strncpy(string, filtered, filtered_len);
+	MRS_setstrn(string, filtered, filtered_len);
 }
 
-int MRS_strcpy(MRS_String *string, const char *src)
+int MRS_setstr(MRS_String *string, const char *src)
 {
 	size_t len = strlen(src);
 	if (len > string->capacity) {
@@ -61,7 +61,7 @@ int MRS_strcpy(MRS_String *string, const char *src)
 	return 0;
 }
 
-int MRS_strncpy(MRS_String *string, const char *src, size_t len)
+int MRS_setstrn(MRS_String *string, const char *src, size_t len)
 {
 	if (len > string->capacity) {
 		return 1;
@@ -176,6 +176,6 @@ MRS_String *MRS_strndup(MRS_String *src, size_t len)
 		return NULL;
 	}
 	MRS_String *out = MRS_create(len);
-	MRS_strncpy(out, src->value, len);
+	MRS_setstrn(out, src->value, len);
 	return out;
 }
