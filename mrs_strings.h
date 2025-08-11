@@ -24,12 +24,12 @@ void MRS_free(MRS_String *string);
 /*
  * `returns` 0 if successful
  */
-int MRS_strcpy(MRS_String *string, const char *src);
+int MRS_setstr(MRS_String *string, const char *src);
 
 /*
  * `returns` 0 if successful
  */
-int MRS_strncpy(MRS_String *string, const char *src, size_t len);
+int MRS_setstrn(MRS_String *string, const char *src, size_t len);
 
 /*
  * `returns` 0 if successful
