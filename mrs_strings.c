@@ -107,7 +107,8 @@ int MRS_strcat(MRS_String *dest, MRS_String *src)
 char *MRS_strstr(MRS_String *haystack, MRS_String *needle,
 		 size_t haystack_start_idx)
 {
-	for (size_t i = haystack_start_idx; haystack->len; i++) {
+	for (size_t i = haystack_start_idx; i < haystack->len - needle->len + 1;
+	     i++) {
 		for (size_t j = 0; needle->len; j++) {
 			if ((haystack->value[i + j] ^ needle->value[j]) != 0) {
 				break;

@@ -41,6 +41,13 @@ int test_mrs_strings_strstr(void)
 	};
 	MRT_ctx_append_case(t_ctx, test_case);
 
+	MRS_setstr(b, "311");
+	test_case = (struct MRT_Case){
+		.description = "11151111111111111231 | 311 OOB",
+		.pass = MRT_ASSERT_NULL(MRS_strstr(a, b, 0))
+	};
+	MRT_ctx_append_case(t_ctx, test_case);
+
 	MRS_free(a);
 	MRS_free(b);
 
