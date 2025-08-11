@@ -61,6 +61,12 @@ char MRS_get_char(MRS_String *src, size_t idx);
 int MRS_get_idx(MRS_String *src, char *idx, size_t *found_position);
 
 /*
+ * `returns` pointer to first occurance of char
+ * `returns` NULL if not found
+ */
+char *MRS_strchr(MRS_String *src, char target);
+
+/*
  * checks for '\t' '\n' and ' '
  *
  * `returns` 0 is true
@@ -74,5 +80,10 @@ int MRS_is_whitespace(MRS_String *src, size_t idx);
 void MRS_remove_whitespace(MRS_String *src);
 
 void MRS_filter(MRS_String *string, const char remove_me);
+
+/*
+ * `returns` NULL if len < src.len
+ */
+MRS_String *MRS_strndup(MRS_String *src, size_t len);
 
 #endif // !MRS_STRINGS_H

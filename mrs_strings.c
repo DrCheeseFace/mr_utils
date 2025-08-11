@@ -159,3 +159,23 @@ void MRS_remove_whitespace(MRS_String *src)
 	MRS_filter(src, '\n');
 	MRS_filter(src, '\t');
 }
+
+char *MRS_strchr(MRS_String *src, char target)
+{
+	for (size_t i = 0; i < src->len; i++) {
+		if (src->value[i] == target) {
+			return &src->value[i];
+		}
+	}
+	return NULL;
+}
+
+MRS_String *MRS_strndup(MRS_String *src, size_t len)
+{
+	if (src->len < len) {
+		return NULL;
+	}
+	MRS_String *out = MRS_create(len);
+	MRS_strncpy(out, src->value, len);
+	return out;
+}
