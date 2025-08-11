@@ -1,5 +1,7 @@
 CC = gcc
 
+CSTANDARD = c99
+
 CFLAGS_TEST = -Wall -Wextra -Werror -Wpointer-arith -Wcast-align \
          -Wstrict-prototypes -Wwrite-strings -Waggregate-return \
          -Wswitch-default -Wswitch-enum -Wunreachable-code \
@@ -9,12 +11,12 @@ CFLAGS_TEST = -Wall -Wextra -Werror -Wpointer-arith -Wcast-align \
          -Wredundant-decls -Wsequence-point -Wshadow \
 	 -Wswitch -Wundef -Wunused-but-set-parameter \
 	 -Wcast-qual  -Wfloat-equal -Wnested-externs \
-	 -O0 -std=c11 -g \
+	 -O0 -std=$(CSTANDARD) -g \
 	 -fsanitize=address \
 	 
 	 
 CFLAGS = -Wall -Wextra -Werror \
-	 -O2 -std=c11\
+	 -O2 -std=$(CSTANDARD)\
 
 TEST_TARGET = test.out
 
