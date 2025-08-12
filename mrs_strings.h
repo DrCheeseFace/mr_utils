@@ -17,19 +17,21 @@ MRS_String *MRS_create(size_t capacity);
  * if `capactity = 0` capacity is set to strlen(value)
  * `returns` -1 if failed (double check capacity is enough)
  */
-int MRS_init(size_t capacity, const char *value, MRS_String *dest);
+int MRS_init(size_t capacity, const char *value, size_t value_len,
+	     MRS_String *dest);
 
 void MRS_free(MRS_String *string);
 
 /*
  * `returns` 0 if successful
  */
-int MRS_setstr(MRS_String *string, const char *src);
+int MRS_setstr(MRS_String *string, const char *src, size_t src_len);
 
 /*
  * `returns` 0 if successful
  */
-int MRS_setstrn(MRS_String *string, const char *src, size_t len);
+int MRS_setstrn(MRS_String *string, const char *src, size_t src_len,
+		size_t len);
 
 /*
  * `returns` 0 if successful

@@ -9,10 +9,10 @@ int test_mrs_strings_strstr(void)
 	const char *needle = "31";
 
 	MRS_String a;
-	MRS_init(0, haystack, &a);
+	MRS_init(0, haystack, strlen(haystack), &a);
 
 	MRS_String b;
-	MRS_init(3, needle, &b);
+	MRS_init(3, needle, strlen(needle), &b);
 
 	struct MRT_Case test_case = (struct MRT_Case){
 		.description = "11151111111111111231 | 31",
@@ -34,21 +34,21 @@ int test_mrs_strings_strstr(void)
 	};
 	MRT_ctx_append_case(t_ctx, test_case);
 
-	MRS_setstr(&b, "52");
+	MRS_setstr(&b, "52", strlen("52"));
 	test_case = (struct MRT_Case){
 		.description = "11151111111111111231 | 52",
 		.pass = MRT_ASSERT_NULL(MRS_strstr(&a, &b, 0))
 	};
 	MRT_ctx_append_case(t_ctx, test_case);
 
-	MRS_setstr(&b, "112");
+	MRS_setstr(&b, "112", strlen("112"));
 	test_case = (struct MRT_Case){
 		.description = "11151111111111111231 | 112",
 		.pass = MRT_ASSERT_EQ(a.value[15], *MRS_strstr(&a, &b, 0))
 	};
 	MRT_ctx_append_case(t_ctx, test_case);
 
-	MRS_setstr(&b, "311");
+	MRS_setstr(&b, "311", strlen("311"));
 	test_case = (struct MRT_Case){
 		.description = "11151111111111111231 | 311 OOB",
 		.pass = MRT_ASSERT_NULL(MRS_strstr(&a, &b, 0))
@@ -68,9 +68,9 @@ int test_mrs_strings_filter(void)
 	struct MRT_Context *t_ctx = MRT_ctx_create("test_mrs_strings_filter");
 
 	MRS_String actual;
-	MRS_init(20, "12121", &actual);
+	MRS_init(20, "12121", strlen("12121"), &actual);
 	MRS_String expected;
-	MRS_init(20, "111", &expected);
+	MRS_init(20, "111", strlen("111"), &expected);
 	MRS_filter(&actual, '2');
 
 	struct MRT_Case test_case =
@@ -78,16 +78,16 @@ int test_mrs_strings_filter(void)
 				   .pass = !MRS_strcmp(&expected, &actual) };
 	MRT_ctx_append_case(t_ctx, test_case);
 
-	MRS_setstr(&actual, "2222");
-	MRS_setstr(&expected, "");
+	MRS_setstr(&actual, "2222", strlen("2222"));
+	MRS_setstr(&expected, "", strlen(""));
 	MRS_filter(&actual, '2');
 	test_case =
 		(struct MRT_Case){ .description = "2222 | 2",
 				   .pass = !MRS_strcmp(&expected, &actual) };
 	MRT_ctx_append_case(t_ctx, test_case);
 
-	MRS_setstr(&actual, "2222");
-	MRS_setstr(&expected, "2222");
+	MRS_setstr(&actual, "2222", strlen("2222"));
+	MRS_setstr(&expected, "2222", strlen("2222"));
 	MRS_filter(&actual, '3');
 	test_case =
 		(struct MRT_Case){ .description = "2222 | 3",
@@ -107,11 +107,11 @@ int test_mrs_strings_strcat(void)
 	struct MRT_Context *t_ctx = MRT_ctx_create("test_mrs_strings_strcat");
 
 	MRS_String actual;
-	MRS_init(10, "aaabbb", &actual);
+	MRS_init(10, "aaabbb", strlen("aaabbb"), &actual);
 	MRS_String append;
-	MRS_init(10, "cc", &append);
+	MRS_init(10, "cc", strlen("cc"), &append);
 	MRS_String expected;
-	MRS_init(10, "aaabbbcc", &expected);
+	MRS_init(10, "aaabbbcc", strlen("aaabbbcc"), &expected);
 	MRS_strcat(&actual, &append);
 
 	struct MRT_Case test_case =
@@ -119,17 +119,17 @@ int test_mrs_strings_strcat(void)
 				   .pass = !MRS_strcmp(&expected, &actual) };
 	MRT_ctx_append_case(t_ctx, test_case);
 
-	MRS_setstr(&actual, "123456789");
-	MRS_setstr(&append, "10");
+	MRS_setstr(&actual, "123456789", strlen("123456789"));
+	MRS_setstr(&append, "10", strlen("10"));
 	test_case =
 		(struct MRT_Case){ .description =
 					   "123456789 | 10 over capacity",
 				   .pass = 0 == !MRS_strcat(&actual, &append) };
 	MRT_ctx_append_case(t_ctx, test_case);
 
-	MRS_setstr(&actual, "123456789");
-	MRS_setstr(&append, "0");
-	MRS_setstr(&expected, "1234567890");
+	MRS_setstr(&actual, "123456789", strlen("123456789"));
+	MRS_setstr(&append, "0", strlen("0"));
+	MRS_setstr(&expected, "1234567890", strlen("1234567890"));
 	MRS_strcat(&actual, &append);
 	test_case =
 		(struct MRT_Case){ .description =
@@ -137,27 +137,27 @@ int test_mrs_strings_strcat(void)
 				   .pass = !MRS_strcmp(&expected, &actual) };
 	MRT_ctx_append_case(t_ctx, test_case);
 
-	MRS_setstr(&actual, "123456789");
-	MRS_setstr(&append, "");
-	MRS_setstr(&expected, "123456789");
+	MRS_setstr(&actual, "123456789", strlen("123456789"));
+	MRS_setstr(&append, "", strlen(""));
+	MRS_setstr(&expected, "123456789", strlen("123456789"));
 	MRS_strcat(&actual, &append);
 	test_case =
 		(struct MRT_Case){ .description = "123456789 | empty src",
 				   .pass = !MRS_strcmp(&expected, &actual) };
 	MRT_ctx_append_case(t_ctx, test_case);
 
-	MRS_setstr(&actual, "");
-	MRS_setstr(&append, "123");
-	MRS_setstr(&expected, "123");
+	MRS_setstr(&actual, "", strlen(""));
+	MRS_setstr(&append, "123", strlen("123"));
+	MRS_setstr(&expected, "123", strlen("123"));
 	MRS_strcat(&actual, &append);
 	test_case =
 		(struct MRT_Case){ .description = "123456789 | empty dest",
 				   .pass = !MRS_strcmp(&expected, &actual) };
 	MRT_ctx_append_case(t_ctx, test_case);
 
-	MRS_setstr(&actual, "");
-	MRS_setstr(&append, "");
-	MRS_setstr(&expected, "");
+	MRS_setstr(&actual, "", strlen(""));
+	MRS_setstr(&append, "", strlen(""));
+	MRS_setstr(&expected, "", strlen(""));
 	MRS_strcat(&actual, &append);
 	test_case =
 		(struct MRT_Case){ .description = "empty dest and src",
@@ -178,7 +178,7 @@ int test_mrs_strings_get_char(void)
 	struct MRT_Context *t_ctx = MRT_ctx_create("test_mrs_strings_strcat");
 
 	MRS_String src;
-	MRS_init(10, "0123456789", &src);
+	MRS_init(10, "0123456789", strlen("0123456789"), &src);
 
 	char actual = MRS_get_char(&src, 3);
 	char expected = '3';
