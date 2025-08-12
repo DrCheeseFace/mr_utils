@@ -12,7 +12,8 @@ MRS_String *MRS_create(size_t capacity)
 	return out;
 }
 
-int MRS_init(size_t capacity, const char *value, MRS_String *dest)
+int MRS_init(size_t capacity, const char *value, size_t value_len,
+	     MRS_String *dest)
 {
 	if (capacity == 0) {
 		capacity = strlen(value);
@@ -26,7 +27,7 @@ int MRS_init(size_t capacity, const char *value, MRS_String *dest)
 	}
 	dest->capacity = capacity;
 
-	if (MRS_setstrn(dest, value, strlen(value))) {
+	if (MRS_setstrn(dest, value, value_len, value_len)) {
 		MRS_free(dest);
 		return -1;
 	}
@@ -54,27 +55,29 @@ void MRS_filter(MRS_String *string, const char remove_me)
 		}
 	}
 	string->len = filtered_len;
-	MRS_setstrn(string, filtered, filtered_len);
+	MRS_setstrn(string, filtered, filtered_len, filtered_len);
 }
 
-int MRS_setstr(MRS_String *string, const char *src)
+int MRS_setstr(MRS_String *string, const char *src, size_t src_len)
 {
-	size_t len = strlen(src);
-	if (len > string->capacity) {
+	if (src_len > string->capacity) {
 		return 1;
 	}
 
-	for (size_t i = 0; i < len; i++) {
+	for (size_t i = 0; i < src_len; i++) {
 		string->value[i] = src[i];
 	}
-	string->len = len;
+	string->len = src_len;
 
 	return 0;
 }
 
-int MRS_setstrn(MRS_String *string, const char *src, size_t len)
+int MRS_setstrn(MRS_String *string, const char *src, size_t src_len, size_t len)
 {
 	if (len > string->capacity) {
+		return 1;
+	}
+	if (len > src_len) {
 		return 1;
 	}
 
