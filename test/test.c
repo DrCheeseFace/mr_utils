@@ -12,7 +12,7 @@ int test_mrs_strings_strstr(void)
 	MRS_init(0, haystack, &a);
 
 	MRS_String b;
-	MRS_init(0, needle, &b);
+	MRS_init(3, needle, &b);
 
 	struct MRT_Case test_case = (struct MRT_Case){
 		.description = "11151111111111111231 | 31",
@@ -38,6 +38,13 @@ int test_mrs_strings_strstr(void)
 	test_case = (struct MRT_Case){
 		.description = "11151111111111111231 | 52",
 		.pass = MRT_ASSERT_NULL(MRS_strstr(&a, &b, 0))
+	};
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRS_setstr(&b, "112");
+	test_case = (struct MRT_Case){
+		.description = "11151111111111111231 | 112",
+		.pass = MRT_ASSERT_EQ(a.value[15], *MRS_strstr(&a, &b, 0))
 	};
 	MRT_ctx_append_case(t_ctx, test_case);
 
