@@ -28,8 +28,15 @@ MRS_String *MRS_init(size_t capacity, const char *value)
 
 void MRS_free(MRS_String *string)
 {
-	free(string->value);
-	free(string);
+	if (string->value != NULL) {
+		free(string->value);
+	}
+	if (string != NULL) {
+		string->value = NULL;
+		string->len = 0;
+		string->capacity = 0;
+		free(string);
+	}
 }
 
 void MRS_filter(MRS_String *string, const char remove_me)
