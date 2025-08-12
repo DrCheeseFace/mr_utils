@@ -6,7 +6,8 @@
 MRS_String *MRS_create(size_t capacity)
 {
 	MRS_String *out = malloc(sizeof(*out));
-	out->value = malloc(sizeof(char) * capacity);
+	out->value = malloc(sizeof(char) * (capacity + 1));
+	out->value[capacity] = '\0';
 	out->capacity = capacity;
 	out->len = 0;
 	return out;
@@ -19,18 +20,20 @@ int MRS_init(size_t capacity, const char *value, size_t value_len,
 		capacity = strlen(value);
 	}
 
-	dest->value = malloc(sizeof(char) * (capacity));
+	dest->value = malloc(sizeof(char) * (capacity + 1));
 	if (dest->value == NULL) {
 		dest->capacity = 0;
 		dest->len = 0;
 		return -1;
 	}
+	dest->value[capacity] = '\0';
 	dest->capacity = capacity;
 
 	if (MRS_setstrn(dest, value, value_len, value_len)) {
 		MRS_free(dest);
 		return -1;
 	}
+	dest->value[value_len] = '\0';
 	return 0;
 }
 
@@ -68,6 +71,7 @@ int MRS_setstr(MRS_String *string, const char *src, size_t src_len)
 		string->value[i] = src[i];
 	}
 	string->len = src_len;
+	string->value[src_len] = '\0';
 
 	return 0;
 }
@@ -83,6 +87,7 @@ int MRS_setstrn(MRS_String *string, const char *src, size_t src_len, size_t len)
 
 	memcpy(string->value, src, len);
 	string->len = len;
+	string->value[len] = '\0';
 
 	return 0;
 }
@@ -192,7 +197,7 @@ int MRS_strndup(MRS_String *src, size_t len, MRS_String *dest)
 		return -1;
 	}
 
-	dest->value = malloc(sizeof(char) * (len));
+	dest->value = malloc(sizeof(char) * (len + 1));
 	if (dest->value == NULL) {
 		dest->capacity = 0;
 		dest->len = 0;
@@ -201,5 +206,6 @@ int MRS_strndup(MRS_String *src, size_t len, MRS_String *dest)
 	memcpy(dest->value, src->value, sizeof(char) * len);
 	dest->capacity = src->capacity;
 	dest->len = len;
+	dest->value[len] = '\0';
 	return 0;
 }
