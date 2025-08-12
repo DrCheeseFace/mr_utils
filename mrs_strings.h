@@ -15,9 +15,9 @@ MRS_String *MRS_create(size_t capacity);
 
 /*
  * if `capactity = 0` capacity is set to strlen(value)
- * `returns` NULL if failed (double check capacity is enough)
+ * `returns` -1 if failed (double check capacity is enough)
  */
-MRS_String *MRS_init(size_t capacity, const char *value);
+int MRS_init(size_t capacity, const char *value, MRS_String *dest);
 
 void MRS_free(MRS_String *string);
 
@@ -82,8 +82,8 @@ void MRS_remove_whitespace(MRS_String *src);
 void MRS_filter(MRS_String *string, const char remove_me);
 
 /*
- * `returns` NULL if len < src.len
+ * `returns` -1 if len < src.len
  */
-MRS_String *MRS_strndup(MRS_String *src, size_t len);
+int MRS_strndup(MRS_String *src, size_t len, MRS_String *dest);
 
 #endif // !MRS_STRINGS_H
