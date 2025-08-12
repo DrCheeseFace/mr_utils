@@ -57,7 +57,6 @@ void MRS_filter(MRS_String *string, const char remove_me)
 			filtered_len++;
 		}
 	}
-	string->len = filtered_len;
 	MRS_setstrn(string, filtered, filtered_len, filtered_len);
 }
 
@@ -67,9 +66,7 @@ int MRS_setstr(MRS_String *string, const char *src, size_t src_len)
 		return 1;
 	}
 
-	for (size_t i = 0; i < src_len; i++) {
-		string->value[i] = src[i];
-	}
+	memcpy(string->value, src, src_len);
 	string->len = src_len;
 	string->value[src_len] = '\0';
 
@@ -103,8 +100,7 @@ int MRS_strcmp(MRS_String *a, MRS_String *b)
 			return 1;
 		}
 	}
-
-	return 0;
+	return memcmp(a->value, b->value, sizeof(char) * a->len);
 }
 
 int MRS_strcat(MRS_String *dest, MRS_String *src)
