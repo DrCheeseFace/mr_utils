@@ -1,9 +1,10 @@
 #include "../mrs_strings.h"
 #include "../mrt_test.h"
+#include <string.h>
 
-int test_mrs_strings_strstr(void)
+int test_strstr(void)
 {
-	struct MRT_Context *t_ctx = MRT_ctx_create("test_mrs_strings_strstr");
+	struct MRT_Context *t_ctx = MRT_ctx_create("test_strstr");
 
 	const char *haystack = "11151111111111111231";
 	const char *needle = "31";
@@ -63,9 +64,9 @@ int test_mrs_strings_strstr(void)
 	return failed;
 }
 
-int test_mrs_strings_filter(void)
+int test_filter(void)
 {
-	struct MRT_Context *t_ctx = MRT_ctx_create("test_mrs_strings_filter");
+	struct MRT_Context *t_ctx = MRT_ctx_create("test_filter");
 
 	MRS_String actual;
 	MRS_init(20, "12121", strlen("12121"), &actual);
@@ -102,9 +103,9 @@ int test_mrs_strings_filter(void)
 	return failed;
 }
 
-int test_mrs_strings_strcat(void)
+int test_strcat(void)
 {
-	struct MRT_Context *t_ctx = MRT_ctx_create("test_mrs_strings_strcat");
+	struct MRT_Context *t_ctx = MRT_ctx_create("test_strcat");
 
 	MRS_String actual;
 	MRS_init(10, "aaabbb", strlen("aaabbb"), &actual);
@@ -173,9 +174,9 @@ int test_mrs_strings_strcat(void)
 	return failed;
 }
 
-int test_mrs_strings_get_char(void)
+int test_get_char(void)
 {
-	struct MRT_Context *t_ctx = MRT_ctx_create("test_mrs_strings_strcat");
+	struct MRT_Context *t_ctx = MRT_ctx_create("test_strcat");
 
 	MRS_String src;
 	MRS_init(10, "0123456789", strlen("0123456789"), &src);
@@ -215,12 +216,211 @@ int test_mrs_strings_get_char(void)
 	return failed;
 }
 
+int test_setstr(void)
+{
+	struct MRT_Context *t_ctx = MRT_ctx_create("test_setstr");
+
+	const char *from = "from";
+	const char *to = "to";
+
+	MRS_String actual;
+	MRS_String expected;
+
+	MRS_init(strlen(from), from, strlen(from), &actual);
+	int result = MRS_setstr(&actual, to, strlen(to));
+	MRS_init(strlen(to), to, strlen(to), &expected);
+
+	struct MRT_Case test_case =
+		(struct MRT_Case){ .description = "from -> to",
+				   .pass = !MRS_strcmp(&expected, &actual) };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	test_case = (struct MRT_Case){ .description = "from -> to result",
+				       .pass = result == 0 };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	result = MRS_setstr(&actual, to, strlen(from) + 1);
+
+	test_case = (struct MRT_Case){ .description = "from -> from+1 length",
+				       .pass = result == 1 };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRS_free(&actual);
+	MRS_free(&expected);
+	int failed = MRT_ctx_log(t_ctx);
+	MRT_ctx_free(t_ctx);
+	return failed;
+}
+
+int test_setstrn(void)
+{
+	struct MRT_Context *t_ctx = MRT_ctx_create("test_setstrn");
+
+	const char *from = "from";
+	const char *to = "to";
+
+	MRS_String actual;
+	MRS_String expected;
+
+	MRS_init(strlen(from), from, strlen(from), &actual);
+	MRS_init(strlen(to), to, 1, &expected);
+
+	int result = MRS_setstrn(&actual, to, strlen(to), 1);
+
+	struct MRT_Case test_case =
+		(struct MRT_Case){ .description = "from -> to length 1",
+				   .pass = !MRS_strcmp(&expected, &actual) };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	test_case =
+		(struct MRT_Case){ .description = "from -> to length 1 result",
+				   .pass = result == 0 };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	result = MRS_setstrn(&actual, to, strlen(to), 3);
+
+	test_case =
+		(struct MRT_Case){ .description = "from -> to length 3 result",
+				   .pass = result == 1 };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRS_free(&actual);
+	MRS_free(&expected);
+	int failed = MRT_ctx_log(t_ctx);
+	MRT_ctx_free(t_ctx);
+	return failed;
+}
+
+int test_get_idx(void)
+{
+	struct MRT_Context *t_ctx = MRT_ctx_create("test_get_idx");
+
+	const char *from = "from";
+	const char *random = "random";
+
+	MRS_String example;
+	MRS_String random_example;
+
+	MRS_init(strlen(random), random, strlen(random), &random_example);
+	MRS_init(strlen(from), from, strlen(from), &example);
+
+	size_t idx_found;
+	int result = MRS_get_idx(&example, &example.value[2], &idx_found);
+
+	struct MRT_Case test_case =
+		(struct MRT_Case){ .description = "'from' find from[2]",
+				   .pass = idx_found == 2 };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	test_case =
+		(struct MRT_Case){ .description = "'from' find from[2] result",
+				   .pass = result == 0 };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	result = MRS_get_idx(&example, &random_example.value[2], &idx_found);
+	test_case =
+		(struct MRT_Case){ .description =
+					   "'from' find char* outside result",
+				   .pass = result == -1 };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRS_free(&example);
+	MRS_free(&random_example);
+	int failed = MRT_ctx_log(t_ctx);
+	MRT_ctx_free(t_ctx);
+	return failed;
+}
+
+int test_strchr(void)
+{
+	struct MRT_Context *t_ctx = MRT_ctx_create("test_strchr");
+
+	const char *xample_str = "xample_str";
+	MRS_String xample;
+	MRS_init(strlen(xample_str), xample_str, strlen(xample_str), &xample);
+
+	char *result = MRS_strchr(&xample, 'l');
+	struct MRT_Case test_case =
+		(struct MRT_Case){ .description = "'xample_str' find 'l'",
+				   .pass = *result == 'l' };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	result = MRS_strchr(&xample, 'r');
+	test_case = (struct MRT_Case){ .description = "'xample_str' find 'r'",
+				       .pass = *result == 'r' };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	result = MRS_strchr(&xample, 'z');
+	test_case = (struct MRT_Case){ .description = "'xample_str' find 'x'",
+				       .pass = MRT_ASSERT_NULL(result) };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRS_free(&xample);
+	int failed = MRT_ctx_log(t_ctx);
+	MRT_ctx_free(t_ctx);
+	return failed;
+}
+
+int test_strndup(void)
+{
+	struct MRT_Context *t_ctx = MRT_ctx_create("test_strndup");
+
+	const char *xample_str = "xample_str";
+	MRS_String xample;
+	MRS_String xample_dup;
+
+	MRS_init(strlen(xample_str), xample_str, strlen(xample_str), &xample);
+
+	int result = MRS_strndup(&xample, xample.len, &xample_dup);
+	struct MRT_Case test_case =
+		(struct MRT_Case){ .description = "dup full string",
+				   .pass = !MRS_strcmp(&xample, &xample_dup) };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	test_case = (struct MRT_Case){ .description = "dup full string result",
+				       .pass = result == 0 };
+	MRT_ctx_append_case(t_ctx, test_case);
+	MRS_free(&xample_dup);
+
+	result = MRS_strndup(&xample, xample.len - 1, &xample_dup);
+	test_case =
+		(struct MRT_Case){ .description = "dup string len - 1",
+				   .pass = xample_dup.len == xample.len - 1 };
+	MRT_ctx_append_case(t_ctx, test_case);
+	test_case = (struct MRT_Case){
+		.description = "dup string len - 1 value check",
+		.pass = !strcmp("xample_st", xample_dup.value)
+	};
+	MRT_ctx_append_case(t_ctx, test_case);
+	test_case =
+		(struct MRT_Case){ .description = "dup string len - 1 result",
+				   .pass = result == 0 };
+	MRT_ctx_append_case(t_ctx, test_case);
+	MRS_free(&xample_dup);
+
+	result = MRS_strndup(&xample, xample.len + 1, &xample_dup);
+	test_case = (struct MRT_Case){ .description = "dup string len + 1",
+				       .pass = result == -1 };
+	MRT_ctx_append_case(t_ctx, test_case);
+	MRS_free(&xample_dup);
+
+	MRS_free(&xample);
+	int failed = MRT_ctx_log(t_ctx);
+	MRT_ctx_free(t_ctx);
+	return failed;
+}
+
 int main(void)
 {
 	int err = 0;
-	err = err || test_mrs_strings_strstr();
-	err = err || test_mrs_strings_filter();
-	err = err || test_mrs_strings_strcat();
-	err = err || test_mrs_strings_get_char();
+	err = err || test_strstr();
+	err = err || test_filter();
+	err = err || test_strcat();
+	err = err || test_get_char();
+	err = err || test_setstr();
+	err = err || test_setstrn();
+	err = err || test_get_idx();
+	err = err || test_strchr();
+	err = err || test_strndup();
 	return err;
 }
