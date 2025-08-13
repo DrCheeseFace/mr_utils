@@ -428,6 +428,34 @@ int test_strndup(void)
 	return failed;
 }
 
+int test_shrink_to_fit(void)
+{
+	struct MRT_Context *t_ctx = MRT_ctx_create("test_shrink_to_fit");
+
+	const char *example_str = "example_str";
+	MRS_String example;
+	MRS_init(32, example_str, strlen(example_str), &example);
+
+	MRS_shrink_to_fit(&example);
+	struct MRT_Case test_case = (struct MRT_Case){
+		.description = "example_str capacity 32 length check",
+		.pass = MRT_ASSERT_EQ(example.capacity, example.len)
+	};
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	test_case = (struct MRT_Case){
+		.description = "example_str capacity 32 value check",
+		.pass = strcmp(example.value, example_str) == 0
+	};
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRS_free(&example);
+
+	int failed = MRT_ctx_log(t_ctx);
+	MRT_ctx_free(t_ctx);
+	return failed;
+}
+
 int main(void)
 {
 	int err = 0;
@@ -440,5 +468,6 @@ int main(void)
 	err = err || test_get_idx();
 	err = err || test_strchr();
 	err = err || test_strndup();
+	err = err || test_shrink_to_fit();
 	return err;
 }

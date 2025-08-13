@@ -88,4 +88,9 @@ void MRS_filter(MRS_String *string, const char remove_me);
  */
 int MRS_strndup(MRS_String *src, size_t len, MRS_String *dest);
 
+/*
+ * reallocs `value` to set `capacity` = `length`
+ */
+void MRS_shrink_to_fit(MRS_String *src);
+
 #endif // !MRS_STRINGS_H
