@@ -95,24 +95,33 @@ int MRS_strcmp(MRS_String *a, MRS_String *b)
 		return 1;
 	}
 
-	for (size_t i = 0; i < a->len; i++) {
-		if ((a->value[i] ^ b->value[i]) != 0) {
-			return 1;
-		}
-	}
 	return memcmp(a->value, b->value, sizeof(char) * a->len);
 }
 
 int MRS_strcat(MRS_String *dest, MRS_String *src)
 {
 	if (src->len + dest->len > dest->capacity) {
-		return 1;
+		char *malloced =
+			malloc(sizeof(char) * (dest->len + src->len + 1));
+		if (malloced == NULL) {
+			return 1;
+		}
+
+		memcpy(malloced, dest->value, dest->len);
+		memcpy(&malloced[dest->len], src->value, src->len);
+		free(dest->value);
+
+		dest->value = malloced;
+		dest->capacity = src->len + dest->len;
+		dest->len = src->len + dest->len;
+
+		dest->value[dest->len] = '\0';
+		return 0;
 	}
 
-	for (size_t i = 0; i < src->len; i++) {
-		dest->value[dest->len] = src->value[i];
-		dest->len++;
-	}
+	memcpy(&dest->value[dest->len], src->value, src->len);
+	dest->len += src->len;
+	dest->value[dest->len] = '\0';
 
 	return 0;
 }
