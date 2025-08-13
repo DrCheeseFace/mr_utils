@@ -43,9 +43,9 @@ void MRT_case_log(struct MRT_Case test_case)
 {
 	MRT_log(test_case.description, MRT_SEVERITY_DEFAULT);
 	if (test_case.pass) {
-		MRT_logln(" PASS", MRT_SEVERITY_OK);
+		MRT_logln(" ... ok", MRT_SEVERITY_OK);
 	} else {
-		MRT_logln(" FAILED", MRT_SEVERITY_ERROR);
+		MRT_logln(" ... FAILED", MRT_SEVERITY_ERROR);
 	}
 	MRT_reset_severity();
 }

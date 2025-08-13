@@ -4,6 +4,7 @@
 - `mrt_test.h`: my mini test library 
 
 ### TODO
+- [ ] add left rigth comparison for failed tests 
 - [ ] malloc calloc realloc free wrappers for debugging memory leaks
 
 i hope you like UB!
