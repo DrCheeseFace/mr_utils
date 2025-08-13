@@ -214,3 +214,19 @@ int MRS_strndup(MRS_String *src, size_t len, MRS_String *dest)
 	dest->value[len] = '\0';
 	return 0;
 }
+
+void MRS_shrink_to_fit(MRS_String *src)
+{
+	if (src->len == src->capacity) {
+		return;
+	}
+
+	char *shrunk_string_alloc = malloc(sizeof(char) * (src->len + 1));
+	memmove(shrunk_string_alloc, src->value, src->len);
+
+	free(src->value);
+
+	src->value = shrunk_string_alloc;
+	src->capacity = src->len;
+	src->value[src->len] = '\0';
+}
