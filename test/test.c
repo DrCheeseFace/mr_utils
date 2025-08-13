@@ -122,15 +122,30 @@ int test_strcat(void)
 
 	MRS_setstr(&actual, "123456789", strlen("123456789"));
 	MRS_setstr(&append, "10", strlen("10"));
+	MRS_setstr(&expected, "12345678910", strlen("12345678910"));
 	test_case =
 		(struct MRT_Case){ .description =
 					   "123456789 | 10 over capacity",
-				   .pass = 0 == !MRS_strcat(&actual, &append) };
+				   .pass = 0 == MRS_strcat(&actual, &append) };
 	MRT_ctx_append_case(t_ctx, test_case);
 
-	MRS_setstr(&actual, "123456789", strlen("123456789"));
-	MRS_setstr(&append, "0", strlen("0"));
-	MRS_setstr(&expected, "1234567890", strlen("1234567890"));
+	test_case = (struct MRT_Case){
+		.description = "123456789 | 10 over capacity length check",
+		.pass = 11 == actual.capacity
+	};
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	test_case = (struct MRT_Case){
+		.description = "123456789 | 10 over capacity equals",
+		.pass = MRS_strcmp(&expected, &actual)
+	};
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRS_free(&actual);
+	MRS_free(&expected);
+	MRS_init(9, "123456789", strlen("123456789"), &actual);
+	MRS_init(10, "1234567891", strlen("1234567891"), &expected);
+	MRS_setstr(&append, "1", strlen("1"));
 	MRS_strcat(&actual, &append);
 	test_case =
 		(struct MRT_Case){ .description =
@@ -147,9 +162,12 @@ int test_strcat(void)
 				   .pass = !MRS_strcmp(&expected, &actual) };
 	MRT_ctx_append_case(t_ctx, test_case);
 
-	MRS_setstr(&actual, "", strlen(""));
+	MRS_free(&actual);
+	MRS_free(&expected);
+	MRS_init(0, "", strlen(""), &actual);
+	MRS_init(0, "123", strlen("123"), &expected);
 	MRS_setstr(&append, "123", strlen("123"));
-	MRS_setstr(&expected, "123", strlen("123"));
+
 	MRS_strcat(&actual, &append);
 	test_case =
 		(struct MRT_Case){ .description = "123456789 | empty dest",
