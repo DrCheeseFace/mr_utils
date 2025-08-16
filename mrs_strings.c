@@ -163,7 +163,7 @@ int MRS_get_idx(MRS_String *src, char *idx, size_t *found_position)
 	if (idx < src->value || idx >= &src->value[src->len]) {
 		return -1;
 	}
-	*found_position = (int)(idx - src->value);
+	*found_position = (size_t)(idx - src->value);
 	return 0;
 }
 
