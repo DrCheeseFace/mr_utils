@@ -1,5 +1,8 @@
+#include "../mrd_debug.h"
 #include "../mrs_strings.h"
 #include "../mrt_test.h"
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 int test_strstr(void)
@@ -456,6 +459,21 @@ int test_shrink_to_fit(void)
 	return failed;
 }
 
+int bruh(void)
+{
+	void *ptr = MRD_malloc(10, __FILE__, __LINE__);
+	MRD_free(ptr, __FILE__, __LINE__);
+
+	ptr = MRD_calloc(0, 10, __FILE__, __LINE__);
+
+	ptr = MRD_realloc(ptr, 11, __FILE__, __LINE__);
+
+	MRD_free(ptr, __FILE__, __LINE__);
+
+	// TODO
+	return 0;
+}
+
 int main(void)
 {
 	int err = 0;
@@ -469,5 +487,6 @@ int main(void)
 	err = err || test_strchr();
 	err = err || test_strndup();
 	err = err || test_shrink_to_fit();
+	err = err || bruh();
 	return err;
 }

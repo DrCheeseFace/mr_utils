@@ -22,14 +22,22 @@ TEST_TARGET = test.out
 
 TEST_SRC = *.c test/*.c
 
+DEBUG_ENABLED ?= 0
+
+ifeq ($(DEBUG_ENABLED), 1)
+    CFLAGS += -DDEBUG
+    CFLAGS_TEST += -DDEBUG
+    MESSAGE = "Building in Debug Mode"
+else
+    MESSAGE = "Building in Release Mode"
+endif
+
 .PHONY: all build run clean format format-check bear test check
 
-all: whodoyouthinkyouareiam
-
-whodoyouthinkyouareiam: test 
+all: test
 
 build:
-	$(CC) $(CFLAGS_TEST) -o $(TEST_TARGET) $(TEST_SRC)
+	echo $(MESSAGE) && $(CC) $(CFLAGS_TEST) -o $(TEST_TARGET) $(TEST_SRC)
 
 run:
 	./$(TEST_TARGET)
