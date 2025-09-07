@@ -4,11 +4,6 @@
 #include <stdbool.h>
 #include <sys/types.h>
 
-#define MRT_DEFAULT_COLOR_CODE "\x1b[0m"
-#define MRT_BLUE_COLOR_CODE "\x1b[34m"
-#define MRT_GREEN_COLOR_CODE "\x1b[32m"
-#define MRT_RED_COLOR_CODE "\x1b[31m"
-
 #define MRT_MAX_TEST_CASES_PER_CONTEXT 128
 #define MRT_MAX_CONTEXT_DESCRIPTION 128
 
@@ -36,14 +31,6 @@ struct MRT_Context {
 	struct MRT_Case cases[MRT_MAX_TEST_CASES_PER_CONTEXT];
 	int case_count;
 };
-
-typedef enum {
-	MRT_SEVERITY_DEFAULT,
-	MRT_SEVERITY_INFO,
-	MRT_SEVERITY_OK,
-	MRT_SEVERITY_ERROR,
-	MRT_SEVERITY_COUNT
-} MRT_Severity;
 
 bool MRT_assert_eq(void *expected, void *actual, size_t size_of);
 
