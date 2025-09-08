@@ -1,6 +1,6 @@
 #include "mrd_debug.h"
 #include "mrl_logger.h"
-#include "mrs_misc.h"
+#include "mrm_misc.h"
 #include "mrs_strings.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -62,24 +62,17 @@ void *MRD_malloc(size_t size, const char *file, int line)
 	sprintf(text, "%s:%d ", file, line);
 	MRL_log(text, MRL_SEVERITY_OK);
 
-	unsigned char *ptr = malloc(size);
+	void *ptr = malloc(size);
 	if (ptr != NULL) {
-		size_t cafe_babe_byte_idx = 0;
-		for (size_t i = 0; i < size; i++) {
-			ptr[i] = CAFE_BABE_BYTES[cafe_babe_byte_idx];
-			cafe_babe_byte_idx++;
-			if (cafe_babe_byte_idx == CAFE_BABE_BYTE_COUNT) {
-				cafe_babe_byte_idx = 0;
-			}
-		}
-
+		MRM_set_cafebabe_bytes(ptr, size);
 		allocations[allocations_count] =
 			(struct Allocation){ .ptr = ptr,
 					     .size = size,
 					     .id = current_allocation_id,
 					     .freed = false,
 					     .reallocated = false,
-					     .reallocated_to_id = CAFE_BABE };
+					     .reallocated_to_id =
+						     MRM_CAFE_BABE };
 
 		allocations_count++;
 		current_allocation_id++;
@@ -126,7 +119,8 @@ void *MRD_calloc(size_t nmemb, size_t size, const char *file, int line)
 					     .id = current_allocation_id,
 					     .freed = false,
 					     .reallocated = false,
-					     .reallocated_to_id = CAFE_BABE };
+					     .reallocated_to_id =
+						     MRM_CAFE_BABE };
 
 		allocations_count++;
 		current_allocation_id++;
@@ -148,7 +142,7 @@ void *MRD_calloc(size_t nmemb, size_t size, const char *file, int line)
 
 void *MRD_realloc(void *ptr, size_t size, const char *file, int line)
 {
-	size_t src_allocation_idx = CAFE_BABE;
+	size_t src_allocation_idx = MRM_CAFE_BABE;
 	for (size_t i = 0; i < allocations_count; i++) {
 		if (ptr == allocations[i].ptr) {
 			src_allocation_idx = i;
@@ -176,6 +170,7 @@ void *MRD_realloc(void *ptr, size_t size, const char *file, int line)
 
 	void *realloc_ptr = realloc(ptr, size);
 	if (realloc_ptr != NULL) {
+		MRM_set_cafebabe_bytes(realloc_ptr, size);
 		allocations[src_allocation_idx].freed = true;
 		allocations[src_allocation_idx].reallocated = true;
 		allocations[src_allocation_idx].reallocated_to_id =
@@ -187,7 +182,8 @@ void *MRD_realloc(void *ptr, size_t size, const char *file, int line)
 					     .id = current_allocation_id,
 					     .freed = false,
 					     .reallocated = false,
-					     .reallocated_to_id = CAFE_BABE };
+					     .reallocated_to_id =
+						     MRM_CAFE_BABE };
 
 		allocations_count++;
 		current_allocation_id++;
