@@ -62,8 +62,17 @@ void *MRD_malloc(size_t size, const char *file, int line)
 	sprintf(text, "%s:%d ", file, line);
 	MRL_log(text, MRL_SEVERITY_OK);
 
-	void *ptr = malloc(size);
+	unsigned char *ptr = malloc(size);
 	if (ptr != NULL) {
+		size_t cafe_babe_byte_idx = 0;
+		for (size_t i = 0; i < size; i++) {
+			ptr[i] = CAFE_BABE_BYTES[cafe_babe_byte_idx];
+			cafe_babe_byte_idx++;
+			if (cafe_babe_byte_idx == CAFE_BABE_BYTE_COUNT) {
+				cafe_babe_byte_idx = 0;
+			}
+		}
+
 		allocations[allocations_count] =
 			(struct Allocation){ .ptr = ptr,
 					     .size = size,
