@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#define MAX_ACTIVE_ALLOCATIONS 4096
+#define MAX_ACTIVE_ALLOCATIONS 1024
 #define MAX_SNIPPET_LEN 128
 
 struct Allocation {

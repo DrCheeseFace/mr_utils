@@ -464,9 +464,10 @@ int bruh(void)
 	void *ptr = MRD_malloc(10, __FILE__, __LINE__);
 	MRD_free(ptr, __FILE__, __LINE__);
 
-	ptr = MRD_calloc(0, 10, __FILE__, __LINE__);
+	ptr = MRD_malloc(10, __FILE__, __LINE__);
+	MRD_free(ptr, __FILE__, __LINE__);
 
-	ptr = MRD_realloc(ptr, 11, __FILE__, __LINE__);
+	ptr = MRD_calloc(0, 10, __FILE__, __LINE__);
 
 	MRD_free(ptr, __FILE__, __LINE__);
 

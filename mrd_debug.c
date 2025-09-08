@@ -14,7 +14,6 @@
 global_variable int current_allocation_id = 0;
 
 global_variable struct Allocation active_allocations[MAX_ACTIVE_ALLOCATIONS];
-global_variable size_t active_allocations_length = 0;
 
 // returns 1 if true
 int MRD_can_free_allocation(struct Allocation allocation)
@@ -30,15 +29,20 @@ int MRD_can_free_allocation(struct Allocation allocation)
 	return 0;
 }
 
-// searches for the first empty slot
+// populates first available slot
 void MRD_add_allocation_to_active_allocations(struct Allocation new_allocation)
 {
 	for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {
 		if (MRD_can_free_allocation(active_allocations[i])) {
 			active_allocations[i] = new_allocation;
+			current_allocation_id++;
 			return;
 		}
 	}
+	char err[64];
+	sprintf(err, "MAX_ACTIVE_ALLOCATIONS reached (%d)",
+		MAX_ACTIVE_ALLOCATIONS);
+	MRL_logln(err, MRL_SEVERITY_ERROR);
 }
 
 void MRD_get_code_snippet(const char *file_name, int line, MRS_String *dest)
@@ -102,8 +106,6 @@ void *MRD_malloc(size_t size, const char *file, int line)
 					     .active = true,
 					     .reallocated_to = NULL });
 
-		active_allocations_length++;
-		current_allocation_id++;
 	} else {
 		MRL_log("FAILED TO ALLOCATE ", MRL_SEVERITY_ERROR);
 	}
@@ -146,15 +148,13 @@ void *MRD_calloc(size_t nmemb, size_t size, const char *file, int line)
 
 	void *ptr = calloc(nmemb, size);
 	if (ptr != NULL) {
-		active_allocations[active_allocations_length] =
+		MRD_add_allocation_to_active_allocations(
 			(struct Allocation){ .ptr = ptr,
 					     .size = size,
 					     .id = current_allocation_id,
 					     .active = true,
-					     .reallocated_to = NULL };
+					     .reallocated_to = NULL });
 
-		active_allocations_length++;
-		current_allocation_id++;
 	} else {
 		MRL_log("FAILED TO ALLOCATE ", MRL_SEVERITY_ERROR);
 	}
@@ -179,7 +179,7 @@ void *MRD_calloc(size_t nmemb, size_t size, const char *file, int line)
 void *MRD_realloc(void *ptr, size_t size, const char *file, int line)
 {
 	struct Allocation *src_allocation = NULL;
-	for (size_t i = 0; i < active_allocations_length; i++) {
+	for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {
 		if (ptr == active_allocations[i].ptr) {
 			src_allocation = &active_allocations[i];
 			break;
@@ -210,15 +210,13 @@ void *MRD_realloc(void *ptr, size_t size, const char *file, int line)
 		src_allocation->active = false;
 		src_allocation->reallocated_to = src_allocation;
 
-		active_allocations[active_allocations_length] =
+		MRD_add_allocation_to_active_allocations(
 			(struct Allocation){ .ptr = realloc_ptr,
 					     .size = size,
 					     .id = current_allocation_id,
 					     .active = true,
-					     .reallocated_to = NULL };
+					     .reallocated_to = NULL });
 
-		active_allocations_length++;
-		current_allocation_id++;
 	} else {
 		MRL_log("FAILED TO REALLOCATE ", MRL_SEVERITY_ERROR);
 	}
@@ -242,20 +240,20 @@ void *MRD_realloc(void *ptr, size_t size, const char *file, int line)
 
 void MRD_free(void *ptr, const char *file, int line)
 {
-	struct Allocation allocation;
-	for (size_t i = 0; i < active_allocations_length; i++) {
+	struct Allocation *allocation = NULL;
+	for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {
 		if (ptr == active_allocations[i].ptr) {
-			allocation = active_allocations[i];
+			allocation = &active_allocations[i];
 			break;
 		}
 	}
 
 	char text[MAX_SNIPPET_LEN];
 
-	sprintf(text, "allocation (%d) of ", allocation.id);
+	sprintf(text, "allocation (%d) of ", allocation->id);
 	MRL_log(text, MRL_SEVERITY_DEFAULT);
 
-	sprintf(text, "%lu ", allocation.size);
+	sprintf(text, "%lu ", allocation->size);
 	MRL_log(text, MRL_SEVERITY_OK);
 
 	MRL_log("bytes ", MRL_SEVERITY_DEFAULT);
@@ -279,7 +277,7 @@ void MRD_free(void *ptr, const char *file, int line)
 	MRL_log(text, MRL_SEVERITY_DEFAULT);
 
 	free(code_snippet.value);
-	allocation.active = false;
+	allocation->active = false;
 
 	MRL_log("\n\n", MRL_SEVERITY_DEFAULT);
 
