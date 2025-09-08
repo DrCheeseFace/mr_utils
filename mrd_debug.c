@@ -70,7 +70,7 @@ void *MRD_malloc(size_t size, const char *file, int line)
 					     .id = current_allocation_id,
 					     .freed = false,
 					     .reallocated = false,
-					     .reallocated_to_id = 69420 };
+					     .reallocated_to_id = CAFE_BABE };
 
 		allocations_count++;
 		current_allocation_id++;
@@ -117,7 +117,7 @@ void *MRD_calloc(size_t nmemb, size_t size, const char *file, int line)
 					     .id = current_allocation_id,
 					     .freed = false,
 					     .reallocated = false,
-					     .reallocated_to_id = 69420 };
+					     .reallocated_to_id = CAFE_BABE };
 
 		allocations_count++;
 		current_allocation_id++;
@@ -139,7 +139,7 @@ void *MRD_calloc(size_t nmemb, size_t size, const char *file, int line)
 
 void *MRD_realloc(void *ptr, size_t size, const char *file, int line)
 {
-	size_t src_allocation_idx = 420;
+	size_t src_allocation_idx = CAFE_BABE;
 	for (size_t i = 0; i < allocations_count; i++) {
 		if (ptr == allocations[i].ptr) {
 			src_allocation_idx = i;
@@ -178,7 +178,7 @@ void *MRD_realloc(void *ptr, size_t size, const char *file, int line)
 					     .id = current_allocation_id,
 					     .freed = false,
 					     .reallocated = false,
-					     .reallocated_to_id = 69420 };
+					     .reallocated_to_id = CAFE_BABE };
 
 		allocations_count++;
 		current_allocation_id++;
