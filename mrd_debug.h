@@ -4,15 +4,14 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#define MAX_ALLOCATIONS 4096
-#define MAX_SNIPPET_LEN 64
+#define MAX_ACTIVE_ALLOCATIONS 4096
+#define MAX_SNIPPET_LEN 128
 
 struct Allocation {
 	void *ptr;
-	bool freed;
-	bool reallocated;
+	bool active;
 	int id;
-	int reallocated_to_id;
+	struct Allocation *reallocated_to;
 	size_t size;
 };
 

@@ -13,15 +13,44 @@
 
 global_variable int current_allocation_id = 0;
 
-global_variable struct Allocation allocations[MAX_ALLOCATIONS];
-global_variable size_t allocations_count = 0;
+global_variable struct Allocation active_allocations[MAX_ACTIVE_ALLOCATIONS];
+global_variable size_t active_allocations_length = 0;
 
-void MRS_get_code_snippet(const char *file_name, int line, MRS_String *dest)
+// returns 1 if true
+int MRD_can_free_allocation(struct Allocation allocation)
+{
+	if (!allocation.active) {
+		if (allocation.reallocated_to == NULL) {
+			return 1;
+		}
+		if (!allocation.reallocated_to->active) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+// searches for the first empty slot
+void MRD_add_allocation_to_active_allocations(struct Allocation new_allocation)
+{
+	for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {
+		if (MRD_can_free_allocation(active_allocations[i])) {
+			active_allocations[i] = new_allocation;
+			return;
+		}
+	}
+}
+
+void MRD_get_code_snippet(const char *file_name, int line, MRS_String *dest)
 {
 	FILE *file = fopen(file_name, "r");
 
+	// cant call MRS_init due to it calling malloc
 	MRS_String read_buffer;
-	MRS_init(MAX_SNIPPET_LEN, "", 0, &read_buffer);
+	read_buffer.value = malloc(sizeof(char) * (MAX_SNIPPET_LEN + 1));
+	read_buffer.value[MAX_SNIPPET_LEN] = '\0';
+	read_buffer.capacity = MAX_SNIPPET_LEN;
+	read_buffer.len = 0;
 
 	int current_line = 1;
 	while (fgets(read_buffer.value, read_buffer.capacity, file)) {
@@ -37,7 +66,8 @@ void MRS_get_code_snippet(const char *file_name, int line, MRS_String *dest)
 	}
 	fclose(file);
 
-	MRS_remove_whitespace(&read_buffer);
+	MRS_filter(&read_buffer, '\n');
+	MRS_filter(&read_buffer, '\t');
 
 	MRS_setstrn(dest, read_buffer.value, read_buffer.len, read_buffer.len);
 	free(read_buffer.value);
@@ -47,7 +77,7 @@ void MRS_get_code_snippet(const char *file_name, int line, MRS_String *dest)
 void *MRD_malloc(size_t size, const char *file, int line)
 {
 	char text[MAX_SNIPPET_LEN];
-	sprintf(text, "%d => ", current_allocation_id);
+	sprintf(text, "allocation (%d) of ", current_allocation_id);
 	MRL_log(text, MRL_SEVERITY_DEFAULT);
 
 	sprintf(text, "%lu ", size);
@@ -64,25 +94,28 @@ void *MRD_malloc(size_t size, const char *file, int line)
 
 	void *ptr = malloc(size);
 	if (ptr != NULL) {
-		MRM_set_cafebabe_bytes(ptr, size);
-		allocations[allocations_count] =
+		memset(ptr, MRM_CAFE_BABE, size);
+		MRD_add_allocation_to_active_allocations(
 			(struct Allocation){ .ptr = ptr,
 					     .size = size,
 					     .id = current_allocation_id,
-					     .freed = false,
-					     .reallocated = false,
-					     .reallocated_to_id =
-						     MRM_CAFE_BABE };
+					     .active = true,
+					     .reallocated_to = NULL });
 
-		allocations_count++;
+		active_allocations_length++;
 		current_allocation_id++;
 	} else {
 		MRL_log("FAILED TO ALLOCATE ", MRL_SEVERITY_ERROR);
 	}
 
+	// cant call MRS_init due to it calling malloc
 	MRS_String code_snippet;
-	MRS_init(MAX_SNIPPET_LEN, "", 0, &code_snippet);
-	MRS_get_code_snippet(file, line, &code_snippet);
+	code_snippet.value = malloc(sizeof(char) * (MAX_SNIPPET_LEN + 1));
+	code_snippet.value[MAX_SNIPPET_LEN] = '\0';
+	code_snippet.capacity = MAX_SNIPPET_LEN;
+	code_snippet.len = 0;
+
+	MRD_get_code_snippet(file, line, &code_snippet);
 	sprintf(text, "%s", code_snippet.value);
 	MRL_log(text, MRL_SEVERITY_DEFAULT);
 	free(code_snippet.value);
@@ -96,7 +129,7 @@ void *MRD_calloc(size_t nmemb, size_t size, const char *file, int line)
 {
 	char text[MAX_SNIPPET_LEN];
 
-	sprintf(text, "%d => ", current_allocation_id);
+	sprintf(text, "allocation (%d) of ", current_allocation_id);
 	MRL_log(text, MRL_SEVERITY_DEFAULT);
 
 	sprintf(text, "%lu ", size);
@@ -113,24 +146,27 @@ void *MRD_calloc(size_t nmemb, size_t size, const char *file, int line)
 
 	void *ptr = calloc(nmemb, size);
 	if (ptr != NULL) {
-		allocations[allocations_count] =
+		active_allocations[active_allocations_length] =
 			(struct Allocation){ .ptr = ptr,
 					     .size = size,
 					     .id = current_allocation_id,
-					     .freed = false,
-					     .reallocated = false,
-					     .reallocated_to_id =
-						     MRM_CAFE_BABE };
+					     .active = true,
+					     .reallocated_to = NULL };
 
-		allocations_count++;
+		active_allocations_length++;
 		current_allocation_id++;
 	} else {
 		MRL_log("FAILED TO ALLOCATE ", MRL_SEVERITY_ERROR);
 	}
 
+	// cant call MRS_init due to it calling malloc
 	MRS_String code_snippet;
-	MRS_init(MAX_SNIPPET_LEN, "", 0, &code_snippet);
-	MRS_get_code_snippet(file, line, &code_snippet);
+	code_snippet.value = malloc(sizeof(char) * (MAX_SNIPPET_LEN + 1));
+	code_snippet.value[MAX_SNIPPET_LEN] = '\0';
+	code_snippet.capacity = MAX_SNIPPET_LEN;
+	code_snippet.len = 0;
+
+	MRD_get_code_snippet(file, line, &code_snippet);
 	sprintf(text, "%s", code_snippet.value);
 	MRL_log(text, MRL_SEVERITY_DEFAULT);
 	free(code_snippet.value);
@@ -142,21 +178,21 @@ void *MRD_calloc(size_t nmemb, size_t size, const char *file, int line)
 
 void *MRD_realloc(void *ptr, size_t size, const char *file, int line)
 {
-	size_t src_allocation_idx = MRM_CAFE_BABE;
-	for (size_t i = 0; i < allocations_count; i++) {
-		if (ptr == allocations[i].ptr) {
-			src_allocation_idx = i;
+	struct Allocation *src_allocation = NULL;
+	for (size_t i = 0; i < active_allocations_length; i++) {
+		if (ptr == active_allocations[i].ptr) {
+			src_allocation = &active_allocations[i];
 			break;
 		}
 	}
 
 	char text[MAX_SNIPPET_LEN];
 
-	sprintf(text, "%d>%d => ", allocations[src_allocation_idx].id,
+	sprintf(text, "allocation (%d>%d) of ", src_allocation->id,
 		current_allocation_id);
 	MRL_log(text, MRL_SEVERITY_DEFAULT);
 
-	sprintf(text, "%lu>%lu ", allocations[src_allocation_idx].size, size);
+	sprintf(text, "%lu>%lu ", src_allocation->size, size);
 	MRL_log(text, MRL_SEVERITY_OK);
 
 	MRL_log("bytes ", MRL_SEVERITY_DEFAULT);
@@ -170,30 +206,31 @@ void *MRD_realloc(void *ptr, size_t size, const char *file, int line)
 
 	void *realloc_ptr = realloc(ptr, size);
 	if (realloc_ptr != NULL) {
-		MRM_set_cafebabe_bytes(realloc_ptr, size);
-		allocations[src_allocation_idx].freed = true;
-		allocations[src_allocation_idx].reallocated = true;
-		allocations[src_allocation_idx].reallocated_to_id =
-			current_allocation_id;
+		memset(realloc_ptr, MRM_CAFE_BABE, size);
+		src_allocation->active = false;
+		src_allocation->reallocated_to = src_allocation;
 
-		allocations[allocations_count] =
+		active_allocations[active_allocations_length] =
 			(struct Allocation){ .ptr = realloc_ptr,
 					     .size = size,
 					     .id = current_allocation_id,
-					     .freed = false,
-					     .reallocated = false,
-					     .reallocated_to_id =
-						     MRM_CAFE_BABE };
+					     .active = true,
+					     .reallocated_to = NULL };
 
-		allocations_count++;
+		active_allocations_length++;
 		current_allocation_id++;
 	} else {
 		MRL_log("FAILED TO REALLOCATE ", MRL_SEVERITY_ERROR);
 	}
 
+	// cant call MRS_init due to it calling malloc
 	MRS_String code_snippet;
-	MRS_init(MAX_SNIPPET_LEN, "", 0, &code_snippet);
-	MRS_get_code_snippet(file, line, &code_snippet);
+	code_snippet.value = malloc(sizeof(char) * (MAX_SNIPPET_LEN + 1));
+	code_snippet.value[MAX_SNIPPET_LEN] = '\0';
+	code_snippet.capacity = MAX_SNIPPET_LEN;
+	code_snippet.len = 0;
+
+	MRD_get_code_snippet(file, line, &code_snippet);
 	sprintf(text, "%s", code_snippet.value);
 	MRL_log(text, MRL_SEVERITY_DEFAULT);
 	free(code_snippet.value);
@@ -206,16 +243,16 @@ void *MRD_realloc(void *ptr, size_t size, const char *file, int line)
 void MRD_free(void *ptr, const char *file, int line)
 {
 	struct Allocation allocation;
-	for (size_t i = 0; i < allocations_count; i++) {
-		if (ptr == allocations[i].ptr) {
-			allocation = allocations[i];
+	for (size_t i = 0; i < active_allocations_length; i++) {
+		if (ptr == active_allocations[i].ptr) {
+			allocation = active_allocations[i];
 			break;
 		}
 	}
 
 	char text[MAX_SNIPPET_LEN];
 
-	sprintf(text, "%d => ", allocation.id);
+	sprintf(text, "allocation (%d) of ", allocation.id);
 	MRL_log(text, MRL_SEVERITY_DEFAULT);
 
 	sprintf(text, "%lu ", allocation.size);
@@ -230,14 +267,19 @@ void MRD_free(void *ptr, const char *file, int line)
 	sprintf(text, "%s:%d ", file, line);
 	MRL_log(text, MRL_SEVERITY_OK);
 
+	// cant call MRS_init due to it calling malloc
 	MRS_String code_snippet;
-	MRS_init(MAX_SNIPPET_LEN, "", 0, &code_snippet);
-	MRS_get_code_snippet(file, line, &code_snippet);
+	code_snippet.value = malloc(sizeof(char) * (MAX_SNIPPET_LEN + 1));
+	code_snippet.value[MAX_SNIPPET_LEN] = '\0';
+	code_snippet.capacity = MAX_SNIPPET_LEN;
+	code_snippet.len = 0;
+
+	MRD_get_code_snippet(file, line, &code_snippet);
 	sprintf(text, "%s", code_snippet.value);
 	MRL_log(text, MRL_SEVERITY_DEFAULT);
 
 	free(code_snippet.value);
-	allocation.freed = true;
+	allocation.active = false;
 
 	MRL_log("\n\n", MRL_SEVERITY_DEFAULT);
 

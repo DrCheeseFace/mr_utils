@@ -12,6 +12,7 @@ eg: this PTR (id) with this DATA that was allocated HERE, was not freed
 ### TODO
 - [ ] add left rigth comparison for failed tests 
 - [ ] malloc calloc realloc free wrappers for debugging memory leaks
+- [x] debug maintain only active allocations. eg: freed and not realloced to something not freed
 
 i hope you like UB!
 

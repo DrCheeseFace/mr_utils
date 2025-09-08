@@ -22,7 +22,7 @@ TEST_TARGET = test.out
 
 TEST_SRC = *.c test/*.c
 
-DEBUG_ENABLED ?= 0
+DEBUG_ENABLED ?= 1
 
 ifeq ($(DEBUG_ENABLED), 1)
     CFLAGS += -DDEBUG
