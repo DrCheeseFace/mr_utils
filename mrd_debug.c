@@ -44,7 +44,7 @@ void MRS_get_code_snippet(const char *file_name, int line, MRS_String *dest)
 
 void *MRD_malloc(size_t size, const char *file, int line)
 {
-	char text[64];
+	char text[256];
 	sprintf(text, "%d => ", current_allocation_id);
 	MRL_log(text, MRL_SEVERITY_DEFAULT);
 
@@ -88,7 +88,7 @@ void *MRD_malloc(size_t size, const char *file, int line)
 
 void *MRD_calloc(size_t nmemb, size_t size, const char *file, int line)
 {
-	char text[64];
+	char text[256];
 
 	sprintf(text, "%d => ", current_allocation_id);
 	MRL_log(text, MRL_SEVERITY_DEFAULT);
@@ -142,7 +142,7 @@ void *MRD_realloc(void *ptr, size_t size, const char *file, int line)
 		}
 	}
 
-	char text[64];
+	char text[256];
 
 	sprintf(text, "%d>%d => ", allocations[allocation_idx].id,
 		current_allocation_id);
@@ -196,7 +196,7 @@ void MRD_free(void *ptr, const char *file, int line)
 		}
 	}
 
-	char text[64];
+	char text[256];
 
 	sprintf(text, "%d => ", allocation.id);
 	MRL_log(text, MRL_SEVERITY_DEFAULT);
