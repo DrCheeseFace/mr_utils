@@ -53,8 +53,7 @@ void *MRD_malloc(size_t size, const char *file, int line)
 
 	MRL_log("bytes ", MRL_SEVERITY_DEFAULT);
 
-	MRL_log("malloc ", MRL_SEVERITY_ALT_INFO);
-	MRL_log("allocated ", MRL_SEVERITY_DEFAULT);
+	MRL_log("malloc allocated ", MRL_SEVERITY_ALT_INFO);
 
 	MRL_log("in ", MRL_SEVERITY_DEFAULT);
 
@@ -99,8 +98,7 @@ void *MRD_calloc(size_t nmemb, size_t size, const char *file, int line)
 
 	MRL_log("bytes ", MRL_SEVERITY_DEFAULT);
 
-	MRL_log("calloc ", MRL_SEVERITY_ALT_ALT_INFO);
-	MRL_log("allocated ", MRL_SEVERITY_DEFAULT);
+	MRL_log("calloc allocated ", MRL_SEVERITY_ALT_INFO);
 
 	MRL_log("in ", MRL_SEVERITY_DEFAULT);
 
@@ -155,8 +153,7 @@ void *MRD_realloc(void *ptr, size_t size, const char *file, int line)
 
 	MRL_log("bytes ", MRL_SEVERITY_DEFAULT);
 
-	MRL_log("realloc ", MRL_SEVERITY_INFO);
-	MRL_log("allocated ", MRL_SEVERITY_DEFAULT);
+	MRL_log("realloc allocated ", MRL_SEVERITY_ALT_ALT_INFO);
 
 	MRL_log("in ", MRL_SEVERITY_DEFAULT);
 
