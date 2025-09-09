@@ -2,7 +2,7 @@ CC = gcc
 
 CSTANDARD = c99
 
-CFLAGS_TEST = -Wpointer-arith -Wcast-align \
+CFLAGS_DEBUG = -Wpointer-arith -Wcast-align \
          -Wstrict-prototypes -Wwrite-strings -Waggregate-return \
          -Wswitch-default -Wswitch-enum -Wunreachable-code \
 	 -Wunused-parameter -Wuninitialized -Winit-self \
@@ -27,8 +27,8 @@ MEMORY_DEBUGGER_SRC = mrd_debug.c mrl_logger.c
 
 DEBUG_ENABLED ?= 1
 ifeq ($(DEBUG_ENABLED), 1)
-    LD_PRELOAD = LD_PRELOAD=./$(MEMORY_DEBUGGER_TARGET)
-    C_FLAGS += $(C_FLAGS_TEST)
+    DEBUG_LD_PRELOAD = LD_PRELOAD=./$(MEMORY_DEBUGGER_TARGET)
+    C_FLAGS += $(C_FLAGS_DEBUG)
 endif
 
 
@@ -40,7 +40,7 @@ build:
 	$(CC) $(CFLAGS) -o $(TEST_TARGET) $(TEST_SRC)
 
 run:
-	$(LD_PRELOAD) ./$(TEST_TARGET)
+	$(DEBUG_LD_PRELOAD) ./$(TEST_TARGET)
 
 clean:
 	-rm -f $(TEST_TARGET)
