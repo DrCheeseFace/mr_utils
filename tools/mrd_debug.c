@@ -1,6 +1,5 @@
 #include "mrd_debug.h"
-#include "../mrl_logger.h"
-#include "../mrm_misc.h"
+#include "../mru_utils.h" // IWYU pragma: keep
 #include <dlfcn.h>
 #include <stdio.h>
 #include <string.h>

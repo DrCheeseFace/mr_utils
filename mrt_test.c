@@ -1,5 +1,5 @@
-#include "mrt_test.h"
-#include "mrl_logger.h"
+#include "mru_utils.h" // IWYU pragma: keep
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
