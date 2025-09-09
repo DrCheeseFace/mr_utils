@@ -530,17 +530,17 @@ int bruh(void)
 int main(void)
 {
 	int err = 0;
-	// err = err || test_strstr();
-	// err = err || test_filter();
-	// err = err || test_strcat();
-	// err = err || test_pushstr();
-	// err = err || test_get_char();
-	// err = err || test_setstr();
-	// err = err || test_setstrn();
-	// err = err || test_get_idx();
-	// err = err || test_strchr();
-	// err = err || test_strndup();
-	// err = err || test_shrink_to_fit();
-	err = err || bruh();
+	err = err || test_strstr();
+	err = err || test_filter();
+	err = err || test_strcat();
+	err = err || test_pushstr();
+	err = err || test_get_char();
+	err = err || test_setstr();
+	err = err || test_setstrn();
+	err = err || test_get_idx();
+	err = err || test_strchr();
+	err = err || test_strndup();
+	err = err || test_shrink_to_fit();
+	// err = err || bruh();
 	return err;
 }
