@@ -44,6 +44,14 @@ int MRS_strcmp(MRS_String *a, MRS_String *b);
 int MRS_strcat(MRS_String *dest, MRS_String *src);
 
 /*
+ * pushes n characters of str to dest
+ * reallocs if capacity is exeeded
+ *
+ * `returns` 0 if successful
+ */
+int MRS_pushstr(MRS_String *dest, const char *str, size_t n);
+
+/*
  * `returns` NULL if not found
  */
 char *MRS_strstr(MRS_String *haystack, MRS_String *needle,

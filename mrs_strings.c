@@ -1,5 +1,4 @@
 #include "mrs_strings.h"
-#include "mrd_debug.h"
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
@@ -122,6 +121,33 @@ int MRS_strcat(MRS_String *dest, MRS_String *src)
 
 	memcpy(&dest->value[dest->len], src->value, src->len);
 	dest->len += src->len;
+	dest->value[dest->len] = '\0';
+
+	return 0;
+}
+
+int MRS_pushstr(MRS_String *dest, const char *append_me, size_t n)
+{
+	if (n + dest->len > dest->capacity) {
+		char *malloced = malloc(sizeof(char) * (dest->len + n + 1));
+		if (malloced == NULL) {
+			return 1;
+		}
+
+		memcpy(malloced, dest->value, dest->len);
+		memcpy(&malloced[dest->len], append_me, n);
+		free(dest->value);
+
+		dest->value = malloced;
+		dest->capacity = n + dest->len;
+		dest->len = n + dest->len;
+
+		dest->value[dest->len] = '\0';
+		return 0;
+	}
+
+	memcpy(&dest->value[dest->len], append_me, n);
+	dest->len += n;
 	dest->value[dest->len] = '\0';
 
 	return 0;

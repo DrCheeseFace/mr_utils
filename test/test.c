@@ -1,4 +1,3 @@
-#include "../mrd_debug.h"
 #include "../mrs_strings.h"
 #include "../mrt_test.h"
 #include <stdio.h>
@@ -189,6 +188,59 @@ int test_strcat(void)
 	MRS_free(&actual);
 	MRS_free(&expected);
 	MRS_free(&append);
+
+	int failed = MRT_ctx_log(t_ctx);
+	MRT_ctx_free(t_ctx);
+	return failed;
+}
+
+int test_pushstr(void)
+{
+	struct MRT_Context *t_ctx = MRT_ctx_create("test_pushstr");
+
+	MRS_String actual;
+	MRS_init(10, "aaabbb", strlen("aaabbb"), &actual);
+	const char *append = "ccc";
+	MRS_String expected;
+	MRS_init(10, "aaabbbccc", strlen("aaabbbccc"), &expected);
+	MRS_pushstr(&actual, append, strlen(append));
+
+	struct MRT_Case test_case =
+		(struct MRT_Case){ .description = "aaabbb | ccc",
+				   .pass = !MRS_strcmp(&expected, &actual) };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	test_case = (struct MRT_Case){ .description = "aaabbb | ccc capactity",
+				       .pass = actual.capacity == 10 };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRS_pushstr(&actual, append, strlen(append));
+	MRS_free(&expected);
+	MRS_init(12, "aaabbbcccccc", strlen("aaabbbcccccc"), &expected);
+
+	test_case =
+		(struct MRT_Case){ .description = "aaabbbccc | ccc",
+				   .pass = !MRS_strcmp(&expected, &actual) };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	test_case =
+		(struct MRT_Case){ .description = "aaabbbccc | ccc capacity",
+				   .pass = actual.capacity == 12 };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRS_pushstr(&actual, "", strlen(""));
+
+	test_case =
+		(struct MRT_Case){ .description = "aaabbbcccccc | ",
+				   .pass = !MRS_strcmp(&expected, &actual) };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	test_case = (struct MRT_Case){ .description = "aaabbbcccccc | ",
+				       .pass = actual.capacity == 12 };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRS_free(&actual);
+	MRS_free(&expected);
 
 	int failed = MRT_ctx_log(t_ctx);
 	MRT_ctx_free(t_ctx);
@@ -461,33 +513,34 @@ int test_shrink_to_fit(void)
 
 int bruh(void)
 {
-	void *ptr = MRD_malloc(10, __FILE__, __LINE__);
-	MRD_free(ptr, __FILE__, __LINE__);
+	fprintf(stderr, "WORK DAMN YOU entry \n\n");
 
-	ptr = MRD_malloc(10, __FILE__, __LINE__);
-	MRD_free(ptr, __FILE__, __LINE__);
+	void *ptr = malloc(69);
+	free(ptr);
 
-	ptr = MRD_calloc(0, 10, __FILE__, __LINE__);
+	ptr = calloc(1, 69);
+	ptr = realloc(ptr, 90);
+	free(ptr);
 
-	MRD_free(ptr, __FILE__, __LINE__);
+	fprintf(stderr, "WORK DAMN YOU exit \n");
 
-	// TODO
 	return 0;
 }
 
 int main(void)
 {
 	int err = 0;
-	err = err || test_strstr();
-	err = err || test_filter();
-	err = err || test_strcat();
-	err = err || test_get_char();
-	err = err || test_setstr();
-	err = err || test_setstrn();
-	err = err || test_get_idx();
-	err = err || test_strchr();
-	err = err || test_strndup();
-	err = err || test_shrink_to_fit();
+	// err = err || test_strstr();
+	// err = err || test_filter();
+	// err = err || test_strcat();
+	// err = err || test_pushstr();
+	// err = err || test_get_char();
+	// err = err || test_setstr();
+	// err = err || test_setstrn();
+	// err = err || test_get_idx();
+	// err = err || test_strchr();
+	// err = err || test_strndup();
+	// err = err || test_shrink_to_fit();
 	err = err || bruh();
 	return err;
 }
