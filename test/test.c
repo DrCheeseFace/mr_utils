@@ -1,4 +1,6 @@
-#include "../mru_utils.h" // IWYU pragma: keep
+#include "../mrs_strings.h"
+#include "../mrt_test.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

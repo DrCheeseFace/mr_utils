@@ -1,6 +1,5 @@
 # my C utils lib
 
-- `mru_utils.h`: umbrella import
 - `mrs_strings.h`: string manipulation library
 - `mrt_test.h`: mini test library 
 - `mrl_logger.h`: logging utilities 
@@ -40,6 +39,7 @@ note: `mrd_debug.h` should not be included in you main build silly
 - [ ] malloc calloc realloc free wrappers for debugging memory leaks eg: this PTR (id) with this DATA that was allocated HERE, was not freed
 - [ ] log to defined out 
 - [ ] dynamic array lib 
+- [ ] useful runtime error message. something with coredump file abort()
 - [x] debug maintain only active allocations. eg: freed and not realloced to something not freed
 
 
