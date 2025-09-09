@@ -1,7 +1,7 @@
 #ifndef MRT_TEST_H
 #define MRT_TEST_H
 
-#include <stdbool.h>
+#include "mrm_misc.h"
 #include <sys/types.h>
 
 #define MRT_MAX_TEST_CASES_PER_CONTEXT 128

@@ -1,8 +1,8 @@
 #ifndef MRD_DEBUG_H
 #define MRD_DEBUG_H
 
-#include <stdbool.h>
-#include <stdlib.h>
+#include "../mrm_misc.h"
+#include <stddef.h>
 
 #define MAX_ACTIVE_ALLOCATIONS 1024
 #define MAX_SNIPPET_LEN 128

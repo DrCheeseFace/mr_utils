@@ -4,6 +4,7 @@
 - `mrt_test.h`: mini test library 
 - `mrl_logger.h`: logging utilities 
 - `mrd_debug.h`: memory allocation debugging info. use LD_PRELOAD to enable logging eg:
+- `mrm_misc.h`: boolean implementation, cafebabe, defines for better `static` keyword
 
 
 #### mrd_debug example build

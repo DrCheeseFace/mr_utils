@@ -162,7 +162,7 @@ void *malloc(size_t size)
 			(struct Allocation){ .ptr = ptr,
 					     .size = size,
 					     .id = current_allocation_id,
-					     .active = true,
+					     .active = TRUE,
 					     .reallocated_to = NULL });
 
 	} else {
@@ -192,7 +192,7 @@ void *calloc(size_t nmemb, size_t size)
 			(struct Allocation){ .ptr = ptr,
 					     .size = size,
 					     .id = current_allocation_id,
-					     .active = true,
+					     .active = TRUE,
 					     .reallocated_to = NULL });
 
 	} else {
@@ -227,14 +227,14 @@ void *realloc(void *ptr, size_t size)
 	void *realloc_ptr = real_realloc(ptr, size);
 	if (realloc_ptr != NULL) {
 		memset(realloc_ptr, MRM_CAFE_BABE, size);
-		src_allocation->active = false;
+		src_allocation->active = FALSE;
 		src_allocation->reallocated_to = realloc_ptr;
 
 		MRD_add_allocation_to_active_allocations(
 			(struct Allocation){ .ptr = realloc_ptr,
 					     .size = size,
 					     .id = current_allocation_id,
-					     .active = true,
+					     .active = TRUE,
 					     .reallocated_to = NULL });
 
 	} else {
@@ -272,5 +272,5 @@ void free(void *ptr)
 #endif
 
 	real_free(ptr);
-	allocation->active = false;
+	allocation->active = FALSE;
 }
