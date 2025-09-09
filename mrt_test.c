@@ -1,5 +1,4 @@
 #include "mrt_test.h"
-#include "mrd_debug.h"
 #include "mrl_logger.h"
 #include <stdio.h>
 #include <stdlib.h>

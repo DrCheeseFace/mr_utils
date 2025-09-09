@@ -1,5 +1,6 @@
 #include "mrl_logger.h"
 #include <stdio.h>
+#include <unistd.h>
 
 const char *terminal_color_codes[MRL_SEVERITY_COUNT] = {
 	MRL_DEFAULT_COLOR_CODE,
@@ -17,24 +18,24 @@ const char *terminal_color_codes[MRL_SEVERITY_COUNT] = {
 
 void MRL_reset_severity(void)
 {
-	printf("%s", terminal_color_codes[MRL_SEVERITY_DEFAULT]);
+	fprintf(stderr, "%s", terminal_color_codes[MRL_SEVERITY_DEFAULT]);
 }
 
 void MRL_set_severity(MRL_Severity severity)
 {
-	printf("%s", terminal_color_codes[severity]);
+	fprintf(stderr, "%s", terminal_color_codes[severity]);
 }
 
 void MRL_logln(const char *message, MRL_Severity severity)
 {
 	MRL_set_severity(severity);
-	puts(message);
+	fprintf(stderr, "%s\n", message);
 	MRL_reset_severity();
 }
 
 void MRL_log(const char *message, MRL_Severity severity)
 {
 	MRL_set_severity(severity);
-	printf("%s", message);
+	fprintf(stderr, "%s", message);
 	MRL_reset_severity();
 }

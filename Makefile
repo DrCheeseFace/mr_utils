@@ -2,45 +2,45 @@ CC = gcc
 
 CSTANDARD = c99
 
-CFLAGS_TEST = -Wall -Wextra -Werror -Wpointer-arith -Wcast-align \
+CFLAGS_TEST = -Wpointer-arith -Wcast-align \
          -Wstrict-prototypes -Wwrite-strings -Waggregate-return \
          -Wswitch-default -Wswitch-enum -Wunreachable-code \
-	 -Wunused-parameter -Wuninitialized -Winit-self -Wpedantic \
-         -pedantic-errors -Wbad-function-cast -Wcast-align\
-	 -Wformat=2 -Wlogical-op   -Wmissing-include-dirs \
+	 -Wunused-parameter -Wuninitialized -Winit-self \
+ 	 -Wbad-function-cast -Wcast-align\
+	 -Wformat=2 -Wlogical-op -Wmissing-include-dirs \
          -Wredundant-decls -Wsequence-point -Wshadow \
 	 -Wswitch -Wundef -Wunused-but-set-parameter \
 	 -Wcast-qual  -Wfloat-equal -Wnested-externs \
-	 -O0 -std=$(CSTANDARD) -g \
+	 -g \
 	 -fsanitize=address \
-	 
+	 -Wpedantic  -pedantic-errors \
 	 
 CFLAGS = -Wall -Wextra -Werror \
-	 -O2 -std=$(CSTANDARD)\
+	 -std=$(CSTANDARD) \
+	 -O2
 
 TEST_TARGET = test.out
+TEST_SRC =  test/*.c mrl_logger.c mrs_strings.c mrt_test.c
 
-TEST_SRC = *.c test/*.c
+MEMORY_DEBUGGER_TARGET = mrd_debug.so
+MEMORY_DEBUGGER_SRC = mrd_debug.c mrl_logger.c
 
 DEBUG_ENABLED ?= 1
-
 ifeq ($(DEBUG_ENABLED), 1)
-    CFLAGS += -DDEBUG
-    CFLAGS_TEST += -DDEBUG
-    MESSAGE = "Building in Debug Mode"
-else
-    MESSAGE = "Building in Release Mode"
+    LD_PRELOAD = LD_PRELOAD=./$(MEMORY_DEBUGGER_TARGET)
+    C_FLAGS += $(C_FLAGS_TEST)
 endif
 
-.PHONY: all build run clean format format-check bear test check
+
+.PHONY: all build run clean format format-check bear test check build-debugger-preload
 
 all: test
 
 build:
-	echo $(MESSAGE) && $(CC) $(CFLAGS_TEST) -o $(TEST_TARGET) $(TEST_SRC)
+	$(CC) $(CFLAGS) -o $(TEST_TARGET) $(TEST_SRC)
 
 run:
-	./$(TEST_TARGET)
+	$(LD_PRELOAD) ./$(TEST_TARGET)
 
 clean:
 	-rm -f $(TEST_TARGET)
@@ -56,6 +56,7 @@ bear: # this is for creating the compile_commands.json file
 
 check: format-check test
 
-test: build run
+test: build-debugger-preload build run
 
-
+build-debugger-preload:
+	$(CC) -shared -fPIC -o $(MEMORY_DEBUGGER_TARGET) $(MEMORY_DEBUGGER_SRC)
