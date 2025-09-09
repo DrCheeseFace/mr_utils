@@ -513,8 +513,6 @@ int test_shrink_to_fit(void)
 
 int bruh(void)
 {
-	fprintf(stderr, "WORK DAMN YOU entry \n\n");
-
 	void *ptr = malloc(69);
 	free(ptr);
 
@@ -522,14 +520,13 @@ int bruh(void)
 	ptr = realloc(ptr, 90);
 	free(ptr);
 
-	fprintf(stderr, "WORK DAMN YOU exit \n");
-
 	return 0;
 }
 
 int main(void)
 {
 	int err = 0;
+
 	err = err || test_strstr();
 	err = err || test_filter();
 	err = err || test_strcat();
@@ -541,6 +538,7 @@ int main(void)
 	err = err || test_strchr();
 	err = err || test_strndup();
 	err = err || test_shrink_to_fit();
+
 	// err = err || bruh();
 	return err;
 }

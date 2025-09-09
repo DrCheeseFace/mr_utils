@@ -38,6 +38,7 @@ note: `mrd_debug.h` should not be included in you main build silly
 - [ ] add left rigth comparison for failed tests 
 - [ ] malloc calloc realloc free wrappers for debugging memory leaks 
 - [ ] log to defined out 
+- [ ] dynamic array lib 
 TODODOODODO keep track of total alloced regions. if some not free, have some debug output.
 eg: this PTR (id) with this DATA that was allocated HERE, was not freed
 - [x] debug maintain only active allocations. eg: freed and not realloced to something not freed
