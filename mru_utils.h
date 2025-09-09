@@ -1,3 +1,7 @@
+/*
+ * this file is an umbrella import for all the utilities
+ */
+
 #ifndef MRU_UTILS_H
 #define MRU_UTILS_H
 
@@ -8,6 +12,7 @@
  * you should only include me (the one above all)
  *
  * contents
+ *  - mru_utils.h => umbrella import
  *  - mrl_logger.h => logging util
  *  - mrm_misc.h => useful defines and cafebabe!
  *  - mrs_strings.h => string manipulation lib

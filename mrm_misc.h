@@ -1,3 +1,7 @@
+/*
+ * this file has useful defines and cafebabe!
+ */
+
 #ifndef MRM_MISC_H
 #define MRM_MISC_H
 

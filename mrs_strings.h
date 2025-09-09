@@ -1,3 +1,7 @@
+/*
+ * this file is a string manipulation library
+ */
+
 #ifndef MRS_STRINGS_H
 #define MRS_STRINGS_H
 #include <stddef.h>

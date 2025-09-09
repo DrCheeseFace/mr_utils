@@ -1,3 +1,7 @@
+/*
+ * this file has logging utilities
+ */
+
 #ifndef MRL_LOGGER_H
 #define MRL_LOGGER_H
 

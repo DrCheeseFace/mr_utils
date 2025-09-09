@@ -1,3 +1,7 @@
+/*
+ * this file is a mini testing lib
+ */
+
 #ifndef MRT_TEST_H
 #define MRT_TEST_H
 

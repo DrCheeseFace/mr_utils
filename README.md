@@ -5,8 +5,7 @@
 - `mrt_test.h`: mini test library 
 - `mrl_logger.h`: logging utilities 
 - `mrd_debug.h`: memory allocation debugging info. use LD_PRELOAD to enable logging eg:
-- `mrm_misc.h`: boolean implementation, cafebabe, defines for better `static` keyword
-
+- `mrm_misc.h`: useful defines and cafebabe!
 
 #### mrd_debug example build
 ```Makefile
@@ -38,12 +37,11 @@ note: `mrd_debug.h` should not be included in you main build silly
 
 ### TODO
 - [ ] add left rigth comparison for failed tests 
-- [ ] malloc calloc realloc free wrappers for debugging memory leaks 
+- [ ] malloc calloc realloc free wrappers for debugging memory leaks eg: this PTR (id) with this DATA that was allocated HERE, was not freed
 - [ ] log to defined out 
 - [ ] dynamic array lib 
-TODODOODODO keep track of total alloced regions. if some not free, have some debug output.
-eg: this PTR (id) with this DATA that was allocated HERE, was not freed
 - [x] debug maintain only active allocations. eg: freed and not realloced to something not freed
+
 
 i hope you like UB!
 

@@ -12,13 +12,6 @@ global_variable void *(*real_calloc)(size_t, size_t) = NULL;
 global_variable void *(*real_realloc)(void *, size_t) = NULL;
 global_variable void (*real_free)(void *) = NULL;
 
-typedef enum MRD_Command {
-	MRD_COMMAND_MALLOC,
-	MRD_COMMAND_CALLOC,
-	MRD_COMMAND_REALLOC,
-	MRD_COMMAND_FREE,
-} MRD_command;
-
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"
 

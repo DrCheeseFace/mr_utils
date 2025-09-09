@@ -1,3 +1,7 @@
+/*
+ * this is a tool used for memory debugging
+ */
+
 #ifndef MRD_DEBUG_H
 #define MRD_DEBUG_H
 
@@ -24,5 +28,12 @@ struct Allocation {
 	struct Allocation *reallocated_to;
 	size_t size;
 };
+
+typedef enum MRD_Command {
+	MRD_COMMAND_MALLOC,
+	MRD_COMMAND_CALLOC,
+	MRD_COMMAND_REALLOC,
+	MRD_COMMAND_FREE,
+} MRD_command;
 
 #endif // !MRD_DEBUG_H
