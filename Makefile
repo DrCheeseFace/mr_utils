@@ -52,7 +52,7 @@ format-check:
 	find *.c *.h test/* tools/* | xargs clang-format --dry-run --Werror --verbose
 
 bear: # this is for creating the compile_commands.json file
-	rm -f compile_commands.json && bear -- make build
+	rm -f compile_commands.json && bear -- make build-debug
 
 check: format-check build-debug run
 

@@ -20,6 +20,9 @@ typedef enum MRD_Command {
 	MRD_COMMAND_FREE,
 } MRD_command;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+
 internal void MRD_init_real_malloc(void)
 {
 #ifdef MRD_LOG_LEVEL_ALL
@@ -64,6 +67,8 @@ internal void MRD_init_real_free(void)
 		MRL_logln("FAILED TO FIND free", MRL_SEVERITY_ERROR);
 	}
 }
+
+#pragma GCC diagnostic pop
 
 // returns 1 if true
 internal int MRD_can_free_allocation(struct Allocation allocation)
