@@ -39,6 +39,7 @@ internal void MRD_init_real_calloc(void)
 #ifdef MRD_LOG_LEVEL_ALL
 	MRL_logln("Initializing mrd_debug calloc", MRL_SEVERITY_INFO);
 #endif
+
 	real_calloc = dlsym(RTLD_NEXT, "calloc");
 	if (real_calloc == NULL) {
 		MRL_logln("FAILED TO FIND calloc", MRL_SEVERITY_ERROR);
@@ -50,6 +51,7 @@ internal void MRD_init_real_realloc(void)
 #ifdef MRD_LOG_LEVEL_ALL
 	MRL_logln("Initializing mrd_debug realloc", MRL_SEVERITY_INFO);
 #endif
+
 	real_realloc = dlsym(RTLD_NEXT, "realloc");
 	if (real_realloc == NULL) {
 		MRL_logln("FAILED TO FIND realloc", MRL_SEVERITY_ERROR);
@@ -61,6 +63,7 @@ internal void MRD_init_real_free(void)
 #ifdef MRD_LOG_LEVEL_ALL
 	MRL_logln("Initializing mrd_debug free", MRL_SEVERITY_INFO);
 #endif
+
 	real_free = dlsym(RTLD_NEXT, "free");
 	if (real_free == NULL) {
 		MRL_logln("FAILED TO FIND free", MRL_SEVERITY_ERROR);
@@ -166,6 +169,7 @@ void *malloc(size_t size)
 #ifdef MRD_LOG_LEVEL_ERR_ONLY
 		MRD_log_command(MRD_COMMAND_MALLOC, size, NULL);
 #endif
+
 		MRL_logln("FAILED TO MALLOC ALLOCATE ", MRL_SEVERITY_ERROR);
 	}
 
@@ -195,6 +199,7 @@ void *calloc(size_t nmemb, size_t size)
 #ifdef MRD_LOG_LEVEL_ERR_ONLY
 		MRD_log_command(MRD_COMMAND_CALLOC, size, NULL);
 #endif
+
 		MRL_logln("FAILED TO CALLOC ALLOCATE ", MRL_SEVERITY_ERROR);
 	}
 
@@ -236,6 +241,7 @@ void *realloc(void *ptr, size_t size)
 #ifndef MRD_LOG_LEVEL_ERR_ONLY
 		MRD_log_command(MRD_COMMAND_REALLOC, size, src_allocation);
 #endif
+
 		MRL_logln("FAILED TO REALLOCATE ", MRL_SEVERITY_ERROR);
 	}
 
