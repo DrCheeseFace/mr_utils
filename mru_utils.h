@@ -9,7 +9,7 @@
  *
  * contents
  *  - mrl_logger.h => logging util
- *  - mrm_mist.h => useful defines and cafebabe!
+ *  - mrm_misc.h => useful defines and cafebabe!
  *  - mrs_strings.h => string manipulation lib
  *  - mrt_test.h => mini testing lib
  *

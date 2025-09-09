@@ -1,5 +1,6 @@
 # my C utils lib
 
+- `mru_utils.h`: umbrella import
 - `mrs_strings.h`: string manipulation library
 - `mrt_test.h`: mini test library 
 - `mrl_logger.h`: logging utilities 
