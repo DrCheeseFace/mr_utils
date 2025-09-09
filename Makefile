@@ -21,10 +21,10 @@ CFLAGS = -Wall -Wextra -Werror \
 	 -O2
 
 TEST_TARGET = test.out
-TEST_SRC =  test/*.c mrl_logger.c mrs_strings.c mrt_test.c
+TEST_SRC =  test/*.c *.c
 
 MEMORY_DEBUGGER_TARGET = mrd_debug.so
-MEMORY_DEBUGGER_SRC = mrd_debug.c mrl_logger.c
+MEMORY_DEBUGGER_SRC = tools/mrd_debug.c mrl_logger.c
 
 MEMORY_DEBUGGER_LOG_LEVEL = MRD_LOG_LEVEL_NORMAL
 # MEMORY_DEBUGGER_LOG_LEVEL = MRD_LOG_LEVEL_ERR_ONLY
@@ -46,10 +46,10 @@ clean:
 	-rm -f $(TEST_TARGET) $(MEMORY_DEBUGGER_TARGET)
 
 format:
-	find *.c *.h test/*.c | xargs clang-format -i --verbose
+	find *.c *.h test/* tools/* | xargs clang-format -i --verbose
 
 format-check:
-	find *.c *.h test/*.c | xargs clang-format --dry-run --Werror --verbose
+	find *.c *.h test/* tools/* | xargs clang-format --dry-run --Werror --verbose
 
 bear: # this is for creating the compile_commands.json file
 	rm -f compile_commands.json && bear -- make build

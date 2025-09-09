@@ -1,6 +1,6 @@
 #include "mrd_debug.h"
-#include "mrl_logger.h"
-#include "mrm_misc.h"
+#include "../mrl_logger.h"
+#include "../mrm_misc.h"
 #include <dlfcn.h>
 #include <stdio.h>
 #include <string.h>
