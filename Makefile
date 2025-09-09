@@ -17,13 +17,17 @@ CFLAGS_DEBUG = -Wpointer-arith -Wcast-align \
 	 
 CFLAGS = -Wall -Wextra -Werror \
 	 -std=$(CSTANDARD) \
-	 -O2
+	 # -O2
 
 TEST_TARGET = test.out
 TEST_SRC =  test/*.c mrl_logger.c mrs_strings.c mrt_test.c
 
 MEMORY_DEBUGGER_TARGET = mrd_debug.so
 MEMORY_DEBUGGER_SRC = mrd_debug.c mrl_logger.c
+MEMORY_DEBUGGER_LOG_LEVEL = MRD_LOG_LEVEL_NORMAL
+# MRD_LOG_LEVEL_NORMAL
+# MRD_LOG_LEVEL_ERR_ONLY
+# MRD_LOG_LEVEL_ALL
 
 DEBUG_ENABLED ?= 1
 ifeq ($(DEBUG_ENABLED), 1)
@@ -59,4 +63,4 @@ check: format-check test
 test: build-debugger-preload build run
 
 build-debugger-preload:
-	$(CC) -shared -fPIC -o $(MEMORY_DEBUGGER_TARGET) $(MEMORY_DEBUGGER_SRC)
+	$(CC) -D $(MEMORY_DEBUGGER_LOG_LEVEL) -shared -fPIC -o $(MEMORY_DEBUGGER_TARGET) $(MEMORY_DEBUGGER_SRC)

@@ -13,35 +13,55 @@ global_variable void *(*real_calloc)(size_t, size_t) = NULL;
 global_variable void *(*real_realloc)(void *, size_t) = NULL;
 global_variable void (*real_free)(void *) = NULL;
 
+typedef enum MRD_Command {
+	MRD_COMMAND_MALLOC,
+	MRD_COMMAND_CALLOC,
+	MRD_COMMAND_REALLOC,
+	MRD_COMMAND_FREE,
+} MRD_command;
+
 internal void MRD_init_real_malloc(void)
 {
+#ifdef MRD_LOG_LEVEL_ALL
+	MRL_logln("Initializing mrd_debug malloc", MRL_SEVERITY_INFO);
+#endif
+
 	real_malloc = dlsym(RTLD_NEXT, "malloc");
 	if (real_malloc == NULL) {
-		fprintf(stderr, "LD_PRELOAD ERR: FAILED TO FIND malloc");
+		MRL_logln("FAILED TO FIND malloc", MRL_SEVERITY_ERROR);
 	}
 }
 
 internal void MRD_init_real_calloc(void)
 {
+#ifdef MRD_LOG_LEVEL_ALL
+	MRL_logln("Initializing mrd_debug calloc", MRL_SEVERITY_INFO);
+#endif
 	real_calloc = dlsym(RTLD_NEXT, "calloc");
 	if (real_calloc == NULL) {
-		fprintf(stderr, "LD_PRELOAD ERR: FAILED TO FIND calloc");
+		MRL_logln("FAILED TO FIND calloc", MRL_SEVERITY_ERROR);
 	}
 }
 
 internal void MRD_init_real_realloc(void)
 {
+#ifdef MRD_LOG_LEVEL_ALL
+	MRL_logln("Initializing mrd_debug realloc", MRL_SEVERITY_INFO);
+#endif
 	real_realloc = dlsym(RTLD_NEXT, "realloc");
 	if (real_realloc == NULL) {
-		fprintf(stderr, "LD_PRELOAD ERR: FAILED TO FIND realloc");
+		MRL_logln("FAILED TO FIND realloc", MRL_SEVERITY_ERROR);
 	}
 }
 
 internal void MRD_init_real_free(void)
 {
+#ifdef MRD_LOG_LEVEL_ALL
+	MRL_logln("Initializing mrd_debug free", MRL_SEVERITY_INFO);
+#endif
 	real_free = dlsym(RTLD_NEXT, "free");
 	if (real_free == NULL) {
-		fprintf(stderr, "LD_PRELOAD ERR: FAILED TO FIND free");
+		MRL_logln("FAILED TO FIND free", MRL_SEVERITY_ERROR);
 	}
 }
 
@@ -76,22 +96,57 @@ MRD_add_allocation_to_active_allocations(struct Allocation new_allocation)
 	MRL_logln(err, MRL_SEVERITY_ERROR);
 }
 
+internal void MRD_log_command(MRD_command command, size_t size,
+			      struct Allocation *realloc_src)
+{
+	char text[MAX_LOG_LENGTH];
+
+	if (command == MRD_COMMAND_REALLOC) {
+		sprintf(text, "allocation (%d>%d) of ", realloc_src->id,
+			current_allocation_id);
+		MRL_log(text, MRL_SEVERITY_DEFAULT);
+
+	} else {
+		sprintf(text, "allocation (%d) of ", current_allocation_id);
+	}
+	MRL_log(text, MRL_SEVERITY_DEFAULT);
+
+	if (command == MRD_COMMAND_REALLOC) {
+		sprintf(text, "%lu>%lu ", realloc_src->size, size);
+	} else {
+		sprintf(text, "%lu ", size);
+	}
+	MRL_log(text, MRL_SEVERITY_OK);
+
+	MRL_log("bytes ", MRL_SEVERITY_DEFAULT);
+	switch (command) {
+	case MRD_COMMAND_MALLOC:
+		MRL_log("malloc allocated ", MRL_SEVERITY_INFO);
+		break;
+	case MRD_COMMAND_CALLOC:
+		MRL_log("calloc allocated ", MRL_SEVERITY_INFO);
+		break;
+	case MRD_COMMAND_REALLOC:
+		MRL_log("realloc allocated ", MRL_SEVERITY_ALT_INFO);
+		break;
+	case MRD_COMMAND_FREE:
+		MRL_log("free'd", MRL_SEVERITY_WARNING);
+		break;
+	default:
+		break;
+	}
+	MRL_logln("", MRL_SEVERITY_DEFAULT);
+}
+
 void *malloc(size_t size)
 {
 	if (real_malloc == NULL) {
 		MRD_init_real_malloc();
 	}
 
-	char text[MAX_LOG_LENGTH];
-	sprintf(text, "allocation (%d) of ", current_allocation_id);
-	MRL_log(text, MRL_SEVERITY_DEFAULT);
-
-	sprintf(text, "%lu ", size);
-	MRL_log(text, MRL_SEVERITY_OK);
-
-	MRL_log("bytes ", MRL_SEVERITY_DEFAULT);
-
-	MRL_log("malloc allocated ", MRL_SEVERITY_INFO);
+#ifndef MRD_LOG_LEVEL_ERR_ONLY
+	MRD_log_command(MRD_COMMAND_MALLOC, size, NULL);
+#endif
 
 	void *ptr = real_malloc(size);
 	if (ptr != NULL) {
@@ -104,10 +159,11 @@ void *malloc(size_t size)
 					     .reallocated_to = NULL });
 
 	} else {
-		MRL_log("FAILED TO ALLOCATE ", MRL_SEVERITY_ERROR);
+#ifdef MRD_LOG_LEVEL_ERR_ONLY
+		MRD_log_command(MRD_COMMAND_MALLOC, size, NULL);
+#endif
+		MRL_logln("FAILED TO MALLOC ALLOCATE ", MRL_SEVERITY_ERROR);
 	}
-
-	MRL_log("\n\n", MRL_SEVERITY_DEFAULT);
 
 	return ptr;
 }
@@ -118,17 +174,9 @@ void *calloc(size_t nmemb, size_t size)
 		MRD_init_real_calloc();
 	}
 
-	char text[MAX_SNIPPET_LEN];
-
-	sprintf(text, "allocation (%d) of ", current_allocation_id);
-	MRL_log(text, MRL_SEVERITY_DEFAULT);
-
-	sprintf(text, "%lu ", size);
-	MRL_log(text, MRL_SEVERITY_OK);
-
-	MRL_log("bytes ", MRL_SEVERITY_DEFAULT);
-
-	MRL_log("calloc allocated ", MRL_SEVERITY_INFO);
+#ifndef MRD_LOG_LEVEL_ERR_ONLY
+	MRD_log_command(MRD_COMMAND_CALLOC, size, NULL);
+#endif
 
 	void *ptr = real_calloc(nmemb, size);
 	if (ptr != NULL) {
@@ -140,10 +188,11 @@ void *calloc(size_t nmemb, size_t size)
 					     .reallocated_to = NULL });
 
 	} else {
-		MRL_log("FAILED TO ALLOCATE ", MRL_SEVERITY_ERROR);
+#ifdef MRD_LOG_LEVEL_ERR_ONLY
+		MRD_log_command(MRD_COMMAND_CALLOC, size, NULL);
+#endif
+		MRL_logln("FAILED TO CALLOC ALLOCATE ", MRL_SEVERITY_ERROR);
 	}
-
-	MRL_log("\n\n", MRL_SEVERITY_DEFAULT);
 
 	return ptr;
 }
@@ -162,18 +211,9 @@ void *realloc(void *ptr, size_t size)
 		}
 	}
 
-	char text[MAX_SNIPPET_LEN];
-
-	sprintf(text, "allocation (%d>%d) of ", src_allocation->id,
-		current_allocation_id);
-	MRL_log(text, MRL_SEVERITY_DEFAULT);
-
-	sprintf(text, "%lu>%lu ", src_allocation->size, size);
-	MRL_log(text, MRL_SEVERITY_OK);
-
-	MRL_log("bytes ", MRL_SEVERITY_DEFAULT);
-
-	MRL_log("realloc allocated ", MRL_SEVERITY_ALT_INFO);
+#ifndef MRD_LOG_LEVEL_ERR_ONLY
+	MRD_log_command(MRD_COMMAND_REALLOC, size, src_allocation);
+#endif
 
 	void *realloc_ptr = real_realloc(ptr, size);
 	if (realloc_ptr != NULL) {
@@ -189,10 +229,11 @@ void *realloc(void *ptr, size_t size)
 					     .reallocated_to = NULL });
 
 	} else {
-		MRL_log("FAILED TO REALLOCATE ", MRL_SEVERITY_ERROR);
+#ifndef MRD_LOG_LEVEL_ERR_ONLY
+		MRD_log_command(MRD_COMMAND_REALLOC, size, src_allocation);
+#endif
+		MRL_logln("FAILED TO REALLOCATE ", MRL_SEVERITY_ERROR);
 	}
-
-	MRL_log("\n\n", MRL_SEVERITY_DEFAULT);
 
 	return realloc_ptr;
 }
@@ -211,21 +252,15 @@ void free(void *ptr)
 		}
 	}
 
-	char text[MAX_SNIPPET_LEN];
-
-	sprintf(text, "allocation (%d) of ", allocation->id);
-	MRL_log(text, MRL_SEVERITY_DEFAULT);
-
-	sprintf(text, "%lu ", allocation->size);
-	MRL_log(text, MRL_SEVERITY_OK);
-
-	MRL_log("bytes ", MRL_SEVERITY_DEFAULT);
-
-	MRL_log("free'd ", MRL_SEVERITY_WARNING);
-
-	allocation->active = false;
-
-	MRL_log("\n\n", MRL_SEVERITY_DEFAULT);
+	if (ptr == NULL) {
+		MRL_logln("ATTEMPTED TO FREE NULL", MRL_SEVERITY_ERROR);
+	}
+#ifndef MRD_LOG_LEVEL_ERR_ONLY
+	else {
+		MRD_log_command(MRD_COMMAND_FREE, allocation->size, NULL);
+	}
+#endif
 
 	real_free(ptr);
+	allocation->active = false;
 }

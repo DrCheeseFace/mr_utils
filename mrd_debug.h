@@ -8,6 +8,15 @@
 #define MAX_SNIPPET_LEN 128
 #define MAX_LOG_LENGTH 512
 
+/*
+ * Define for log levels 
+ *
+ * MRD_LOG_LEVEL_ALL
+ * MRD_LOG_LEVEL_NORMAL
+ * MRD_LOG_LEVEL_ERR_ONLY
+ *
+ */
+
 struct Allocation {
 	void *ptr;
 	bool active;

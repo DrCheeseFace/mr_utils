@@ -10,6 +10,7 @@
 ```Makefile
 MEMORY_DEBUGGER_TARGET = mrd_debug.so
 MEMORY_DEBUGGER_SRC = mrd_debug.c mrl_logger.c
+MEMORY_DEBUGGER_LOG_LEVEL = MRD_LOG_LEVEL_ALL
 
 DEBUG_ENABLED ?= 1
 ifeq ($(DEBUG_ENABLED), 1)
@@ -28,7 +29,7 @@ run:
 	$(DEBUG_LD_PRELOAD) ./$(TEST_TARGET)
 
 build-debugger-preload:
-    $(CC) -shared -fPIC -o $(MEMORY_DEBUGGER_TARGET) $(MEMORY_DEBUGGER_SRC)
+	$(CC) -D MRD_LOG_LEVEL_ALL -shared -fPIC -o $(MEMORY_DEBUGGER_TARGET) $(MEMORY_DEBUGGER_SRC)
 ```
 note: `mrd_debug.h` should not be included in you main build silly
 
@@ -36,6 +37,7 @@ note: `mrd_debug.h` should not be included in you main build silly
 ### TODO
 - [ ] add left rigth comparison for failed tests 
 - [ ] malloc calloc realloc free wrappers for debugging memory leaks 
+- [ ] log to defined out 
 TODODOODODO keep track of total alloced regions. if some not free, have some debug output.
 eg: this PTR (id) with this DATA that was allocated HERE, was not freed
 - [x] debug maintain only active allocations. eg: freed and not realloced to something not freed
