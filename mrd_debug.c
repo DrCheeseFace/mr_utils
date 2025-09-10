@@ -71,8 +71,8 @@ internal long MRD_get_base_address(const char *path)
 		pid, path); // lol
 
 	FILE *fp = popen(command, "r");
-	char output_buffer[1024] = "";
-	char output_full_out[1024] = "";
+	char output_buffer[BASE_ADDRESS_SIZE] = "";
+	char output_full_out[BASE_ADDRESS_SIZE + 2] = "";
 	while (fgets(output_buffer, sizeof(output_buffer), fp) != NULL) {
 		strcat(output_full_out, output_buffer);
 	}
@@ -120,7 +120,7 @@ internal void unused MRD_log_backtrace(void)
 
 		long call_addr_long = strtol(call_addr, NULL, 16);
 		long addr_diff = call_addr_long - base_addr_long;
-		char addr_diff_hex[32];
+		char addr_diff_hex[32]; // eg: +0xCDCD
 		sprintf(addr_diff_hex, " +0x%lX", addr_diff);
 
 		// build addr2line command
@@ -132,8 +132,8 @@ internal void unused MRD_log_backtrace(void)
 
 		// exec addr2line command
 		FILE *fp = popen(addr2line_command, "r");
-		char addr2line_output_buffer[256] = "";
-		char addr2line_output_full_out[256] = "";
+		char addr2line_output_buffer[128] = "";
+		char addr2line_output_full_out[128] = "";
 		while (fgets(addr2line_output_buffer,
 			     sizeof(addr2line_output_buffer), fp) != NULL) {
 			strcat(addr2line_output_full_out,
@@ -149,10 +149,10 @@ internal void unused MRD_log_backtrace(void)
 
 		char *start_func = strchr(symbols[i], '(') + 1;
 		char *end_func = strchr(symbols[i], '+');
-		char func_name[128] = "";
+		char func_name[64] = "";
 		strncpy(func_name, start_func, end_func - start_func);
 
-		char log[512];
+		char log[256];
 		sprintf(log, "%s:%s => %s()", addr2line_output_full_out,
 			line_string, func_name);
 
