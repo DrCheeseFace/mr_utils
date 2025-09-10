@@ -33,7 +33,7 @@ void *MRD_calloc(size_t nmemb, size_t size, const char *file_name, int line);
 void *MRD_realloc(void *ptr, size_t size, const char *file_name, int line);
 void MRD_free(void *ptr, const char *file_name, int line);
 
-#endif // !MRD_DEBUG_H
+#endif // !DEBUG
 
 #ifdef DEBUG
 
@@ -42,6 +42,4 @@ void MRD_free(void *ptr, const char *file_name, int line);
 #define realloc(ptr, size) MRD_realloc(ptr, size, __FILE__, __LINE__)
 #define free(ptr) MRD_free(ptr, __FILE__, __LINE__)
 
-#else
-
-#endif // !DEBUG
+#endif // !MRD_DEBUG_H

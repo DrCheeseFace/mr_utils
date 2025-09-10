@@ -1,10 +1,10 @@
-#include "../mrd_debug.h"
-#include "../mrs_strings.h"
-#include "../mrt_test.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "../mrd_debug.h"
+#include "../mrs_strings.h"
+#include "../mrt_test.h"
 
 int test_strstr(void)
 {
@@ -541,7 +541,7 @@ int main(void)
 	err = err || test_strndup();
 	err = err || test_shrink_to_fit();
 
-	err = err || bruh();
+	// err = err || bruh();
 
 	return err;
 }

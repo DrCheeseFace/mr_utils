@@ -9,7 +9,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 global_variable int current_allocation_id = 0;
 global_variable struct Allocation active_allocations[MAX_ACTIVE_ALLOCATIONS];
