@@ -16,7 +16,7 @@
  * good placeholder value to use for unintialized data
  * especially mallocs and such
  */
-#define MRM_CAFE_BABE 0xCD // base 10 -> 205
+#define CAFE_BABE 0xCD // base 10 -> 205
 
 /*
  * implementation of boolean

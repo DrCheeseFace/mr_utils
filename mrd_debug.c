@@ -1,5 +1,6 @@
 #include "mrd_debug.h"
 #include "mrl_logger.h"
+#include "mrm_misc.h"
 #include "mrs_strings.h"
 
 #ifdef malloc
@@ -16,9 +17,10 @@
 
 global_variable int current_allocation_id = 0;
 global_variable struct Allocation active_allocations[MAX_ACTIVE_ALLOCATIONS];
+global_variable long base_address = CAFE_BABE;
 
 // cant call MRS_init due to it calling malloc
-internal void MRS_init_code_snippet(MRS_String *dest)
+internal void MRD_init_code_snippet(MRS_String *dest)
 {
 	dest->value = malloc(sizeof(char) * (MAX_SNIPPET_LEN + 1));
 	dest->value[MAX_SNIPPET_LEN] = '\0';
@@ -38,7 +40,7 @@ internal void MRD_get_code_snippet(const char *file_name, int line,
 	FILE *file = fopen(file_name, "r");
 
 	MRS_String read_buffer;
-	MRS_init_code_snippet(&read_buffer);
+	MRD_init_code_snippet(&read_buffer);
 
 	int current_line = 1;
 	while (fgets(read_buffer.value, read_buffer.capacity, file)) {
@@ -62,10 +64,10 @@ internal void MRD_get_code_snippet(const char *file_name, int line,
 	return;
 }
 
-internal long MRD_get_base_address(const char *path)
+internal void MRD_get_base_address(const char *path)
 {
 	int pid = getpid();
-	char base_addr[BASE_ADDRESS_SIZE + 1];
+	char base_addr_string[BASE_ADDRESS_SIZE + 1];
 	char command[256];
 	sprintf(command,
 		"cat /proc/%d/maps | grep %s | head -n 1 | awk '{print $1}' | cut -d'-' -f1",
@@ -80,12 +82,14 @@ internal long MRD_get_base_address(const char *path)
 	}
 
 	for (size_t i = 0; i < BASE_ADDRESS_SIZE; i++) {
-		base_addr[i] = output_full_out[i];
+		base_addr_string[i] = output_full_out[i];
 	}
 
-	long base_addr_long = strtol(base_addr, NULL, 16);
+	long base_addr_long = strtol(base_addr_string, NULL, 16);
 
-	return base_addr_long;
+	base_address = base_addr_long;
+
+	return;
 }
 
 internal void unused MRD_log_backtrace(void)
@@ -104,7 +108,9 @@ internal void unused MRD_log_backtrace(void)
 	strncpy(path, symbols[1], end_of_path - symbols[1]);
 	path[end_of_path - symbols[1]] = '\0';
 
-	long base_addr_long = MRD_get_base_address(path);
+	if (base_address == CAFE_BABE) {
+		MRD_get_base_address(path);
+	}
 
 	int max_backtrace_depth_printout = MAX_BACKTRACE_DEPTH_PRINTOUT;
 	if (nptrs < max_backtrace_depth_printout) {
@@ -121,7 +127,7 @@ internal void unused MRD_log_backtrace(void)
 		strncpy(call_addr, open_bracket, BASE_ADDRESS_SIZE);
 
 		long call_addr_long = strtol(call_addr, NULL, 16);
-		long addr_diff = call_addr_long - base_addr_long;
+		long addr_diff = call_addr_long - base_address;
 		char addr_diff_hex[32]; // eg: +0xCDCD
 		sprintf(addr_diff_hex, " +0x%lX", addr_diff);
 
@@ -246,7 +252,7 @@ internal void MRD_log_command(MRD_command command, size_t size,
 	MRL_log(text, MRL_SEVERITY_OK);
 
 	MRS_String code_snippet;
-	MRS_init_code_snippet(&code_snippet);
+	MRD_init_code_snippet(&code_snippet);
 
 	MRD_get_code_snippet(file_name, line, &code_snippet);
 	sprintf(text, "%s", code_snippet.value);
@@ -266,7 +272,7 @@ void *MRD_malloc(size_t size, const char *file_name, int line)
 
 	void *ptr = malloc(size);
 	if (ptr != NULL) {
-		memset(ptr, MRM_CAFE_BABE, size);
+		memset(ptr, CAFE_BABE, size);
 		MRD_add_allocation_to_active_allocations(
 			(struct Allocation){ .ptr = ptr,
 					     .size = size,
@@ -330,7 +336,7 @@ void *MRD_realloc(void *ptr, size_t size, const char *file_name, int line)
 
 	void *realloc_ptr = realloc(ptr, size);
 	if (realloc_ptr != NULL) {
-		memset(realloc_ptr, MRM_CAFE_BABE, size);
+		memset(realloc_ptr, CAFE_BABE, size);
 		src_allocation->active = FALSE;
 		src_allocation->reallocated_to = realloc_ptr;
 
