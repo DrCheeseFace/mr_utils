@@ -70,10 +70,6 @@ build-debug:
 ```
 note: `mrd_debug.h` requires the build flag `-rdynamic` do show backtrace symbols 
 note: `static` functions wont be displayed as the symbol isnt exported :( 
-dependencies 
-```
-sudo apt install libelf-dev elfutils
-```
 
 
 
