@@ -22,7 +22,7 @@ CFLAGS_DEBUG = -Wall -Wextra -Werror \
          -Wredundant-decls -Wsequence-point -Wshadow \
 	 -Wswitch -Wundef -Wunused-but-set-parameter \
 	 -Wcast-qual  -Wfloat-equal -Wnested-externs \
-	 -O0 -g \
+	 -O0 -g -rdynamic \
 	 -Wpedantic  -pedantic-errors \
 	 # -fsanitize=address \
 	 
@@ -68,7 +68,13 @@ debug:  build-debug run
 build-debug:
 	$(CC) $(CFLAGS_DEBUG) -D $(MEMORY_DEBUGGER_LOG_LEVEL) -D DEBUG -o $(TEST_TARGET) $(TEST_SRC)
 ```
-note: `mrd_debug.h` should not be included in you main build silly
+note: `mrd_debug.h` requires the build flag `-rdynamic` do show backtrace symbols 
+note: `static` functions wont be displayed as the symbol isnt exported :( 
+dependencies 
+```
+sudo apt install libelf-dev elfutils
+```
+
 
 
 ### TODO

@@ -1,5 +1,10 @@
 /*
  * this is a tool used for memory debugging
+ * 
+ * To enable backtrack logging define
+ *
+ * MRD_DEBUG_BACKTRACE
+ *
  */
 
 #ifndef MRD_DEBUG_H
@@ -11,7 +16,9 @@
 #define MAX_ACTIVE_ALLOCATIONS 1024
 #define MAX_SNIPPET_LEN 128
 #define MAX_LOG_LENGTH 512
-#define MAX_CALLSTACK_DEPTH 8
+#define MAX_BACKTRACE_LENGTH 4
+#define MAX_BACKTRACE_DEPTH_PRINTOUT 8
+#define BASE_ADDRESS_SIZE 12
 #define DEBUG_LOG_HEAD "MRD_DEBUG LOG: "
 
 struct Allocation {
