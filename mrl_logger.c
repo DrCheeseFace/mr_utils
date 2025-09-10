@@ -1,4 +1,5 @@
 #include "mrl_logger.h"
+#include "mrd_debug.h"
 #include <stdio.h>
 #include <unistd.h>
 

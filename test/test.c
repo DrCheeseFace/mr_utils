@@ -1,3 +1,4 @@
+#include "../mrd_debug.h"
 #include "../mrs_strings.h"
 #include "../mrt_test.h"
 
@@ -540,6 +541,7 @@ int main(void)
 	err = err || test_strndup();
 	err = err || test_shrink_to_fit();
 
-	// err = err || bruh();
+	err = err || bruh();
+
 	return err;
 }
