@@ -281,8 +281,6 @@ void *MRD_malloc(size_t size, const char *file_name, int line)
 					     .reallocated_to = NULL });
 
 	} else {
-		MRD_log_command(MRD_COMMAND_MALLOC, size, NULL, file_name,
-				line);
 		MRD_log_err("FAILED TO MALLOC ALLOCATE ");
 	}
 
