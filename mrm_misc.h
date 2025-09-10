@@ -22,14 +22,33 @@
  * implementation of boolean
  *
  * false = 0
+ *
  * true = 1
  */
-#define bool MRM_Bool
-#define TRUE MRM_BOOL_TRUE
-#define FALSE MRM_BOOL_FALSE
 typedef enum MRM_Bool {
 	MRM_BOOL_FALSE = 0,
 	MRM_BOOL_TRUE,
 } MRM_Bool;
+#define bool MRM_Bool
+#define TRUE MRM_BOOL_TRUE
+#define FALSE MRM_BOOL_FALSE
+
+/*
+ * implementation of error codes
+ *
+ * NOT_FOUND = -1
+ *
+ * OK = 0
+ *
+ * ERR = 1
+ */
+typedef enum MRM_ErrorCode {
+	MRM_ERROR_CODES_NOT_FOUND = -1,
+	MRM_ERROR_CODES_OK = 0,
+	MRM_ERROR_CODES_ERR = 1,
+} MRM_ErrorCode;
+#define NOT_FOUND MRM_ERROR_CODE_NOT_FOUND
+#define OK MRM_ERROR_CODE_OK
+#define ERR MRM_ERROR_CODE_ERR
 
 #endif // !MRM_MISC_H
