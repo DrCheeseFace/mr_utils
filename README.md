@@ -3,7 +3,7 @@
 - `mrs_strings.h`: string manipulation library
 - `mrt_test.h`: mini test library 
 - `mrl_logger.h`: logging utilities 
-- `mrd_debug.h`: memory allocation debugging info. use LD_PRELOAD to enable logging eg:
+- `mrd_debug.h`: memory allocation debugging info. enable by defining DEBUG eg: `#define DEBUG` or the `-DDEBUG` gcc flag
 - `mrm_misc.h`: useful defines and cafebabe!
 
 #### mrd_debug example build
