@@ -51,4 +51,6 @@ typedef enum MRM_ErrorCode {
 #define OK MRM_ERROR_CODE_OK
 #define ERR MRM_ERROR_CODE_ERR
 
+#define unused __attribute__((__unused__))
+
 #endif // !MRM_MISC_H
