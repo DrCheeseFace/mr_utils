@@ -51,6 +51,10 @@ typedef enum MRM_ErrorCode {
 #define OK MRM_ERROR_CODE_OK
 #define ERR MRM_ERROR_CODE_ERR
 
+// used for ignoring unused functions due to defines
 #define unused __attribute__((__unused__))
+
+// used to temporarily shut up clang for unused variable
+#define ignore __attribute__((__unused__))
 
 #endif // !MRM_MISC_H
