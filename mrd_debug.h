@@ -12,6 +12,7 @@
 #define MAX_SNIPPET_LEN 128
 #define MAX_LOG_LENGTH 512
 #define MAX_CALLSTACK_DEPTH 8
+#define DEBUG_LOG_HEAD "MRD_DEBUG LOG: "
 
 struct Allocation {
 	void *ptr;

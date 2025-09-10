@@ -72,7 +72,7 @@ MRD_add_allocation_to_active_allocations(struct Allocation new_allocation)
 		}
 	}
 	char err[64];
-	sprintf(err, "MAX_ACTIVE_ALLOCATIONS reached (%d)",
+	sprintf(err, "%sMAX_ACTIVE_ALLOCATIONS reached (%d)", DEBUG_LOG_HEAD,
 		MAX_ACTIVE_ALLOCATIONS);
 	MRL_logln(err, MRL_SEVERITY_ERROR);
 }
@@ -81,6 +81,7 @@ internal void MRD_log_command(MRD_command command, size_t size,
 			      struct Allocation *realloc_src,
 			      const char *file_name, int line)
 {
+	MRL_log(DEBUG_LOG_HEAD, MRL_SEVERITY_INFO);
 	char text[MAX_LOG_LENGTH];
 	if (command == MRD_COMMAND_REALLOC) {
 		sprintf(text, "allocation (%d>%d) of ", realloc_src->id,
@@ -153,6 +154,7 @@ void *MRD_malloc(size_t size, const char *file_name, int line)
 	} else {
 		MRD_log_command(MRD_COMMAND_MALLOC, size, NULL, file_name,
 				line);
+		MRL_log(DEBUG_LOG_HEAD, MRL_SEVERITY_INFO);
 		MRL_logln("FAILED TO MALLOC ALLOCATE ", MRL_SEVERITY_ERROR);
 	}
 
@@ -175,6 +177,7 @@ void *MRD_calloc(size_t nmemb, size_t size, const char *file_name, int line)
 	} else {
 		MRD_log_command(MRD_COMMAND_CALLOC, size, NULL, file_name,
 				line);
+		MRL_log(DEBUG_LOG_HEAD, MRL_SEVERITY_INFO);
 		MRL_logln("FAILED TO CALLOC ALLOCATE ", MRL_SEVERITY_ERROR);
 	}
 
@@ -210,7 +213,7 @@ void *MRD_realloc(void *ptr, size_t size, const char *file_name, int line)
 	} else {
 		MRD_log_command(MRD_COMMAND_REALLOC, size, src_allocation,
 				file_name, line);
-
+		MRL_log(DEBUG_LOG_HEAD, MRL_SEVERITY_INFO);
 		MRL_logln("FAILED TO REALLOCATE ", MRL_SEVERITY_ERROR);
 	}
 
@@ -230,8 +233,6 @@ void MRD_free(void *ptr, const char *file_name, int line)
 	if (ptr == NULL) {
 		MRL_logln("ATTEMPTED TO FREE NULL", MRL_SEVERITY_ERROR);
 	} else {
-		(void)file_name;
-		(void)line;
 		MRD_log_command(MRD_COMMAND_FREE, allocation->size, NULL,
 				file_name, line);
 	}
