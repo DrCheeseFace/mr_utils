@@ -16,3 +16,6 @@ jobs:
 
       - name: Run Check Command
         run: make check
+
+      - name: Run make RELEASE
+        run: make

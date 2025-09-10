@@ -1,17 +1,18 @@
 #include "mrd_debug.h"
-#include "execinfo.h"
 #include "mrl_logger.h"
 #include "mrs_strings.h"
-#include <string.h>
-#include <unistd.h>
 
+#ifdef malloc
 #undef malloc
 #undef calloc
 #undef realloc
 #undef free
+#endif
 
+#include "execinfo.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 global_variable int current_allocation_id = 0;
 global_variable struct Allocation active_allocations[MAX_ACTIVE_ALLOCATIONS];
@@ -72,6 +73,7 @@ internal long MRD_get_base_address(const char *path)
 
 	FILE *fp = popen(command, "r");
 	char output_buffer[BASE_ADDRESS_SIZE] = "";
+	// has newline and \0 hence the +2
 	char output_full_out[BASE_ADDRESS_SIZE + 2] = "";
 	while (fgets(output_buffer, sizeof(output_buffer), fp) != NULL) {
 		strcat(output_full_out, output_buffer);
@@ -104,13 +106,13 @@ internal void unused MRD_log_backtrace(void)
 
 	long base_addr_long = MRD_get_base_address(path);
 
-	uint max_backtrace_depth_printout = MAX_BACKTRACE_DEPTH_PRINTOUT;
-	if (nptrs < (int)max_backtrace_depth_printout) {
+	int max_backtrace_depth_printout = MAX_BACKTRACE_DEPTH_PRINTOUT;
+	if (nptrs < max_backtrace_depth_printout) {
 		max_backtrace_depth_printout = nptrs;
 	}
 
 	// 2 is used here to remove depth created in this file
-	for (size_t i = 2; i < max_backtrace_depth_printout; i++) {
+	for (size_t i = 2; i < (size_t)max_backtrace_depth_printout; i++) {
 		// calc diff between base and call addr
 		char call_addr[BASE_ADDRESS_SIZE + 1];
 		call_addr[BASE_ADDRESS_SIZE] = '\0';

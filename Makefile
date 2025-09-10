@@ -3,7 +3,7 @@ CC = gcc
 CSTANDARD = c99
 
 CFLAGS_DEBUG = -Wall -Wextra -Werror \
-               -Wpointer-arith -Wcast-align \
+               -Wpointer-arith -Wcast-align -Wint-conversion \
                -Wstrict-prototypes -Wwrite-strings -Waggregate-return \
                -Wswitch-default -Wswitch-enum -Wunreachable-code \
                -Wunused-parameter -Wuninitialized -Winit-self \
@@ -12,14 +12,13 @@ CFLAGS_DEBUG = -Wall -Wextra -Werror \
                -Wredundant-decls -Wsequence-point -Wshadow \
                -Wswitch -Wundef -Wunused-but-set-parameter \
                -Wcast-qual  -Wfloat-equal -Wnested-externs \
-               -O0 -g \
-               -Wpedantic  -pedantic-errors \
+	       -Wpedantic  -pedantic-errors \
                -DDEBUG -rdynamic \
-	 -fsanitize=address \
+	       -O0 -g \
+	       -fsanitize=address \
 	 
 CFLAGS = -Wall -Wextra -Werror \
-	 -std=$(CSTANDARD) \
-	 -O2
+	 -O2 
 
 TEST_TARGET = test.out
 TEST_SRC =  test/*.c *.c
@@ -34,7 +33,7 @@ all: test
 test: build run
 
 build:
-	$(CC) $(CFLAGS) -o $(TEST_TARGET) $(TEST_SRC)
+	$(CC) -std=$(CSTANDARD) $(CFLAGS) -o $(TEST_TARGET) $(TEST_SRC)
 
 run:
 	./$(TEST_TARGET)
@@ -56,4 +55,4 @@ check: format-check build-debug run
 debug:  build-debug run
 
 build-debug:
-	$(CC) $(CFLAGS_DEBUG) -D $(DEBUG_LEVEL) -o $(TEST_TARGET) $(TEST_SRC)
+	$(CC) -std=$(CSTANDARD) $(CFLAGS_DEBUG) -D $(DEBUG_LEVEL) -o $(TEST_TARGET) $(TEST_SRC)

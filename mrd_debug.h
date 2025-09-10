@@ -10,7 +10,7 @@
 #define MRD_DEBUG_H
 
 #include "mrm_misc.h"
-#include <stdlib.h>
+#include <stddef.h>
 
 #define MAX_ACTIVE_ALLOCATIONS 1024
 #define MAX_SNIPPET_LEN 128
@@ -19,6 +19,7 @@
 #define MAX_BACKTRACE_DEPTH_PRINTOUT 8
 #define BASE_ADDRESS_SIZE 12
 #define DEBUG_LOG_HEAD "MRD_DEBUG LOG: "
+#define _GNU_SOURCE
 
 struct Allocation {
 	void *ptr;
@@ -43,6 +44,8 @@ void MRD_free(void *ptr, const char *file_name, int line);
 #endif // !DEBUG
 
 #ifdef DEBUG
+
+#include <stdlib.h>
 
 #define malloc(size) MRD_malloc(size, __FILE__, __LINE__)
 #define calloc(nmemb, size) MRD_calloc(nmemb, size, __FILE__, __LINE__)
