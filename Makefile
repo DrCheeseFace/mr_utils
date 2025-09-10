@@ -24,7 +24,8 @@ CFLAGS = -Wall -Wextra -Werror \
 TEST_TARGET = test.out
 TEST_SRC =  test/*.c *.c
 
-# DEBUG_LEVEL = -D MRD_DEBUG_BACKTRACE
+DEBUG_LEVEL = MRD_DEBUG_BACKTRACE
+# DEBUG_LEVEL = MRD_DEBUG_DEFAULT
 
 .PHONY: all build run clean format format-check bear test check debug build-debug 
 
@@ -55,4 +56,4 @@ check: format-check build-debug run
 debug:  build-debug run
 
 build-debug:
-	$(CC) $(CFLAGS_DEBUG) $(DEBUG_LEVEL) -o $(TEST_TARGET) $(TEST_SRC)
+	$(CC) $(CFLAGS_DEBUG) -D $(DEBUG_LEVEL) -o $(TEST_TARGET) $(TEST_SRC)

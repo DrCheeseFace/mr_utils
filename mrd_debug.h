@@ -1,10 +1,9 @@
 /*
  * this is a tool used for memory debugging
  * 
- * To enable backtrack logging define
- *
  * MRD_DEBUG_BACKTRACE
  *
+ * MRD_DEBUG_DEFAULT
  */
 
 #ifndef MRD_DEBUG_H

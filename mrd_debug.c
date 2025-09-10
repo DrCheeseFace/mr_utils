@@ -157,9 +157,9 @@ internal void unused MRD_log_backtrace(void)
 			line_string, func_name);
 
 		for (size_t indents = 0; indents < i - 1; indents++) {
-			MRL_log("   ", MRL_SEVERITY_DEFAULT);
+			MRL_log("  ", MRL_SEVERITY_DEFAULT);
 		}
-		MRL_log("↪", MRL_SEVERITY_DEFAULT);
+		MRL_log("↪ ", MRL_SEVERITY_DEFAULT);
 		MRL_logln(log, MRL_SEVERITY_DEFAULT);
 	}
 
@@ -278,6 +278,8 @@ void *MRD_malloc(size_t size, const char *file_name, int line)
 		MRD_log_err("FAILED TO MALLOC ALLOCATE ");
 	}
 
+	MRL_logln("", MRL_SEVERITY_DEFAULT);
+
 	return ptr;
 }
 
@@ -299,10 +301,10 @@ void *MRD_calloc(size_t nmemb, size_t size, const char *file_name, int line)
 					     .reallocated_to = NULL });
 
 	} else {
-		MRD_log_command(MRD_COMMAND_CALLOC, size, NULL, file_name,
-				line);
 		MRD_log_err("FAILED TO CALLOC ALLOCATE");
 	}
+
+	MRL_logln("", MRL_SEVERITY_DEFAULT);
 
 	return ptr;
 }
@@ -338,10 +340,10 @@ void *MRD_realloc(void *ptr, size_t size, const char *file_name, int line)
 					     .reallocated_to = NULL });
 
 	} else {
-		MRD_log_command(MRD_COMMAND_REALLOC, size, src_allocation,
-				file_name, line);
 		MRD_log_err("FAILED TO REALLOCATE");
 	}
+
+	MRL_logln("", MRL_SEVERITY_DEFAULT);
 
 	return realloc_ptr;
 }
@@ -366,6 +368,8 @@ void MRD_free(void *ptr, const char *file_name, int line)
 #ifdef MRD_DEBUG_BACKTRACE
 	MRD_log_backtrace();
 #endif
+
+	MRL_logln("", MRL_SEVERITY_DEFAULT);
 
 	free(ptr);
 	allocation->active = FALSE;
