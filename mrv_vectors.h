@@ -38,6 +38,6 @@ void *MRV_get_item(MRV_Vector *vec, void *item);
 
 void *MRV_get_item_where(MRV_Vector *vec, bool (*is_item)(void *));
 
-#define MRV_qsort(vec, compare) qsort(vec->arr, vec->len, vec->stride, compare)
+void MRV_qsort(MRV_Vector *vec, int (*compare)(const void *, const void *));
 
 #endif // !MRV_VECTORS_H

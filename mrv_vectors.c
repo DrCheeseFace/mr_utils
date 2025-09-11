@@ -151,3 +151,8 @@ void *MRV_get_item(MRV_Vector *vec, void *item)
 
 	return NULL;
 }
+
+void MRV_qsort(MRV_Vector *vec, int (*compare)(const void *, const void *))
+{
+	qsort(vec->arr, vec->len, vec->stride, compare);
+}
