@@ -21,9 +21,9 @@
 /*
  * implementation of boolean
  *
- * false = 0
+ * FALSE = 0
  *
- * true = 1
+ * TRUE = 1
  */
 typedef enum MRM_Bool {
 	MRM_BOOL_FALSE = 0,
