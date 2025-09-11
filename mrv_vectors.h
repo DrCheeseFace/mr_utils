@@ -6,7 +6,7 @@
 #define MRV_VECTORS_H
 
 #include "mrm_misc.h"
-#include <stddef.h>
+#include <stdlib.h>
 
 typedef struct {
 	unsigned char *arr;
@@ -36,6 +36,8 @@ void *MRV_get_idx(MRV_Vector *vec, size_t n);
 
 void *MRV_get_item(MRV_Vector *vec, void *item);
 
-void *MRV_get_item_where(MRV_Vector *vec, bool (*compare)(void *));
+void *MRV_get_item_where(MRV_Vector *vec, bool (*is_item)(void *));
+
+#define MRV_qsort(vec, compare) qsort(vec->arr, vec->len, vec->stride, compare)
 
 #endif // !MRV_VECTORS_H
