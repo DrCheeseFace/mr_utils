@@ -574,7 +574,7 @@ int test_append(void)
 				   .pass = int_array->len == 10 };
 	MRT_ctx_append_case(t_ctx, test_case);
 
-	Error err = MRV_append(int_array, &append_val);
+	Err err = MRV_append(int_array, &append_val);
 	val = MRV_get_idx(int_array, 10);
 
 	test_case = (struct MRT_Case){
@@ -629,7 +629,7 @@ int test_pop(void)
 	MRT_ctx_append_case(t_ctx, test_case);
 
 	MRV_pop(int_array);
-	Error err = MRV_pop(int_array);
+	Err err = MRV_pop(int_array);
 
 	test_case = (struct MRT_Case){ .description = "pop to len = 0 len",
 				       .pass = int_array->len == 0 };

@@ -49,7 +49,7 @@ void MRV_init(MRV_Vector *vec, size_t capacity, size_t stride)
 	return;
 }
 
-MRM_ErrorCode MRV_clear(MRV_Vector *vec)
+Err MRV_clear(MRV_Vector *vec)
 {
 	if (vec == NULL) {
 		return ERR;
@@ -67,7 +67,7 @@ MRM_ErrorCode MRV_clear(MRV_Vector *vec)
 	return OK;
 }
 
-MRM_ErrorCode MRV_append(MRV_Vector *vec, void *item)
+Err MRV_append(MRV_Vector *vec, void *item)
 {
 	if (vec == NULL) {
 		return ERR;
@@ -85,7 +85,7 @@ MRM_ErrorCode MRV_append(MRV_Vector *vec, void *item)
 	return OK;
 }
 
-MRM_ErrorCode MRV_realloc_to_fit(MRV_Vector *vec)
+Err MRV_realloc_to_fit(MRV_Vector *vec)
 {
 	if (vec == NULL) {
 		return ERR;
@@ -101,7 +101,7 @@ MRM_ErrorCode MRV_realloc_to_fit(MRV_Vector *vec)
 	return OK;
 }
 
-MRM_ErrorCode MRV_pop(MRV_Vector *vec)
+Err MRV_pop(MRV_Vector *vec)
 {
 	if (vec == NULL) {
 		return ERR;

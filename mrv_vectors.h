@@ -23,14 +23,14 @@ void MRV_free(MRV_Vector *vec);
 
 void MRV_init(MRV_Vector *vec, size_t capacity, size_t stride);
 
-MRM_ErrorCode MRV_clear(MRV_Vector *vec);
+Err MRV_clear(MRV_Vector *vec);
 
 // resizes vec->arr if needed
-MRM_ErrorCode MRV_append(MRV_Vector *vec, void *item);
+Err MRV_append(MRV_Vector *vec, void *item);
 
-MRM_ErrorCode MRV_realloc_to_fit(MRV_Vector *vec);
+Err MRV_realloc_to_fit(MRV_Vector *vec);
 
-MRM_ErrorCode MRV_pop(MRV_Vector *vec);
+Err MRV_pop(MRV_Vector *vec);
 
 void *MRV_get_idx(MRV_Vector *vec, size_t n);
 

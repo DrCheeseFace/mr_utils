@@ -28,9 +28,8 @@
 typedef enum MRM_Bool {
 	MRM_BOOL_FALSE = 0,
 	MRM_BOOL_TRUE,
-} MRM_Bool;
+} Bool;
 
-#define Bool MRM_Bool
 #define TRUE MRM_BOOL_TRUE
 #define FALSE MRM_BOOL_FALSE
 
@@ -47,9 +46,8 @@ typedef enum MRM_ErrorCode {
 	MRM_ERROR_CODE_NOT_FOUND = -1,
 	MRM_ERROR_CODE_OK = 0,
 	MRM_ERROR_CODE_ERR = 1,
-} MRM_ErrorCode;
+} Err;
 
-#define Error MRM_ErrorCode
 #define NOT_FOUND MRM_ERROR_CODE_NOT_FOUND
 #define OK MRM_ERROR_CODE_OK
 #define ERR MRM_ERROR_CODE_ERR
