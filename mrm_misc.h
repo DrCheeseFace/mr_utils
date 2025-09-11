@@ -25,7 +25,7 @@
  *
  * TRUE = 1
  */
-typedef enum MRM_Bool {
+typedef enum {
 	MRM_BOOL_FALSE = 0,
 	MRM_BOOL_TRUE,
 } Bool;
@@ -42,7 +42,7 @@ typedef enum MRM_Bool {
  *
  * ERR = 1
  */
-typedef enum MRM_ErrorCode {
+typedef enum {
 	MRM_ERROR_CODE_NOT_FOUND = -1,
 	MRM_ERROR_CODE_OK = 0,
 	MRM_ERROR_CODE_ERR = 1,
