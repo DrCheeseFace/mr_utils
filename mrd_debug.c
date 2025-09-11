@@ -118,6 +118,7 @@ internal void unused MRD_log_backtrace(void)
 	}
 
 	// 2 is used here to remove depth created in this file
+        size_t indent_level = 0;
 	for (size_t i = 2; i < (size_t)max_backtrace_depth_printout; i++) {
 		// calc diff between base and call addr
 		char call_addr[BASE_ADDRESS_SIZE + 1];
@@ -164,9 +165,10 @@ internal void unused MRD_log_backtrace(void)
 		sprintf(log, "%s:%s => %s()", addr2line_output_full_out,
 			line_string, func_name);
 
-		for (size_t indents = 0; indents < i - 1; indents++) {
+		for (size_t j = 0; j < indent_level; j++) {
 			MRL_log("  ", MRL_SEVERITY_DEFAULT);
 		}
+		indent_level++;
 		MRL_log("↪ ", MRL_SEVERITY_DEFAULT);
 		MRL_logln(log, MRL_SEVERITY_DEFAULT);
 	}
@@ -207,15 +209,17 @@ MRD_add_allocation_to_active_allocations(struct Allocation new_allocation)
 }
 
 internal void MRD_log_command(MRD_command command, size_t size,
-			      struct Allocation *realloc_src,
+			      struct Allocation *realloc_free_src,
 			      const char *file_name, int line)
 {
 	MRL_log(DEBUG_LOG_HEAD, MRL_SEVERITY_INFO);
 	char text[MAX_LOG_LENGTH];
 	if (command == MRD_COMMAND_REALLOC) {
-		sprintf(text, "allocation (%d>%d) of ", realloc_src->id,
+		sprintf(text, "allocation (%d>%d) of ", realloc_free_src->id,
 			current_allocation_id);
 
+	} else if (command == MRD_COMMAND_FREE) {
+		sprintf(text, "allocation (%d) of ", realloc_free_src->id);
 	} else {
 		sprintf(text, "allocation (%d) of ", current_allocation_id);
 	}
@@ -223,7 +227,7 @@ internal void MRD_log_command(MRD_command command, size_t size,
 	MRL_log(text, MRL_SEVERITY_DEFAULT);
 
 	if (command == MRD_COMMAND_REALLOC) {
-		sprintf(text, "[%lu>%lu] ", realloc_src->size, size);
+		sprintf(text, "[%lu>%lu] ", realloc_free_src->size, size);
 	} else {
 		sprintf(text, "[%lu] ", size);
 	}
@@ -367,7 +371,7 @@ void MRD_free(void *ptr, const char *file_name, int line)
 	if (ptr == NULL) {
 		MRD_log_err("ATTEMPTED TO FREE NULL");
 	} else {
-		MRD_log_command(MRD_COMMAND_FREE, allocation->size, NULL,
+		MRD_log_command(MRD_COMMAND_FREE, allocation->size, allocation,
 				file_name, line);
 	}
 
