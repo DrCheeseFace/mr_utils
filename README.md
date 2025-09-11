@@ -36,9 +36,8 @@ CFLAGS = -Wall -Wextra -Werror \
 TEST_TARGET = test.out
 TEST_SRC =  test/*.c *.c
 
-MEMORY_DEBUGGER_LOG_LEVEL = MRD_LOG_LEVEL_NORMAL
-# MEMORY_DEBUGGER_LOG_LEVEL = MRD_LOG_LEVEL_ERR_ONLY
-# MEMORY_DEBUGGER_LOG_LEVEL = MRD_LOG_LEVEL_ALL
+DEBUG_LEVEL = MRD_DEBUG_BACKTRACE
+# DEBUG_LEVEL = MRD_DEBUG_DEFAULT
 
 .PHONY: all build run clean format format-check bear test check build-debugger-preload debug build-debug 
 
@@ -71,9 +70,9 @@ debug:  build-debug run
 build-debug:
 	$(CC) $(CFLAGS_DEBUG) -D $(MEMORY_DEBUGGER_LOG_LEVEL) -o $(TEST_TARGET) $(TEST_SRC)
 ```
-note: `mrd_debug.h` requires the build flag `-rdynamic` do show backtrace symbols 
-note: `-rdynamic` breaks `-fsanitize=address`
-note: `static` functions wont be displayed as the symbol isnt exported :( 
+- note: `mrd_debug.h` requires the build flag `-rdynamic` do show backtrace symbols
+- note: `-rdynamic` breaks `-fsanitize=address`
+- note: `static` functions wont be displayed as the symbol isnt exported :(
 
 
 
