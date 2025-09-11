@@ -5,6 +5,7 @@
 #include "../mrd_debug.h"
 #include "../mrs_strings.h"
 #include "../mrt_test.h"
+#include "../mrv_vector.h"
 
 int test_strstr(void)
 {
@@ -513,6 +514,151 @@ int test_shrink_to_fit(void)
 	return failed;
 }
 
+int test_append(void)
+{
+	struct MRT_Context *t_ctx = MRT_ctx_create("test_append");
+
+	MRV_Vector *int_array = MRV_create(10, sizeof(int));
+	int append_val = CAFE_BABE;
+	MRV_append(int_array, &append_val);
+
+	struct MRT_Case test_case = (struct MRT_Case){
+		.description = "empty array append within capacity len",
+		.pass = int_array->len == 1
+	};
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	test_case = (struct MRT_Case){
+		.description = "empty array append within capacity capacity",
+		.pass = int_array->capacity == 10
+	};
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	test_case = (struct MRT_Case){
+		.description = "empty array append within capacity stride",
+		.pass = int_array->stride == sizeof(int)
+	};
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	int *val = MRV_get_idx(int_array, 0);
+	test_case = (struct MRT_Case){
+		.description = "empty array append within capacity val",
+		.pass = *val == append_val
+	};
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRV_destroy(int_array);
+
+	int_array = MRV_create(10, sizeof(int));
+
+	test_case = (struct MRT_Case){
+		.description = "empty array append to capacity capacity",
+		.pass = int_array->capacity == 10
+	};
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	for (size_t i = 0; i < 10; i++) {
+		MRV_append(int_array, &i);
+		val = MRV_get_idx(int_array, i);
+
+		test_case = (struct MRT_Case){
+			.description = "empty array append to capacity value",
+			.pass = *val == (int)i
+		};
+		MRT_ctx_append_case(t_ctx, test_case);
+	}
+
+	test_case =
+		(struct MRT_Case){ .description =
+					   "empty array append to capacity len",
+				   .pass = int_array->len == 10 };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	Error err = MRV_append(int_array, &append_val);
+	val = MRV_get_idx(int_array, 10);
+
+	test_case = (struct MRT_Case){
+		.description = "empty array append over capacity OK",
+		.pass = err == OK
+	};
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	test_case = (struct MRT_Case){
+		.description = "empty array append over capacity value",
+		.pass = *val == append_val
+	};
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	test_case = (struct MRT_Case){
+		.description = "empty array append over capacity len",
+		.pass = int_array->len == 11
+	};
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	test_case = (struct MRT_Case){
+		.description = "empty array append over capacity capacity",
+		.pass = int_array->capacity == 11
+	};
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRV_destroy(int_array);
+
+	int failed = MRT_ctx_log(t_ctx);
+	MRT_ctx_free(t_ctx);
+	return failed;
+}
+
+int test_pop(void)
+{
+	struct MRT_Context *t_ctx = MRT_ctx_create("test_strstr");
+
+	MRV_Vector *int_array = MRV_create(10, sizeof(int));
+	int append_val = CAFE_BABE;
+	MRV_append(int_array, &append_val);
+	MRV_append(int_array, &append_val);
+	MRV_append(int_array, &append_val);
+	MRV_pop(int_array);
+
+	struct MRT_Case test_case =
+		(struct MRT_Case){ .description = "pop len > 0 len",
+				   .pass = int_array->len == 2 };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	test_case = (struct MRT_Case){ .description = "pop len > 0 capacity",
+				       .pass = int_array->capacity == 10 };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRV_pop(int_array);
+	Error err = MRV_pop(int_array);
+
+	test_case = (struct MRT_Case){ .description = "pop to len = 0 len",
+				       .pass = int_array->len == 0 };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	test_case = (struct MRT_Case){ .description = "pop to len = 0 capacity",
+				       .pass = int_array->capacity == 10 };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	test_case = (struct MRT_Case){ .description = "pop to len = 0 err",
+				       .pass = err == OK };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	err = MRV_pop(int_array);
+	test_case = (struct MRT_Case){ .description = "pop at len = 0 len",
+				       .pass = int_array->len == 0 };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	test_case = (struct MRT_Case){ .description = "pop at len = 0 err",
+				       .pass = err == ERR };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+        MRV_destroy(int_array);
+
+	int failed = MRT_ctx_log(t_ctx);
+	MRT_ctx_free(t_ctx);
+	return failed;
+}
+
 int bruh(void)
 {
 	void *ptr = malloc(69);
@@ -540,6 +686,9 @@ int main(void)
 	err = err || test_strchr();
 	err = err || test_strndup();
 	err = err || test_shrink_to_fit();
+	err = err || test_append();
+	err = err || test_pop();
+
 
 	// err = err || bruh();
 

@@ -43,9 +43,9 @@ void MRS_free(MRS_String *string)
 	if (string != NULL && string->value != NULL) {
 		free(string->value);
 		string->value = NULL;
-		string->len = 0;
-		string->capacity = 0;
 	}
+	string->len = CAFE_BABE;
+	string->capacity = CAFE_BABE;
 }
 
 void MRS_filter(MRS_String *string, const char remove_me)

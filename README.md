@@ -1,6 +1,7 @@
 # my C utils lib
 
 - `mrs_strings.h`: string manipulation library
+- `mrv_vector.h`: vector library
 - `mrt_test.h`: mini test library 
 - `mrl_logger.h`: logging utilities 
 - `mrd_debug.h`: memory allocation debugging info. enable by defining DEBUG eg: `#define DEBUG` or the `-DDEBUG` gcc flag
@@ -14,17 +15,19 @@ CSTANDARD = c99
 
 CFLAGS_DEBUG = -Wall -Wextra -Werror \
 	 -Wpointer-arith -Wcast-align \
-         -Wstrict-prototypes -Wwrite-strings -Waggregate-return \
-         -Wswitch-default -Wswitch-enum -Wunreachable-code \
+     -Wstrict-prototypes -Wwrite-strings -Waggregate-return \
+     -Wswitch-default -Wswitch-enum -Wunreachable-code \
 	 -Wunused-parameter -Wuninitialized -Winit-self \
  	 -Wbad-function-cast -Wcast-align\
 	 -Wformat=2 -Wlogical-op -Wmissing-include-dirs \
-         -Wredundant-decls -Wsequence-point -Wshadow \
+     -Wredundant-decls -Wsequence-point -Wshadow \
 	 -Wswitch -Wundef -Wunused-but-set-parameter \
 	 -Wcast-qual  -Wfloat-equal -Wnested-externs \
 	 -O0 -g -rdynamic \
 	 -Wpedantic  -pedantic-errors \
-	 # -fsanitize=address \
+     -DDEBUG \
+	 -fsanitize=address \
+     # BEWARE -rdynamic breaks leak check on fsanitize
 	 
 CFLAGS = -Wall -Wextra -Werror \
 	 -std=$(CSTANDARD) \
@@ -66,9 +69,10 @@ check: format-check build-debug run
 debug:  build-debug run
 
 build-debug:
-	$(CC) $(CFLAGS_DEBUG) -D $(MEMORY_DEBUGGER_LOG_LEVEL) -D DEBUG -o $(TEST_TARGET) $(TEST_SRC)
+	$(CC) $(CFLAGS_DEBUG) -D $(MEMORY_DEBUGGER_LOG_LEVEL) -o $(TEST_TARGET) $(TEST_SRC)
 ```
 note: `mrd_debug.h` requires the build flag `-rdynamic` do show backtrace symbols 
+note: `-rdynamic` breaks `-fsanitize=address`
 note: `static` functions wont be displayed as the symbol isnt exported :( 
 
 
@@ -76,8 +80,9 @@ note: `static` functions wont be displayed as the symbol isnt exported :(
 ### TODO
 - [ ] add left rigth comparison for failed tests 
 - [ ] malloc calloc realloc free wrappers for debugging memory leaks eg: this PTR (id) with this DATA that was allocated HERE, was not freed
+- [ ] optimize mrd_debug. map offsets to log messages so i dont have to calculate multiple times
 - [ ] log to defined out 
-- [ ] dynamic array lib 
+- [x] dynamic array lib
 - [ ] doc generator tool 
 - [ ] useful runtime error message. something with coredump file abort()
 - [x] debug maintain only active allocations. eg: freed and not realloced to something not freed

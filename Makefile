@@ -13,9 +13,10 @@ CFLAGS_DEBUG = -Wall -Wextra -Werror \
                -Wswitch -Wundef -Wunused-but-set-parameter \
                -Wcast-qual  -Wfloat-equal -Wnested-externs \
 	       -Wpedantic  -pedantic-errors \
-               -DDEBUG -rdynamic \
 	       -O0 -g \
 	       -fsanitize=address \
+	       # -DDEBUG -rdynamic \
+	       # BEWARE -rdynamic breaks leak check on fsanitize
 	 
 CFLAGS = -Wall -Wextra -Werror \
 	 -O2 
