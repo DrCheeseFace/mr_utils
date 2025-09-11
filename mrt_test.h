@@ -8,8 +8,7 @@
 #include "mrm_misc.h"
 #include <stddef.h>
 
-#define MRT_MAX_TEST_CASES_PER_CONTEXT 128
-#define MRT_MAX_CONTEXT_DESCRIPTION 128
+#define MRT_INIT_TEST_CASES_PER_CONTEXT 64
 
 #define MRT_TAB "    "
 
@@ -25,8 +24,6 @@
 
 /*
  * MRT_Context holds test cases and a description for the group of test cases 
- * 
- * can hold a maximum of MRT_MAX_TEST_CASES_PER_CONTEXT cases
  *
  */
 extern struct MRT_Context MRT_Context;

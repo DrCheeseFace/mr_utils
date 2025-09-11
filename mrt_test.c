@@ -2,6 +2,7 @@
 #include "mrd_debug.h"
 #include "mrl_logger.h"
 #include "mrs_strings.h"
+#include "mrv_vectors.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,7 +17,7 @@ struct MRT_Context {
 	MRS_String *description;
 	int pass_count;
 	int fail_count;
-	struct MRT_Case cases[MRT_MAX_TEST_CASES_PER_CONTEXT];
+	MRV_Vector *cases;
 	int case_count;
 };
 
@@ -45,15 +46,21 @@ struct MRT_Context *MRT_ctx_create(const char *description)
 	MRS_setstr(s, description, strlen(description));
 	t_ctx->description = s;
 
+	t_ctx->cases = MRV_create(MRT_INIT_TEST_CASES_PER_CONTEXT,
+				  sizeof(struct MRT_Case));
+
 	return t_ctx;
 }
 
 void MRT_ctx_free(struct MRT_Context *t_ctx)
 {
 	for (size_t i = 0; i < (size_t)t_ctx->case_count; i++) {
-		MRS_free(t_ctx->cases[i].description);
-		free(t_ctx->cases[i].description);
+		struct MRT_Case *c = MRV_get_idx(t_ctx->cases, i);
+		MRS_free(c->description);
+		free(c->description);
 	}
+
+	MRV_destroy((MRV_Vector *)t_ctx->cases);
 
 	MRS_free(t_ctx->description);
 	free(t_ctx->description);
@@ -70,11 +77,11 @@ void MRT_ctx_append_case(struct MRT_Context *t_ctx, const char *description,
 		t_ctx->fail_count++;
 	}
 
-	t_ctx->cases[t_ctx->case_count].pass = pass;
-
 	MRS_String *s = MRS_create(strlen(description));
 	MRS_setstr(s, description, strlen(description));
-	t_ctx->cases[t_ctx->case_count].description = s;
+
+	MRV_append(t_ctx->cases,
+		   &(struct MRT_Case){ .description = s, .pass = pass });
 
 	t_ctx->case_count++;
 }
@@ -88,7 +95,8 @@ int MRT_ctx_log(struct MRT_Context *t_ctx)
 
 	for (int i = 0; i < t_ctx->case_count; i++) {
 		MRL_log(MRT_TAB, MRL_SEVERITY_DEFAULT);
-		MRT_case_log(t_ctx->cases[i]);
+		struct MRT_Case *c = MRV_get_idx(t_ctx->cases, i);
+		MRT_case_log(*c);
 	}
 	MRL_logln("", MRL_SEVERITY_DEFAULT);
 
