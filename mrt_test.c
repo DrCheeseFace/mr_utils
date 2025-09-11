@@ -9,7 +9,7 @@
 #include <string.h>
 
 struct MRT_Case {
-	MRS_String *description;
+	MRS_String description;
 	Bool pass;
 };
 
@@ -17,7 +17,7 @@ struct MRT_Context {
 	MRS_String *description;
 	int pass_count;
 	int fail_count;
-	MRV_Vector *cases;
+	MRV_Vector cases;
 	int case_count;
 };
 
@@ -28,7 +28,7 @@ Bool MRT_assert_eq(void *expected, void *actual, size_t size_of)
 
 void MRT_case_log(struct MRT_Case test_case)
 {
-	MRL_log(test_case.description->value, MRL_SEVERITY_DEFAULT);
+	MRL_log(test_case.description.value, MRL_SEVERITY_DEFAULT);
 	if (test_case.pass) {
 		MRL_logln(" ... ok", MRL_SEVERITY_OK);
 	} else {
@@ -46,8 +46,8 @@ struct MRT_Context *MRT_ctx_create(const char *description)
 	MRS_setstr(s, description, strlen(description));
 	t_ctx->description = s;
 
-	t_ctx->cases = MRV_create(MRT_INIT_TEST_CASES_PER_CONTEXT,
-				  sizeof(struct MRT_Case));
+	MRV_init(&t_ctx->cases, MRT_INIT_TEST_CASES_PER_CONTEXT,
+		 sizeof(struct MRT_Case));
 
 	return t_ctx;
 }
@@ -55,12 +55,11 @@ struct MRT_Context *MRT_ctx_create(const char *description)
 void MRT_ctx_free(struct MRT_Context *t_ctx)
 {
 	for (size_t i = 0; i < (size_t)t_ctx->case_count; i++) {
-		struct MRT_Case *c = MRV_get_idx(t_ctx->cases, i);
-		MRS_free(c->description);
-		free(c->description);
+		struct MRT_Case *c = MRV_get_idx(&t_ctx->cases, i);
+		MRS_free(&c->description);
 	}
 
-	MRV_destroy((MRV_Vector *)t_ctx->cases);
+	MRV_free(&t_ctx->cases);
 
 	MRS_free(t_ctx->description);
 	free(t_ctx->description);
@@ -77,10 +76,10 @@ void MRT_ctx_append_case(struct MRT_Context *t_ctx, const char *description,
 		t_ctx->fail_count++;
 	}
 
-	MRS_String *s = MRS_create(strlen(description));
-	MRS_setstr(s, description, strlen(description));
+	MRS_String s;
+	MRS_init(strlen(description), description, strlen(description), &s);
 
-	MRV_append(t_ctx->cases,
+	MRV_append(&t_ctx->cases,
 		   &(struct MRT_Case){ .description = s, .pass = pass });
 
 	t_ctx->case_count++;
@@ -95,7 +94,7 @@ int MRT_ctx_log(struct MRT_Context *t_ctx)
 
 	for (int i = 0; i < t_ctx->case_count; i++) {
 		MRL_log(MRT_TAB, MRL_SEVERITY_DEFAULT);
-		struct MRT_Case *c = MRV_get_idx(t_ctx->cases, i);
+		struct MRT_Case *c = MRV_get_idx(&t_ctx->cases, i);
 		MRT_case_log(*c);
 	}
 	MRL_logln("", MRL_SEVERITY_DEFAULT);
