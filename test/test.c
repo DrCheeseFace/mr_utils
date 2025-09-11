@@ -659,12 +659,12 @@ int test_pop(void)
 	return failed;
 }
 
-bool is_two(void *x)
+Bool is_two(void *x)
 {
 	return *(int *)x == 2;
 }
 
-bool always_false(void *_)
+Bool always_false(void *_)
 {
 	(void)_;
 	return FALSE;

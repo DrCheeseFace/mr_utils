@@ -129,7 +129,7 @@ void *MRV_get_idx(MRV_Vector *vec, size_t n)
 	return &vec->arr[n * vec->stride];
 }
 
-void *MRV_get_item_where(MRV_Vector *vec, bool (*is_item)(void *))
+void *MRV_get_item_where(MRV_Vector *vec, Bool (*is_item)(void *))
 {
 	for (size_t i = 0; i < vec->len; i++) {
 		if (is_item(&vec->arr[i * vec->stride]) == TRUE) {

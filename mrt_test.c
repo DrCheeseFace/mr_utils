@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-bool MRT_assert_eq(void *expected, void *actual, size_t size_of)
+Bool MRT_assert_eq(void *expected, void *actual, size_t size_of)
 {
 	return memcmp(expected, actual, size_of) == 0;
 }

@@ -25,7 +25,7 @@
 
 struct MRT_Case {
 	char description[MRT_MAX_CONTEXT_DESCRIPTION];
-	bool pass;
+	Bool pass;
 };
 
 struct MRT_Context {
@@ -36,7 +36,7 @@ struct MRT_Context {
 	int case_count;
 };
 
-bool MRT_assert_eq(void *expected, void *actual, size_t size_of);
+Bool MRT_assert_eq(void *expected, void *actual, size_t size_of);
 
 struct MRT_Context *MRT_ctx_create(const char *description);
 

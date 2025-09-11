@@ -30,7 +30,7 @@ typedef enum MRM_Bool {
 	MRM_BOOL_TRUE,
 } MRM_Bool;
 
-#define bool MRM_Bool
+#define Bool MRM_Bool
 #define TRUE MRM_BOOL_TRUE
 #define FALSE MRM_BOOL_FALSE
 

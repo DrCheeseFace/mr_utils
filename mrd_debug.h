@@ -23,7 +23,7 @@
 
 struct Allocation {
 	void *ptr;
-	bool active;
+	Bool active;
 	int id;
 	struct Allocation *reallocated_to;
 	size_t size;
