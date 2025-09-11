@@ -652,7 +652,7 @@ int test_pop(void)
 				       .pass = err == ERR };
 	MRT_ctx_append_case(t_ctx, test_case);
 
-        MRV_destroy(int_array);
+	MRV_destroy(int_array);
 
 	int failed = MRT_ctx_log(t_ctx);
 	MRT_ctx_free(t_ctx);
@@ -688,7 +688,6 @@ int main(void)
 	err = err || test_shrink_to_fit();
 	err = err || test_append();
 	err = err || test_pop();
-
 
 	// err = err || bruh();
 
