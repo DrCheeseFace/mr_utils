@@ -129,10 +129,22 @@ void *MRV_get_idx(MRV_Vector *vec, size_t n)
 	return &vec->arr[n * vec->stride];
 }
 
-void *MRV_get_item(MRV_Vector *vec, bool (*is_item)(void *))
+void *MRV_get_item_where(MRV_Vector *vec, bool (*compare)(void *))
 {
 	for (size_t i = 0; i < vec->len; i++) {
-		if (is_item(&vec->arr[i * vec->stride]) == TRUE) {
+		if (compare(&vec->arr[i * vec->stride]) == TRUE) {
+			return &vec->arr[i * vec->stride];
+		}
+	}
+
+	return NULL;
+}
+
+void *MRV_get_item(MRV_Vector *vec, void *item)
+{
+	for (size_t i = 0; i < vec->len; i++) {
+		if (memcmp(&vec->arr[i * vec->stride], item, vec->stride) ==
+		    0) {
 			return &vec->arr[i * vec->stride];
 		}
 	}

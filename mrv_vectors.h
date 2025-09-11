@@ -34,6 +34,8 @@ MRM_ErrorCode MRV_pop(MRV_Vector *vec);
 
 void *MRV_get_idx(MRV_Vector *vec, size_t n);
 
-void *MRV_get_item(MRV_Vector *vec, bool (*is_item)(void *));
+void *MRV_get_item(MRV_Vector *vec, void *item);
+
+void *MRV_get_item_where(MRV_Vector *vec, bool (*compare)(void *));
 
 #endif // !MRV_VECTORS_H

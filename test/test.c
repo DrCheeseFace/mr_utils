@@ -659,6 +659,87 @@ int test_pop(void)
 	return failed;
 }
 
+bool is_two(void *x)
+{
+	return *(int *)x == 2;
+}
+
+bool always_false(void *_)
+{
+	(void)_;
+	return FALSE;
+}
+
+int test_get_item_where(void)
+{
+	struct MRT_Context *t_ctx = MRT_ctx_create("test_get_item_where");
+
+	MRV_Vector *int_array = MRV_create(10, sizeof(int));
+	int append_val = 1;
+	MRV_append(int_array, &append_val);
+	append_val++;
+	MRV_append(int_array, &append_val);
+	append_val++;
+	MRV_append(int_array, &append_val);
+	append_val++;
+
+	void *two_ptr = MRV_get_idx(int_array, 1);
+
+	struct MRT_Case test_case = (struct MRT_Case){
+		.description = "get middle item",
+		.pass = MRV_get_item_where(int_array, is_two) == two_ptr
+	};
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	test_case = (struct MRT_Case){
+		.description = "item doesnt exist",
+		.pass = MRV_get_item_where(int_array, always_false) == NULL
+	};
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRV_destroy(int_array);
+
+	int failed = MRT_ctx_log(t_ctx);
+	MRT_ctx_free(t_ctx);
+	return failed;
+}
+
+int test_get_item(void)
+{
+	struct MRT_Context *t_ctx = MRT_ctx_create("test_get_item");
+
+	MRV_Vector *int_array = MRV_create(10, sizeof(int));
+	int append_val = 1;
+	MRV_append(int_array, &append_val);
+	append_val++;
+	MRV_append(int_array, &append_val);
+	append_val++;
+	MRV_append(int_array, &append_val);
+	append_val++;
+
+	void *two_ptr = MRV_get_idx(int_array, 1);
+
+	append_val = 2;
+	struct MRT_Case test_case = (struct MRT_Case){
+		.description = "get middle item",
+		.pass = MRV_get_item(int_array, &append_val) == two_ptr
+	};
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	append_val = CAFE_BABE;
+	test_case =
+		(struct MRT_Case){ .description = "item doesnt exist",
+				   .pass = MRV_get_item(int_array,
+							&append_val) == NULL };
+	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRV_destroy(int_array);
+
+	int failed = MRT_ctx_log(t_ctx);
+	MRT_ctx_free(t_ctx);
+	return failed;
+}
+
 int bruh(void)
 {
 	void *ptr = malloc(69);
@@ -691,6 +772,8 @@ int main(void)
 	// mrv_vectors
 	err = err || test_append();
 	err = err || test_pop();
+	err = err || test_get_item_where();
+	err = err || test_get_item();
 
 	// err = err || bruh();
 
