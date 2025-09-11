@@ -9,7 +9,6 @@
 #ifndef MRD_DEBUG_H
 #define MRD_DEBUG_H
 
-#include "mrm_misc.h"
 #include <stddef.h>
 
 #define MAX_ACTIVE_ALLOCATIONS 1024
@@ -20,21 +19,6 @@
 #define BASE_ADDRESS_SIZE 12
 #define DEBUG_LOG_HEAD "MRD_DEBUG LOG: "
 #define _GNU_SOURCE
-
-struct Allocation {
-	void *ptr;
-	Bool active;
-	int id;
-	struct Allocation *reallocated_to;
-	size_t size;
-};
-
-typedef enum MRD_Command {
-	MRD_COMMAND_MALLOC,
-	MRD_COMMAND_CALLOC,
-	MRD_COMMAND_REALLOC,
-	MRD_COMMAND_FREE,
-} MRD_command;
 
 void *MRD_malloc(size_t size, const char *file_name, int line);
 void *MRD_calloc(size_t nmemb, size_t size, const char *file_name, int line);

@@ -6,7 +6,7 @@
 #define MRT_TEST_H
 
 #include "mrm_misc.h"
-#include <sys/types.h>
+#include <stddef.h>
 
 #define MRT_MAX_TEST_CASES_PER_CONTEXT 128
 #define MRT_MAX_CONTEXT_DESCRIPTION 128
@@ -23,18 +23,13 @@
 
 #define MRT_ASSERT_NOT_NULL(actual) (actual != NULL)
 
-struct MRT_Case {
-	char description[MRT_MAX_CONTEXT_DESCRIPTION];
-	Bool pass;
-};
-
-struct MRT_Context {
-	char description[MRT_MAX_CONTEXT_DESCRIPTION];
-	int pass_count;
-	int fail_count;
-	struct MRT_Case cases[MRT_MAX_TEST_CASES_PER_CONTEXT];
-	int case_count;
-};
+/*
+ * MRT_Context holds test cases and a description for the group of test cases 
+ * 
+ * can hold a maximum of MRT_MAX_TEST_CASES_PER_CONTEXT cases
+ *
+ */
+extern struct MRT_Context MRT_Context;
 
 Bool MRT_assert_eq(void *expected, void *actual, size_t size_of);
 
@@ -42,7 +37,8 @@ struct MRT_Context *MRT_ctx_create(const char *description);
 
 void MRT_ctx_free(struct MRT_Context *t_ctx);
 
-void MRT_ctx_append_case(struct MRT_Context *t_ctx, struct MRT_Case test_case);
+void MRT_ctx_append_case(struct MRT_Context *t_ctx, const char *description,
+			 Bool pass);
 
 /*
  * `returns` 0 if passed 

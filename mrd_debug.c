@@ -15,8 +15,23 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+struct MRD_Allocation {
+	void *ptr;
+	Bool active;
+	int id;
+	struct MRD_Allocation *reallocated_to;
+	size_t size;
+};
+
+typedef enum MRD_Command {
+	MRD_COMMAND_MALLOC,
+	MRD_COMMAND_CALLOC,
+	MRD_COMMAND_REALLOC,
+	MRD_COMMAND_FREE,
+} MRD_Command;
+
 global_variable int current_allocation_id = 0;
-global_variable struct Allocation active_allocations[MAX_ACTIVE_ALLOCATIONS];
+global_variable struct MRD_Allocation active_allocations[MAX_ACTIVE_ALLOCATIONS];
 global_variable long base_address = CAFE_BABE;
 
 // cant call MRS_init due to it calling malloc
@@ -177,7 +192,8 @@ internal void unused MRD_log_backtrace(void)
 }
 
 // returns 1 if true
-internal int MRD_is_free_active_allocation_slot(struct Allocation allocation)
+internal int
+MRD_is_free_active_allocation_slot(struct MRD_Allocation allocation)
 {
 	if (allocation.active == FALSE) {
 		if (allocation.reallocated_to == NULL) {
@@ -192,7 +208,7 @@ internal int MRD_is_free_active_allocation_slot(struct Allocation allocation)
 
 // populates first available slot
 internal void
-MRD_add_allocation_to_active_allocations(struct Allocation new_allocation)
+MRD_add_allocation_to_active_allocations(struct MRD_Allocation new_allocation)
 {
 	for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {
 		if (MRD_is_free_active_allocation_slot(active_allocations[i])) {
@@ -208,8 +224,8 @@ MRD_add_allocation_to_active_allocations(struct Allocation new_allocation)
 	MRD_log_err(err);
 }
 
-internal void MRD_log_command(MRD_command command, size_t size,
-			      struct Allocation *realloc_free_src,
+internal void MRD_log_command(enum MRD_Command command, size_t size,
+			      struct MRD_Allocation *realloc_free_src,
 			      const char *file_name, int line)
 {
 	MRL_log(DEBUG_LOG_HEAD, MRL_SEVERITY_INFO);
@@ -278,11 +294,11 @@ void *MRD_malloc(size_t size, const char *file_name, int line)
 	if (ptr != NULL) {
 		memset(ptr, CAFE_BABE, size);
 		MRD_add_allocation_to_active_allocations(
-			(struct Allocation){ .ptr = ptr,
-					     .size = size,
-					     .id = current_allocation_id,
-					     .active = TRUE,
-					     .reallocated_to = NULL });
+			(struct MRD_Allocation){ .ptr = ptr,
+						 .size = size,
+						 .id = current_allocation_id,
+						 .active = TRUE,
+						 .reallocated_to = NULL });
 
 	} else {
 		MRD_log_err("FAILED TO MALLOC ALLOCATE ");
@@ -304,11 +320,11 @@ void *MRD_calloc(size_t nmemb, size_t size, const char *file_name, int line)
 	void *ptr = calloc(nmemb, size);
 	if (ptr != NULL) {
 		MRD_add_allocation_to_active_allocations(
-			(struct Allocation){ .ptr = ptr,
-					     .size = size,
-					     .id = current_allocation_id,
-					     .active = TRUE,
-					     .reallocated_to = NULL });
+			(struct MRD_Allocation){ .ptr = ptr,
+						 .size = size,
+						 .id = current_allocation_id,
+						 .active = TRUE,
+						 .reallocated_to = NULL });
 
 	} else {
 		MRD_log_err("FAILED TO CALLOC ALLOCATE");
@@ -321,7 +337,7 @@ void *MRD_calloc(size_t nmemb, size_t size, const char *file_name, int line)
 
 void *MRD_realloc(void *ptr, size_t size, const char *file_name, int line)
 {
-	struct Allocation *src_allocation = NULL;
+	struct MRD_Allocation *src_allocation = NULL;
 	for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {
 		if (ptr == active_allocations[i].ptr) {
 			src_allocation = &active_allocations[i];
@@ -343,11 +359,11 @@ void *MRD_realloc(void *ptr, size_t size, const char *file_name, int line)
 		src_allocation->reallocated_to = realloc_ptr;
 
 		MRD_add_allocation_to_active_allocations(
-			(struct Allocation){ .ptr = realloc_ptr,
-					     .size = size,
-					     .id = current_allocation_id,
-					     .active = TRUE,
-					     .reallocated_to = NULL });
+			(struct MRD_Allocation){ .ptr = realloc_ptr,
+						 .size = size,
+						 .id = current_allocation_id,
+						 .active = TRUE,
+						 .reallocated_to = NULL });
 
 	} else {
 		MRD_log_err("FAILED TO REALLOCATE");
@@ -360,7 +376,7 @@ void *MRD_realloc(void *ptr, size_t size, const char *file_name, int line)
 
 void MRD_free(void *ptr, const char *file_name, int line)
 {
-	struct Allocation *allocation = NULL;
+	struct MRD_Allocation *allocation = NULL;
 	for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {
 		if (ptr == active_allocations[i].ptr) {
 			allocation = &active_allocations[i];

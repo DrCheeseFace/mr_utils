@@ -1,5 +1,7 @@
 #include "mrs_strings.h"
 #include "mrd_debug.h"
+#include "mrm_misc.h"
+
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>

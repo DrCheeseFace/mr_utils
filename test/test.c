@@ -20,46 +20,31 @@ int test_strstr(void)
 	MRS_String b;
 	MRS_init(3, needle, strlen(needle), &b);
 
-	struct MRT_Case test_case = (struct MRT_Case){
-		.description = "11151111111111111231 | 31",
-		.pass = MRT_ASSERT_EQ(a.value[18], *MRS_strstr(&a, &b, 0))
-	};
-	MRT_ctx_append_case(t_ctx, test_case);
+	MRT_ctx_append_case(t_ctx, "11151111111111111231 | 31",
+			    MRT_ASSERT_EQ(a.value[18], *MRS_strstr(&a, &b, 0)));
 
 	size_t start_idx = 3;
-	test_case = (struct MRT_Case){
-		.description = "11151111111111111231 | 31 startidx=3",
-		.pass = MRT_ASSERT_EQ(a.value[18],
-				      *MRS_strstr(&a, &b, start_idx))
-	};
-	MRT_ctx_append_case(t_ctx, test_case);
 
-	test_case = (struct MRT_Case){
-		.description = "11151111111111111231 | 31 startidx=NULL",
-		.pass = MRT_ASSERT_EQ(a.value[18], *MRS_strstr(&a, &b, 0))
-	};
-	MRT_ctx_append_case(t_ctx, test_case);
+	MRT_ctx_append_case(t_ctx, "11151111111111111231 | 31 startidx=3",
+			    MRT_ASSERT_EQ(a.value[18],
+					  *MRS_strstr(&a, &b, start_idx)));
+	MRT_ctx_append_case(t_ctx, "11151111111111111231 | 31 startidx=NULL",
+			    MRT_ASSERT_EQ(a.value[18], *MRS_strstr(&a, &b, 0)));
 
 	MRS_setstr(&b, "52", strlen("52"));
-	test_case = (struct MRT_Case){
-		.description = "11151111111111111231 | 52",
-		.pass = MRT_ASSERT_NULL(MRS_strstr(&a, &b, 0))
-	};
-	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRT_ctx_append_case(t_ctx, "11151111111111111231 | 52",
+			    MRT_ASSERT_NULL(MRS_strstr(&a, &b, 0)));
 
 	MRS_setstr(&b, "112", strlen("112"));
-	test_case = (struct MRT_Case){
-		.description = "11151111111111111231 | 112",
-		.pass = MRT_ASSERT_EQ(a.value[15], *MRS_strstr(&a, &b, 0))
-	};
-	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRT_ctx_append_case(t_ctx, "11151111111111111231 | 112",
+			    MRT_ASSERT_EQ(a.value[15], *MRS_strstr(&a, &b, 0)));
 
 	MRS_setstr(&b, "311", strlen("311"));
-	test_case = (struct MRT_Case){
-		.description = "11151111111111111231 | 311 OOB",
-		.pass = MRT_ASSERT_NULL(MRS_strstr(&a, &b, 0))
-	};
-	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRT_ctx_append_case(t_ctx, "11151111111111111231 | 311 OOB",
+			    MRT_ASSERT_NULL(MRS_strstr(&a, &b, 0)));
 
 	MRS_free(&a);
 	MRS_free(&b);
@@ -79,26 +64,20 @@ int test_filter(void)
 	MRS_init(20, "111", strlen("111"), &expected);
 	MRS_filter(&actual, '2');
 
-	struct MRT_Case test_case =
-		(struct MRT_Case){ .description = "12121 | 2",
-				   .pass = !MRS_strcmp(&expected, &actual) };
-	MRT_ctx_append_case(t_ctx, test_case);
+	MRT_ctx_append_case(t_ctx, "12121 | 2",
+			    !MRS_strcmp(&expected, &actual));
 
 	MRS_setstr(&actual, "2222", strlen("2222"));
 	MRS_setstr(&expected, "", strlen(""));
 	MRS_filter(&actual, '2');
-	test_case =
-		(struct MRT_Case){ .description = "2222 | 2",
-				   .pass = !MRS_strcmp(&expected, &actual) };
-	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRT_ctx_append_case(t_ctx, "2222 | 2", !MRS_strcmp(&expected, &actual));
 
 	MRS_setstr(&actual, "2222", strlen("2222"));
 	MRS_setstr(&expected, "2222", strlen("2222"));
 	MRS_filter(&actual, '3');
-	test_case =
-		(struct MRT_Case){ .description = "2222 | 3",
-				   .pass = !MRS_strcmp(&expected, &actual) };
-	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRT_ctx_append_case(t_ctx, "2222 | 3", !MRS_strcmp(&expected, &actual));
 
 	MRS_free(&actual);
 	MRS_free(&expected);
@@ -120,31 +99,19 @@ int test_strcat(void)
 	MRS_init(10, "aaabbbcc", strlen("aaabbbcc"), &expected);
 	MRS_strcat(&actual, &append);
 
-	struct MRT_Case test_case =
-		(struct MRT_Case){ .description = "aaabbb | cc",
-				   .pass = !MRS_strcmp(&expected, &actual) };
-	MRT_ctx_append_case(t_ctx, test_case);
+	MRT_ctx_append_case(t_ctx, "aaabbb | cc",
+			    !MRS_strcmp(&expected, &actual));
 
 	MRS_setstr(&actual, "123456789", strlen("123456789"));
 	MRS_setstr(&append, "10", strlen("10"));
 	MRS_setstr(&expected, "12345678910", strlen("12345678910"));
-	test_case =
-		(struct MRT_Case){ .description =
-					   "123456789 | 10 over capacity",
-				   .pass = 0 == MRS_strcat(&actual, &append) };
-	MRT_ctx_append_case(t_ctx, test_case);
 
-	test_case = (struct MRT_Case){
-		.description = "123456789 | 10 over capacity length check",
-		.pass = 11 == actual.capacity
-	};
-	MRT_ctx_append_case(t_ctx, test_case);
-
-	test_case = (struct MRT_Case){
-		.description = "123456789 | 10 over capacity equals",
-		.pass = MRS_strcmp(&expected, &actual)
-	};
-	MRT_ctx_append_case(t_ctx, test_case);
+	MRT_ctx_append_case(t_ctx, "123456789 | 10 over capacity",
+			    0 == MRS_strcat(&actual, &append));
+	MRT_ctx_append_case(t_ctx, "123456789 | 10 over capacity length check",
+			    11 == actual.capacity);
+	MRT_ctx_append_case(t_ctx, "123456789 | 10 over capacity equals",
+			    MRS_strcmp(&expected, &actual));
 
 	MRS_free(&actual);
 	MRS_free(&expected);
@@ -152,20 +119,17 @@ int test_strcat(void)
 	MRS_init(10, "1234567891", strlen("1234567891"), &expected);
 	MRS_setstr(&append, "1", strlen("1"));
 	MRS_strcat(&actual, &append);
-	test_case =
-		(struct MRT_Case){ .description =
-					   "123456789 | 1 exactly capacity",
-				   .pass = !MRS_strcmp(&expected, &actual) };
-	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRT_ctx_append_case(t_ctx, "123456789 | 1 exactly capacity",
+			    !MRS_strcmp(&expected, &actual));
 
 	MRS_setstr(&actual, "123456789", strlen("123456789"));
 	MRS_setstr(&append, "", strlen(""));
 	MRS_setstr(&expected, "123456789", strlen("123456789"));
 	MRS_strcat(&actual, &append);
-	test_case =
-		(struct MRT_Case){ .description = "123456789 | empty src",
-				   .pass = !MRS_strcmp(&expected, &actual) };
-	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRT_ctx_append_case(t_ctx, "123456789 | empty src",
+			    !MRS_strcmp(&expected, &actual));
 
 	MRS_free(&actual);
 	MRS_free(&expected);
@@ -174,19 +138,17 @@ int test_strcat(void)
 	MRS_setstr(&append, "123", strlen("123"));
 
 	MRS_strcat(&actual, &append);
-	test_case =
-		(struct MRT_Case){ .description = "123456789 | empty dest",
-				   .pass = !MRS_strcmp(&expected, &actual) };
-	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRT_ctx_append_case(t_ctx, "123456789 | empty dest",
+			    !MRS_strcmp(&expected, &actual));
 
 	MRS_setstr(&actual, "", strlen(""));
 	MRS_setstr(&append, "", strlen(""));
 	MRS_setstr(&expected, "", strlen(""));
 	MRS_strcat(&actual, &append);
-	test_case =
-		(struct MRT_Case){ .description = "empty dest and src",
-				   .pass = !MRS_strcmp(&expected, &actual) };
-	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRT_ctx_append_case(t_ctx, "empty dest and src",
+			    !MRS_strcmp(&expected, &actual));
 
 	MRS_free(&actual);
 	MRS_free(&expected);
@@ -208,39 +170,25 @@ int test_pushstr(void)
 	MRS_init(10, "aaabbbccc", strlen("aaabbbccc"), &expected);
 	MRS_pushstr(&actual, append, strlen(append));
 
-	struct MRT_Case test_case =
-		(struct MRT_Case){ .description = "aaabbb | ccc",
-				   .pass = !MRS_strcmp(&expected, &actual) };
-	MRT_ctx_append_case(t_ctx, test_case);
-
-	test_case = (struct MRT_Case){ .description = "aaabbb | ccc capactity",
-				       .pass = actual.capacity == 10 };
-	MRT_ctx_append_case(t_ctx, test_case);
+	MRT_ctx_append_case(t_ctx, "aaabbb | ccc",
+			    !MRS_strcmp(&expected, &actual));
+	MRT_ctx_append_case(t_ctx, "aaabbb | ccc capactity",
+			    actual.capacity == 10);
 
 	MRS_pushstr(&actual, append, strlen(append));
 	MRS_free(&expected);
 	MRS_init(12, "aaabbbcccccc", strlen("aaabbbcccccc"), &expected);
 
-	test_case =
-		(struct MRT_Case){ .description = "aaabbbccc | ccc",
-				   .pass = !MRS_strcmp(&expected, &actual) };
-	MRT_ctx_append_case(t_ctx, test_case);
-
-	test_case =
-		(struct MRT_Case){ .description = "aaabbbccc | ccc capacity",
-				   .pass = actual.capacity == 12 };
-	MRT_ctx_append_case(t_ctx, test_case);
+	MRT_ctx_append_case(t_ctx, "aaabbbccc | ccc",
+			    !MRS_strcmp(&expected, &actual));
+	MRT_ctx_append_case(t_ctx, "aaabbbccc | ccc capacity",
+			    actual.capacity == 12);
 
 	MRS_pushstr(&actual, "", strlen(""));
 
-	test_case =
-		(struct MRT_Case){ .description = "aaabbbcccccc | ",
-				   .pass = !MRS_strcmp(&expected, &actual) };
-	MRT_ctx_append_case(t_ctx, test_case);
-
-	test_case = (struct MRT_Case){ .description = "aaabbbcccccc | ",
-				       .pass = actual.capacity == 12 };
-	MRT_ctx_append_case(t_ctx, test_case);
+	MRT_ctx_append_case(t_ctx, "aaabbbcccccc | ",
+			    !MRS_strcmp(&expected, &actual));
+	MRT_ctx_append_case(t_ctx, "aaabbbcccccc | ", actual.capacity == 12);
 
 	MRS_free(&actual);
 	MRS_free(&expected);
@@ -259,31 +207,26 @@ int test_get_char(void)
 
 	char actual = MRS_get_char(&src, 3);
 	char expected = '3';
-	struct MRT_Case test_case =
-		(struct MRT_Case){ .description = "within bounds fully",
-				   .pass = MRT_ASSERT_EQ(expected, actual) };
-	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRT_ctx_append_case(t_ctx, "within bounds fully",
+			    MRT_ASSERT_EQ(expected, actual));
 
 	actual = MRS_get_char(&src, 0);
 	expected = '0';
-	test_case =
-		(struct MRT_Case){ .description = "zeroth idx",
-				   .pass = MRT_ASSERT_EQ(expected, actual) };
-	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRT_ctx_append_case(t_ctx, "zeroth idx",
+			    MRT_ASSERT_EQ(expected, actual));
 
 	actual = MRS_get_char(&src, 9);
 	expected = '9';
-	test_case =
-		(struct MRT_Case){ .description = "last idx",
-				   .pass = MRT_ASSERT_EQ(expected, actual) };
-	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRT_ctx_append_case(t_ctx, "last idx", MRT_ASSERT_EQ(expected, actual));
 
 	actual = MRS_get_char(&src, 10);
 	expected = '\0';
-	test_case =
-		(struct MRT_Case){ .description = "outof bounds",
-				   .pass = MRT_ASSERT_EQ(expected, actual) };
-	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRT_ctx_append_case(t_ctx, "outof bounds",
+			    MRT_ASSERT_EQ(expected, actual));
 
 	MRS_free(&src);
 
@@ -306,20 +249,13 @@ int test_setstr(void)
 	int result = MRS_setstr(&actual, to, strlen(to));
 	MRS_init(strlen(to), to, strlen(to), &expected);
 
-	struct MRT_Case test_case =
-		(struct MRT_Case){ .description = "from -> to",
-				   .pass = !MRS_strcmp(&expected, &actual) };
-	MRT_ctx_append_case(t_ctx, test_case);
-
-	test_case = (struct MRT_Case){ .description = "from -> to result",
-				       .pass = result == 0 };
-	MRT_ctx_append_case(t_ctx, test_case);
+	MRT_ctx_append_case(t_ctx, "from -> to",
+			    !MRS_strcmp(&expected, &actual));
+	MRT_ctx_append_case(t_ctx, "from -> to result", result == 0);
 
 	result = MRS_setstr(&actual, to, strlen(from) + 1);
 
-	test_case = (struct MRT_Case){ .description = "from -> from+1 length",
-				       .pass = result == 1 };
-	MRT_ctx_append_case(t_ctx, test_case);
+	MRT_ctx_append_case(t_ctx, "from -> from+1 length", result == 1);
 
 	MRS_free(&actual);
 	MRS_free(&expected);
@@ -343,22 +279,13 @@ int test_setstrn(void)
 
 	int result = MRS_setstrn(&actual, to, strlen(to), 1);
 
-	struct MRT_Case test_case =
-		(struct MRT_Case){ .description = "from -> to length 1",
-				   .pass = !MRS_strcmp(&expected, &actual) };
-	MRT_ctx_append_case(t_ctx, test_case);
-
-	test_case =
-		(struct MRT_Case){ .description = "from -> to length 1 result",
-				   .pass = result == 0 };
-	MRT_ctx_append_case(t_ctx, test_case);
+	MRT_ctx_append_case(t_ctx, "from -> to length 1",
+			    !MRS_strcmp(&expected, &actual));
+	MRT_ctx_append_case(t_ctx, "from -> to length 1 result", result == 0);
 
 	result = MRS_setstrn(&actual, to, strlen(to), 3);
 
-	test_case =
-		(struct MRT_Case){ .description = "from -> to length 3 result",
-				   .pass = result == 1 };
-	MRT_ctx_append_case(t_ctx, test_case);
+	MRT_ctx_append_case(t_ctx, "from -> to length 3 result", result == 1);
 
 	MRS_free(&actual);
 	MRS_free(&expected);
@@ -383,22 +310,13 @@ int test_get_idx(void)
 	size_t idx_found;
 	int result = MRS_get_idx(&example, &example.value[2], &idx_found);
 
-	struct MRT_Case test_case =
-		(struct MRT_Case){ .description = "'from' find from[2]",
-				   .pass = idx_found == 2 };
-	MRT_ctx_append_case(t_ctx, test_case);
-
-	test_case =
-		(struct MRT_Case){ .description = "'from' find from[2] result",
-				   .pass = result == 0 };
-	MRT_ctx_append_case(t_ctx, test_case);
+	MRT_ctx_append_case(t_ctx, "'from' find from[2]", idx_found == 2);
+	MRT_ctx_append_case(t_ctx, "'from' find from[2] result", result == 0);
 
 	result = MRS_get_idx(&example, &random_example.value[2], &idx_found);
-	test_case =
-		(struct MRT_Case){ .description =
-					   "'from' find char* outside result",
-				   .pass = result == -1 };
-	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRT_ctx_append_case(t_ctx, "'from' find char* outside result",
+			    result == -1);
 
 	MRS_free(&example);
 	MRS_free(&random_example);
@@ -416,20 +334,17 @@ int test_strchr(void)
 	MRS_init(strlen(xample_str), xample_str, strlen(xample_str), &xample);
 
 	char *result = MRS_strchr(&xample, 'l');
-	struct MRT_Case test_case =
-		(struct MRT_Case){ .description = "'xample_str' find 'l'",
-				   .pass = *result == 'l' };
-	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRT_ctx_append_case(t_ctx, "'xample_str' find 'l'", *result == 'l');
 
 	result = MRS_strchr(&xample, 'r');
-	test_case = (struct MRT_Case){ .description = "'xample_str' find 'r'",
-				       .pass = *result == 'r' };
-	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRT_ctx_append_case(t_ctx, "'xample_str' find 'r'", *result == 'r');
 
 	result = MRS_strchr(&xample, 'z');
-	test_case = (struct MRT_Case){ .description = "'xample_str' find 'x'",
-				       .pass = MRT_ASSERT_NULL(result) };
-	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRT_ctx_append_case(t_ctx, "'xample_str' find 'x'",
+			    MRT_ASSERT_NULL(result));
 
 	MRS_free(&xample);
 	int failed = MRT_ctx_log(t_ctx);
@@ -448,36 +363,27 @@ int test_strndup(void)
 	MRS_init(strlen(xample_str), xample_str, strlen(xample_str), &xample);
 
 	int result = MRS_strndup(&xample, xample.len, &xample_dup);
-	struct MRT_Case test_case =
-		(struct MRT_Case){ .description = "dup full string",
-				   .pass = !MRS_strcmp(&xample, &xample_dup) };
-	MRT_ctx_append_case(t_ctx, test_case);
 
-	test_case = (struct MRT_Case){ .description = "dup full string result",
-				       .pass = result == 0 };
-	MRT_ctx_append_case(t_ctx, test_case);
+	MRT_ctx_append_case(t_ctx, "dup full string",
+			    !MRS_strcmp(&xample, &xample_dup));
+	MRT_ctx_append_case(t_ctx, "dup full string result", result == 0);
+
 	MRS_free(&xample_dup);
 
 	result = MRS_strndup(&xample, xample.len - 1, &xample_dup);
-	test_case =
-		(struct MRT_Case){ .description = "dup string len - 1",
-				   .pass = xample_dup.len == xample.len - 1 };
-	MRT_ctx_append_case(t_ctx, test_case);
-	test_case = (struct MRT_Case){
-		.description = "dup string len - 1 value check",
-		.pass = !strcmp("xample_st", xample_dup.value)
-	};
-	MRT_ctx_append_case(t_ctx, test_case);
-	test_case =
-		(struct MRT_Case){ .description = "dup string len - 1 result",
-				   .pass = result == 0 };
-	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRT_ctx_append_case(t_ctx, "dup string len - 1",
+			    xample_dup.len == xample.len - 1);
+	MRT_ctx_append_case(t_ctx, "dup string len - 1 value check",
+			    !strcmp("xample_st", xample_dup.value));
+	MRT_ctx_append_case(t_ctx, "dup string len - 1 result", result == 0);
+
 	MRS_free(&xample_dup);
 
 	result = MRS_strndup(&xample, xample.len + 1, &xample_dup);
-	test_case = (struct MRT_Case){ .description = "dup string len + 1",
-				       .pass = result == -1 };
-	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRT_ctx_append_case(t_ctx, "dup string len + 1", result == -1);
+
 	MRS_free(&xample_dup);
 
 	MRS_free(&xample);
@@ -495,17 +401,11 @@ int test_shrink_to_fit(void)
 	MRS_init(32, example_str, strlen(example_str), &example);
 
 	MRS_shrink_to_fit(&example);
-	struct MRT_Case test_case = (struct MRT_Case){
-		.description = "example_str capacity 32 length check",
-		.pass = MRT_ASSERT_EQ(example.capacity, example.len)
-	};
-	MRT_ctx_append_case(t_ctx, test_case);
 
-	test_case = (struct MRT_Case){
-		.description = "example_str capacity 32 value check",
-		.pass = strcmp(example.value, example_str) == 0
-	};
-	MRT_ctx_append_case(t_ctx, test_case);
+	MRT_ctx_append_case(t_ctx, "example_str capacity 32 length check",
+			    MRT_ASSERT_EQ(example.capacity, example.len));
+	MRT_ctx_append_case(t_ctx, "example_str capacity 32 value check",
+			    strcmp(example.value, example_str) == 0);
 
 	MRS_free(&example);
 
@@ -522,84 +422,49 @@ int test_append(void)
 	int append_val = CAFE_BABE;
 	MRV_append(int_array, &append_val);
 
-	struct MRT_Case test_case = (struct MRT_Case){
-		.description = "empty array append within capacity len",
-		.pass = int_array->len == 1
-	};
-	MRT_ctx_append_case(t_ctx, test_case);
-
-	test_case = (struct MRT_Case){
-		.description = "empty array append within capacity capacity",
-		.pass = int_array->capacity == 10
-	};
-	MRT_ctx_append_case(t_ctx, test_case);
-
-	test_case = (struct MRT_Case){
-		.description = "empty array append within capacity stride",
-		.pass = int_array->stride == sizeof(int)
-	};
-	MRT_ctx_append_case(t_ctx, test_case);
+	MRT_ctx_append_case(t_ctx, "empty array append within capacity len",
+			    int_array->len == 1);
+	MRT_ctx_append_case(t_ctx,
+			    "empty array append within capacity capacity",
+			    int_array->capacity == 10);
+	MRT_ctx_append_case(t_ctx, "empty array append within capacity stride",
+			    int_array->stride == sizeof(int));
 
 	int *val = MRV_get_idx(int_array, 0);
-	test_case = (struct MRT_Case){
-		.description = "empty array append within capacity val",
-		.pass = *val == append_val
-	};
-	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRT_ctx_append_case(t_ctx, "empty array append within capacity val",
+			    *val == append_val);
 
 	MRV_destroy(int_array);
 
 	int_array = MRV_create(10, sizeof(int));
 
-	test_case = (struct MRT_Case){
-		.description = "empty array append to capacity capacity",
-		.pass = int_array->capacity == 10
-	};
-	MRT_ctx_append_case(t_ctx, test_case);
+	MRT_ctx_append_case(t_ctx, "empty array append to capacity capacity",
+			    int_array->capacity == 10);
 
 	for (size_t i = 0; i < 10; i++) {
 		MRV_append(int_array, &i);
 		val = MRV_get_idx(int_array, i);
 
-		test_case = (struct MRT_Case){
-			.description = "empty array append to capacity value",
-			.pass = *val == (int)i
-		};
-		MRT_ctx_append_case(t_ctx, test_case);
+		MRT_ctx_append_case(t_ctx,
+				    "empty array append to capacity value",
+				    *val == (int)i);
 	}
 
-	test_case =
-		(struct MRT_Case){ .description =
-					   "empty array append to capacity len",
-				   .pass = int_array->len == 10 };
-	MRT_ctx_append_case(t_ctx, test_case);
+	MRT_ctx_append_case(t_ctx, "empty array append to capacity len",
+			    int_array->len == 10);
 
 	Err err = MRV_append(int_array, &append_val);
 	val = MRV_get_idx(int_array, 10);
 
-	test_case = (struct MRT_Case){
-		.description = "empty array append over capacity OK",
-		.pass = err == OK
-	};
-	MRT_ctx_append_case(t_ctx, test_case);
-
-	test_case = (struct MRT_Case){
-		.description = "empty array append over capacity value",
-		.pass = *val == append_val
-	};
-	MRT_ctx_append_case(t_ctx, test_case);
-
-	test_case = (struct MRT_Case){
-		.description = "empty array append over capacity len",
-		.pass = int_array->len == 11
-	};
-	MRT_ctx_append_case(t_ctx, test_case);
-
-	test_case = (struct MRT_Case){
-		.description = "empty array append over capacity capacity",
-		.pass = int_array->capacity == 11
-	};
-	MRT_ctx_append_case(t_ctx, test_case);
+	MRT_ctx_append_case(t_ctx, "empty array append over capacity OK",
+			    err == OK);
+	MRT_ctx_append_case(t_ctx, "empty array append over capacity value",
+			    *val == append_val);
+	MRT_ctx_append_case(t_ctx, "empty array append over capacity len",
+			    int_array->len == 11);
+	MRT_ctx_append_case(t_ctx, "empty array append over capacity capacity",
+			    int_array->capacity == 11);
 
 	MRV_destroy(int_array);
 
@@ -619,38 +484,22 @@ int test_pop(void)
 	MRV_append(int_array, &append_val);
 	MRV_pop(int_array);
 
-	struct MRT_Case test_case =
-		(struct MRT_Case){ .description = "pop len > 0 len",
-				   .pass = int_array->len == 2 };
-	MRT_ctx_append_case(t_ctx, test_case);
-
-	test_case = (struct MRT_Case){ .description = "pop len > 0 capacity",
-				       .pass = int_array->capacity == 10 };
-	MRT_ctx_append_case(t_ctx, test_case);
+	MRT_ctx_append_case(t_ctx, "pop len > 0 len", int_array->len == 2);
+	MRT_ctx_append_case(t_ctx, "pop len > 0 capacity",
+			    int_array->capacity == 10);
 
 	MRV_pop(int_array);
 	Err err = MRV_pop(int_array);
 
-	test_case = (struct MRT_Case){ .description = "pop to len = 0 len",
-				       .pass = int_array->len == 0 };
-	MRT_ctx_append_case(t_ctx, test_case);
-
-	test_case = (struct MRT_Case){ .description = "pop to len = 0 capacity",
-				       .pass = int_array->capacity == 10 };
-	MRT_ctx_append_case(t_ctx, test_case);
-
-	test_case = (struct MRT_Case){ .description = "pop to len = 0 err",
-				       .pass = err == OK };
-	MRT_ctx_append_case(t_ctx, test_case);
+	MRT_ctx_append_case(t_ctx, "pop to len = 0 len", int_array->len == 0);
+	MRT_ctx_append_case(t_ctx, "pop to len = 0 capacity",
+			    int_array->capacity == 10);
+	MRT_ctx_append_case(t_ctx, "pop to len = 0 err", err == OK);
 
 	err = MRV_pop(int_array);
-	test_case = (struct MRT_Case){ .description = "pop at len = 0 len",
-				       .pass = int_array->len == 0 };
-	MRT_ctx_append_case(t_ctx, test_case);
 
-	test_case = (struct MRT_Case){ .description = "pop at len = 0 err",
-				       .pass = err == ERR };
-	MRT_ctx_append_case(t_ctx, test_case);
+	MRT_ctx_append_case(t_ctx, "pop at len = 0 len", int_array->len == 0);
+	MRT_ctx_append_case(t_ctx, "pop at len = 0 err", err == ERR);
 
 	MRV_destroy(int_array);
 
@@ -685,17 +534,11 @@ int test_get_item_where(void)
 
 	void *two_ptr = MRV_get_idx(int_array, 1);
 
-	struct MRT_Case test_case = (struct MRT_Case){
-		.description = "get middle item",
-		.pass = MRV_get_item_where(int_array, is_two) == two_ptr
-	};
-	MRT_ctx_append_case(t_ctx, test_case);
-
-	test_case = (struct MRT_Case){
-		.description = "item doesnt exist",
-		.pass = MRV_get_item_where(int_array, always_false) == NULL
-	};
-	MRT_ctx_append_case(t_ctx, test_case);
+	MRT_ctx_append_case(t_ctx, "get middle item",
+			    MRV_get_item_where(int_array, is_two) == two_ptr);
+	MRT_ctx_append_case(t_ctx, "item doesnt exist",
+			    MRV_get_item_where(int_array, always_false) ==
+				    NULL);
 
 	MRV_destroy(int_array);
 
@@ -720,18 +563,14 @@ int test_get_item(void)
 	void *two_ptr = MRV_get_idx(int_array, 1);
 
 	append_val = 2;
-	struct MRT_Case test_case = (struct MRT_Case){
-		.description = "get middle item",
-		.pass = MRV_get_item(int_array, &append_val) == two_ptr
-	};
-	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRT_ctx_append_case(t_ctx, "get middle item",
+			    MRV_get_item(int_array, &append_val) == two_ptr);
 
 	append_val = CAFE_BABE;
-	test_case =
-		(struct MRT_Case){ .description = "item doesnt exist",
-				   .pass = MRV_get_item(int_array,
-							&append_val) == NULL };
-	MRT_ctx_append_case(t_ctx, test_case);
+
+	MRT_ctx_append_case(t_ctx, "item doesnt exist",
+			    MRV_get_item(int_array, &append_val) == NULL);
 
 	MRV_destroy(int_array);
 
