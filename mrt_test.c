@@ -35,7 +35,7 @@ void MRT_case_log(struct MRT_Case test_case)
 	MRL_reset_severity();
 }
 
-struct MRT_Context *MRT_ctx_create(const char *description)
+MRT_Context *MRT_ctx_create(const char *description)
 {
 	struct MRT_Context *t_ctx = malloc(sizeof(struct MRT_Context));
 	memset(t_ctx, 0, sizeof(*t_ctx));
@@ -50,7 +50,7 @@ struct MRT_Context *MRT_ctx_create(const char *description)
 	return t_ctx;
 }
 
-void MRT_ctx_free(struct MRT_Context *t_ctx)
+void MRT_ctx_free(MRT_Context *t_ctx)
 {
 	for (size_t i = 0; i < t_ctx->cases.len; i++) {
 		struct MRT_Case *c = MRV_get_idx(&t_ctx->cases, i);
@@ -65,8 +65,7 @@ void MRT_ctx_free(struct MRT_Context *t_ctx)
 	free(t_ctx);
 }
 
-void MRT_ctx_append_case(struct MRT_Context *t_ctx, const char *description,
-			 Bool pass)
+void MRT_ctx_append_case(MRT_Context *t_ctx, const char *description, Bool pass)
 {
 	if (pass) {
 		t_ctx->pass_count++;

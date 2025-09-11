@@ -26,15 +26,15 @@
  * MRT_Context holds test cases and a description for the group of test cases 
  *
  */
-extern struct MRT_Context MRT_Context;
+typedef struct MRT_Context MRT_Context;
 
 Bool MRT_assert_eq(void *expected, void *actual, size_t size_of);
 
-struct MRT_Context *MRT_ctx_create(const char *description);
+MRT_Context *MRT_ctx_create(const char *description);
 
-void MRT_ctx_free(struct MRT_Context *t_ctx);
+void MRT_ctx_free(MRT_Context *t_ctx);
 
-void MRT_ctx_append_case(struct MRT_Context *t_ctx, const char *description,
+void MRT_ctx_append_case(MRT_Context *t_ctx, const char *description,
 			 Bool pass);
 
 /*
