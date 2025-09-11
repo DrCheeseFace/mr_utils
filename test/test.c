@@ -9,7 +9,7 @@
 
 int test_strstr(void)
 {
-	struct MRT_Context *t_ctx = MRT_ctx_create("test_strstr");
+	MRT_Context *t_ctx = MRT_ctx_create("test_strstr");
 
 	const char *haystack = "11151111111111111231";
 	const char *needle = "31";
@@ -56,7 +56,7 @@ int test_strstr(void)
 
 int test_filter(void)
 {
-	struct MRT_Context *t_ctx = MRT_ctx_create("test_filter");
+	MRT_Context *t_ctx = MRT_ctx_create("test_filter");
 
 	MRS_String actual;
 	MRS_init(20, "12121", strlen("12121"), &actual);
@@ -89,7 +89,7 @@ int test_filter(void)
 
 int test_strcat(void)
 {
-	struct MRT_Context *t_ctx = MRT_ctx_create("test_strcat");
+	MRT_Context *t_ctx = MRT_ctx_create("test_strcat");
 
 	MRS_String actual;
 	MRS_init(10, "aaabbb", strlen("aaabbb"), &actual);
@@ -161,7 +161,7 @@ int test_strcat(void)
 
 int test_pushstr(void)
 {
-	struct MRT_Context *t_ctx = MRT_ctx_create("test_pushstr");
+	MRT_Context *t_ctx = MRT_ctx_create("test_pushstr");
 
 	MRS_String actual;
 	MRS_init(10, "aaabbb", strlen("aaabbb"), &actual);
@@ -200,7 +200,7 @@ int test_pushstr(void)
 
 int test_get_char(void)
 {
-	struct MRT_Context *t_ctx = MRT_ctx_create("test_strcat");
+	MRT_Context *t_ctx = MRT_ctx_create("test_strcat");
 
 	MRS_String src;
 	MRS_init(10, "0123456789", strlen("0123456789"), &src);
@@ -237,7 +237,7 @@ int test_get_char(void)
 
 int test_setstr(void)
 {
-	struct MRT_Context *t_ctx = MRT_ctx_create("test_setstr");
+	MRT_Context *t_ctx = MRT_ctx_create("test_setstr");
 
 	const char *from = "from";
 	const char *to = "to";
@@ -266,7 +266,7 @@ int test_setstr(void)
 
 int test_setstrn(void)
 {
-	struct MRT_Context *t_ctx = MRT_ctx_create("test_setstrn");
+	MRT_Context *t_ctx = MRT_ctx_create("test_setstrn");
 
 	const char *from = "from";
 	const char *to = "to";
@@ -296,7 +296,7 @@ int test_setstrn(void)
 
 int test_get_idx(void)
 {
-	struct MRT_Context *t_ctx = MRT_ctx_create("test_get_idx");
+	MRT_Context *t_ctx = MRT_ctx_create("test_get_idx");
 
 	const char *from = "from";
 	const char *random = "random";
@@ -327,7 +327,7 @@ int test_get_idx(void)
 
 int test_strchr(void)
 {
-	struct MRT_Context *t_ctx = MRT_ctx_create("test_strchr");
+	MRT_Context *t_ctx = MRT_ctx_create("test_strchr");
 
 	const char *xample_str = "xample_str";
 	MRS_String xample;
@@ -354,7 +354,7 @@ int test_strchr(void)
 
 int test_strndup(void)
 {
-	struct MRT_Context *t_ctx = MRT_ctx_create("test_strndup");
+	MRT_Context *t_ctx = MRT_ctx_create("test_strndup");
 
 	const char *xample_str = "xample_str";
 	MRS_String xample;
@@ -394,7 +394,7 @@ int test_strndup(void)
 
 int test_shrink_to_fit(void)
 {
-	struct MRT_Context *t_ctx = MRT_ctx_create("test_shrink_to_fit");
+	MRT_Context *t_ctx = MRT_ctx_create("test_shrink_to_fit");
 
 	const char *example_str = "example_str";
 	MRS_String example;
@@ -416,7 +416,7 @@ int test_shrink_to_fit(void)
 
 int test_append(void)
 {
-	struct MRT_Context *t_ctx = MRT_ctx_create("test_append");
+	MRT_Context *t_ctx = MRT_ctx_create("test_append");
 
 	MRV_Vector *int_array = MRV_create(10, sizeof(int));
 	int append_val = CAFE_BABE;
@@ -475,7 +475,7 @@ int test_append(void)
 
 int test_pop(void)
 {
-	struct MRT_Context *t_ctx = MRT_ctx_create("test_strstr");
+	MRT_Context *t_ctx = MRT_ctx_create("test_strstr");
 
 	MRV_Vector *int_array = MRV_create(10, sizeof(int));
 	int append_val = CAFE_BABE;
@@ -521,7 +521,7 @@ Bool always_false(void *_)
 
 int test_get_item_where(void)
 {
-	struct MRT_Context *t_ctx = MRT_ctx_create("test_get_item_where");
+	MRT_Context *t_ctx = MRT_ctx_create("test_get_item_where");
 
 	MRV_Vector *int_array = MRV_create(10, sizeof(int));
 	int append_val = 1;
@@ -549,7 +549,7 @@ int test_get_item_where(void)
 
 int test_get_item(void)
 {
-	struct MRT_Context *t_ctx = MRT_ctx_create("test_get_item");
+	MRT_Context *t_ctx = MRT_ctx_create("test_get_item");
 
 	MRV_Vector *int_array = MRV_create(10, sizeof(int));
 	int append_val = 1;
