@@ -5,7 +5,7 @@
 #include "../mrd_debug.h"
 #include "../mrs_strings.h"
 #include "../mrt_test.h"
-#include "../mrv_vector.h"
+#include "../mrv_vectors.h"
 
 int test_strstr(void)
 {
@@ -675,6 +675,7 @@ int main(void)
 {
 	int err = 0;
 
+	// mrs_strings
 	err = err || test_strstr();
 	err = err || test_filter();
 	err = err || test_strcat();
@@ -686,6 +687,8 @@ int main(void)
 	err = err || test_strchr();
 	err = err || test_strndup();
 	err = err || test_shrink_to_fit();
+
+	// mrv_vectors
 	err = err || test_append();
 	err = err || test_pop();
 

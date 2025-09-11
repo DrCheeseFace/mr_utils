@@ -118,7 +118,7 @@ internal void unused MRD_log_backtrace(void)
 	}
 
 	// 2 is used here to remove depth created in this file
-        size_t indent_level = 0;
+	size_t indent_level = 0;
 	for (size_t i = 2; i < (size_t)max_backtrace_depth_printout; i++) {
 		// calc diff between base and call addr
 		char call_addr[BASE_ADDRESS_SIZE + 1];
@@ -177,13 +177,13 @@ internal void unused MRD_log_backtrace(void)
 }
 
 // returns 1 if true
-internal int MRD_can_free_allocation(struct Allocation allocation)
+internal int MRD_is_free_active_allocation_slot(struct Allocation allocation)
 {
-	if (!allocation.active) {
+	if (allocation.active == FALSE) {
 		if (allocation.reallocated_to == NULL) {
 			return 1;
 		}
-		if (!allocation.reallocated_to->active) {
+		if (allocation.reallocated_to->active == FALSE) {
 			return 1;
 		}
 	}
@@ -195,7 +195,7 @@ internal void
 MRD_add_allocation_to_active_allocations(struct Allocation new_allocation)
 {
 	for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {
-		if (MRD_can_free_allocation(active_allocations[i])) {
+		if (MRD_is_free_active_allocation_slot(active_allocations[i])) {
 			active_allocations[i] = new_allocation;
 			current_allocation_id++;
 			return;
@@ -381,6 +381,15 @@ void MRD_free(void *ptr, const char *file_name, int line)
 
 	MRL_logln("", MRL_SEVERITY_DEFAULT);
 
+	// if the pointer to free is ever realloced somewhere, we need to set this to NULL
+	for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {
+		if (allocation->ptr == active_allocations[i].reallocated_to) {
+			active_allocations[i].reallocated_to = NULL;
+			break;
+		}
+	}
+
 	free(ptr);
+
 	allocation->active = FALSE;
 }

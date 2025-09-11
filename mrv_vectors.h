@@ -2,8 +2,8 @@
  * this file is a vector library
  */
 
-#ifndef MRV_VECTOR_H
-#define MRV_VECTOR_H
+#ifndef MRV_VECTORS_H
+#define MRV_VECTORS_H
 
 #include "mrm_misc.h"
 #include <stddef.h>
@@ -34,4 +34,6 @@ MRM_ErrorCode MRV_pop(MRV_Vector *vec);
 
 void *MRV_get_idx(MRV_Vector *vec, size_t n);
 
-#endif // !MRV_VECTOR_H
+void *MRV_get_item(MRV_Vector *vec, bool (*is_item)(void *));
+
+#endif // !MRV_VECTORS_H
