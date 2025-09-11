@@ -107,7 +107,7 @@ int test_strcat(void)
 	MRS_setstr(&expected, "12345678910", strlen("12345678910"));
 
 	MRT_ctx_append_case(t_ctx, "123456789 | 10 over capacity",
-			    0 == MRS_strcat(&actual, &append));
+			    OK == MRS_strcat(&actual, &append));
 	MRT_ctx_append_case(t_ctx, "123456789 | 10 over capacity length check",
 			    11 == actual.capacity);
 	MRT_ctx_append_case(t_ctx, "123456789 | 10 over capacity equals",
@@ -251,11 +251,11 @@ int test_setstr(void)
 
 	MRT_ctx_append_case(t_ctx, "from -> to",
 			    !MRS_strcmp(&expected, &actual));
-	MRT_ctx_append_case(t_ctx, "from -> to result", result == 0);
+	MRT_ctx_append_case(t_ctx, "from -> to result", result == OK);
 
 	result = MRS_setstr(&actual, to, strlen(from) + 1);
 
-	MRT_ctx_append_case(t_ctx, "from -> from+1 length", result == 1);
+	MRT_ctx_append_case(t_ctx, "from -> from+1 length", result == ERR);
 
 	MRS_free(&actual);
 	MRS_free(&expected);
@@ -281,11 +281,11 @@ int test_setstrn(void)
 
 	MRT_ctx_append_case(t_ctx, "from -> to length 1",
 			    !MRS_strcmp(&expected, &actual));
-	MRT_ctx_append_case(t_ctx, "from -> to length 1 result", result == 0);
+	MRT_ctx_append_case(t_ctx, "from -> to length 1 result", result == OK);
 
 	result = MRS_setstrn(&actual, to, strlen(to), 3);
 
-	MRT_ctx_append_case(t_ctx, "from -> to length 3 result", result == 1);
+	MRT_ctx_append_case(t_ctx, "from -> to length 3 result", result == ERR);
 
 	MRS_free(&actual);
 	MRS_free(&expected);
@@ -311,12 +311,12 @@ int test_get_idx(void)
 	int result = MRS_get_idx(&example, &example.value[2], &idx_found);
 
 	MRT_ctx_append_case(t_ctx, "'from' find from[2]", idx_found == 2);
-	MRT_ctx_append_case(t_ctx, "'from' find from[2] result", result == 0);
+	MRT_ctx_append_case(t_ctx, "'from' find from[2] result", result == OK);
 
 	result = MRS_get_idx(&example, &random_example.value[2], &idx_found);
 
 	MRT_ctx_append_case(t_ctx, "'from' find char* outside result",
-			    result == -1);
+			    result == NOT_FOUND);
 
 	MRS_free(&example);
 	MRS_free(&random_example);
@@ -366,7 +366,7 @@ int test_strndup(void)
 
 	MRT_ctx_append_case(t_ctx, "dup full string",
 			    !MRS_strcmp(&xample, &xample_dup));
-	MRT_ctx_append_case(t_ctx, "dup full string result", result == 0);
+	MRT_ctx_append_case(t_ctx, "dup full string result", result == OK);
 
 	MRS_free(&xample_dup);
 
@@ -376,13 +376,13 @@ int test_strndup(void)
 			    xample_dup.len == xample.len - 1);
 	MRT_ctx_append_case(t_ctx, "dup string len - 1 value check",
 			    !strcmp("xample_st", xample_dup.value));
-	MRT_ctx_append_case(t_ctx, "dup string len - 1 result", result == 0);
+	MRT_ctx_append_case(t_ctx, "dup string len - 1 result", result == OK);
 
 	MRS_free(&xample_dup);
 
 	result = MRS_strndup(&xample, xample.len + 1, &xample_dup);
 
-	MRT_ctx_append_case(t_ctx, "dup string len + 1", result == -1);
+	MRT_ctx_append_case(t_ctx, "dup string len + 1", result == ERR);
 
 	MRS_free(&xample_dup);
 

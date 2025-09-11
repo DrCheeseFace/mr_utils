@@ -16,7 +16,7 @@ MRS_String *MRS_create(size_t capacity)
 	return out;
 }
 
-int MRS_init(size_t capacity, const char *value, size_t value_len,
+Err MRS_init(size_t capacity, const char *value, size_t value_len,
 	     MRS_String *dest)
 {
 	if (capacity == 0) {
@@ -27,17 +27,17 @@ int MRS_init(size_t capacity, const char *value, size_t value_len,
 	if (dest->value == NULL) {
 		dest->capacity = 0;
 		dest->len = 0;
-		return -1;
+		return ERR;
 	}
 	dest->value[capacity] = '\0';
 	dest->capacity = capacity;
 
 	if (MRS_setstrn(dest, value, value_len, value_len)) {
 		MRS_free(dest);
-		return -1;
+		return ERR;
 	}
 	dest->value[value_len] = '\0';
-	return 0;
+	return OK;
 }
 
 void MRS_free(MRS_String *string)
@@ -63,51 +63,51 @@ void MRS_filter(MRS_String *string, const char remove_me)
 	MRS_setstrn(string, filtered, filtered_len, filtered_len);
 }
 
-int MRS_setstr(MRS_String *string, const char *src, size_t src_len)
+Err MRS_setstr(MRS_String *string, const char *src, size_t src_len)
 {
 	if (src_len > string->capacity) {
-		return 1;
+		return ERR;
 	}
 
 	memcpy(string->value, src, src_len);
 	string->len = src_len;
 	string->value[src_len] = '\0';
 
-	return 0;
+	return OK;
 }
 
-int MRS_setstrn(MRS_String *string, const char *src, size_t src_len, size_t len)
+Err MRS_setstrn(MRS_String *string, const char *src, size_t src_len, size_t len)
 {
 	if (len > string->capacity) {
-		return 1;
+		return ERR;
 	}
 	if (len > src_len) {
-		return 1;
+		return ERR;
 	}
 
 	memcpy(string->value, src, len);
 	string->len = len;
 	string->value[len] = '\0';
 
-	return 0;
+	return OK;
 }
 
 int MRS_strcmp(MRS_String *a, MRS_String *b)
 {
 	if (a->len != b->len) {
-		return 1;
+		return -1;
 	}
 
 	return memcmp(a->value, b->value, sizeof(char) * a->len);
 }
 
-int MRS_strcat(MRS_String *dest, MRS_String *src)
+Err MRS_strcat(MRS_String *dest, MRS_String *src)
 {
 	if (src->len + dest->len > dest->capacity) {
 		char *malloced =
 			malloc(sizeof(char) * (dest->len + src->len + 1));
 		if (malloced == NULL) {
-			return 1;
+			return ERR;
 		}
 
 		memcpy(malloced, dest->value, dest->len);
@@ -119,22 +119,22 @@ int MRS_strcat(MRS_String *dest, MRS_String *src)
 		dest->len = src->len + dest->len;
 
 		dest->value[dest->len] = '\0';
-		return 0;
+		return OK;
 	}
 
 	memcpy(&dest->value[dest->len], src->value, src->len);
 	dest->len += src->len;
 	dest->value[dest->len] = '\0';
 
-	return 0;
+	return OK;
 }
 
-int MRS_pushstr(MRS_String *dest, const char *append_me, size_t n)
+Err MRS_pushstr(MRS_String *dest, const char *append_me, size_t n)
 {
 	if (n + dest->len > dest->capacity) {
 		char *malloced = malloc(sizeof(char) * (dest->len + n + 1));
 		if (malloced == NULL) {
-			return 1;
+			return ERR;
 		}
 
 		memcpy(malloced, dest->value, dest->len);
@@ -146,14 +146,14 @@ int MRS_pushstr(MRS_String *dest, const char *append_me, size_t n)
 		dest->len = n + dest->len;
 
 		dest->value[dest->len] = '\0';
-		return 0;
+		return OK;
 	}
 
 	memcpy(&dest->value[dest->len], append_me, n);
 	dest->len += n;
 	dest->value[dest->len] = '\0';
 
-	return 0;
+	return OK;
 }
 
 char *MRS_strstr(MRS_String *haystack, MRS_String *needle,
@@ -188,25 +188,25 @@ char MRS_get_char(MRS_String *src, size_t idx)
 	}
 }
 
-int MRS_get_idx(MRS_String *src, char *idx, size_t *found_position)
+Err MRS_get_idx(MRS_String *src, char *idx, size_t *found_position)
 {
 	if (idx < src->value || idx >= &src->value[src->len]) {
-		return -1;
+		return NOT_FOUND;
 	}
 	*found_position = (size_t)(idx - src->value);
-	return 0;
+	return OK;
 }
 
-int MRS_is_whitespace(MRS_String *src, size_t idx)
+Err MRS_is_whitespace(MRS_String *src, size_t idx)
 {
 	char c = MRS_get_char(src, idx);
 	if (c == '\0') {
-		return -1;
+		return NOT_FOUND;
 	}
 	if (c == '\n' || c == '\t' || c == ' ') {
-		return 0;
+		return OK;
 	}
-	return 1;
+	return ERR;
 }
 
 void MRS_remove_whitespace(MRS_String *src)
@@ -226,23 +226,23 @@ char *MRS_strchr(MRS_String *src, char target)
 	return NULL;
 }
 
-int MRS_strndup(MRS_String *src, size_t len, MRS_String *dest)
+Err MRS_strndup(MRS_String *src, size_t len, MRS_String *dest)
 {
 	if (src->len < len) {
-		return -1;
+		return ERR;
 	}
 
 	dest->value = malloc(sizeof(char) * (len + 1));
 	if (dest->value == NULL) {
 		dest->capacity = 0;
 		dest->len = 0;
-		return -1;
+		return ERR;
 	}
 	memcpy(dest->value, src->value, sizeof(char) * len);
 	dest->capacity = src->capacity;
 	dest->len = len;
 	dest->value[len] = '\0';
-	return 0;
+	return OK;
 }
 
 void MRS_shrink_to_fit(MRS_String *src)
