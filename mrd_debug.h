@@ -1,6 +1,6 @@
 /*
  * this is a tool used for memory debugging
- * 
+ *
  * MRD_DEBUG_BACKTRACE
  *
  * MRD_DEBUG_DEFAULT

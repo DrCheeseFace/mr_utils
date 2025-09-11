@@ -1,5 +1,11 @@
 /*
  * this file has logging utilities
+ *
+ * \ MRL_reset_severity    - sets log severity to MRL_SEVERITY_DEFAULT
+ * \ MRL_set_severity      - sets log severity
+ * \ MRL_log               - log line to stderr
+ * \ MRL_logln             - log lint to stderr with newline
+ *
  */
 
 #ifndef MRL_LOGGER_H

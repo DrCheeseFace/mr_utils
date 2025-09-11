@@ -8,6 +8,23 @@
 #include "mrm_misc.h"
 #include <stdlib.h>
 
+/*
+ * vectors!
+ *
+ * \ MRV_create            - allocates a MRV_Vector on the heap and initializes it
+ * \ MRV_destroy           - frees contents of MRV_Vector and itself
+ * \ MRV_free              - frees contents of MRV_Vector
+ * \ MRV_init              - set arr to CAFE_BABE and length/capacity to 0
+ * \ MRV_clear             - set arr to CAFE_BABE and length/capacity to 0
+ * \ MRV_append            - appends element
+ * \ MRV_realloc_to_fit    - sets capacity to length and reallocates to fit
+ * \ MRV_pop               - removes last element
+ * \ MRV_get_idx           - get pointer to idx
+ * \ MRV_get_item          - get pointer to first memcmp identical items
+ * \ MRV_get_item_where    - get pointer to item that satisfies user defined method
+ * \ MRV_qsort             - quicksort
+ *
+ */
 typedef struct {
 	unsigned char *arr;
 	size_t stride;

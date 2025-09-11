@@ -50,7 +50,7 @@ int test_strstr(void)
 	MRS_free(&b);
 
 	int failed = MRT_ctx_log(t_ctx);
-	MRT_ctx_free(t_ctx);
+	MRT_ctx_destroy(t_ctx);
 	return failed;
 }
 
@@ -83,7 +83,7 @@ int test_filter(void)
 	MRS_free(&expected);
 
 	int failed = MRT_ctx_log(t_ctx);
-	MRT_ctx_free(t_ctx);
+	MRT_ctx_destroy(t_ctx);
 	return failed;
 }
 
@@ -155,7 +155,7 @@ int test_strcat(void)
 	MRS_free(&append);
 
 	int failed = MRT_ctx_log(t_ctx);
-	MRT_ctx_free(t_ctx);
+	MRT_ctx_destroy(t_ctx);
 	return failed;
 }
 
@@ -194,7 +194,7 @@ int test_pushstr(void)
 	MRS_free(&expected);
 
 	int failed = MRT_ctx_log(t_ctx);
-	MRT_ctx_free(t_ctx);
+	MRT_ctx_destroy(t_ctx);
 	return failed;
 }
 
@@ -231,7 +231,7 @@ int test_get_char(void)
 	MRS_free(&src);
 
 	int failed = MRT_ctx_log(t_ctx);
-	MRT_ctx_free(t_ctx);
+	MRT_ctx_destroy(t_ctx);
 	return failed;
 }
 
@@ -260,7 +260,7 @@ int test_setstr(void)
 	MRS_free(&actual);
 	MRS_free(&expected);
 	int failed = MRT_ctx_log(t_ctx);
-	MRT_ctx_free(t_ctx);
+	MRT_ctx_destroy(t_ctx);
 	return failed;
 }
 
@@ -290,7 +290,7 @@ int test_setstrn(void)
 	MRS_free(&actual);
 	MRS_free(&expected);
 	int failed = MRT_ctx_log(t_ctx);
-	MRT_ctx_free(t_ctx);
+	MRT_ctx_destroy(t_ctx);
 	return failed;
 }
 
@@ -321,7 +321,7 @@ int test_get_idx(void)
 	MRS_free(&example);
 	MRS_free(&random_example);
 	int failed = MRT_ctx_log(t_ctx);
-	MRT_ctx_free(t_ctx);
+	MRT_ctx_destroy(t_ctx);
 	return failed;
 }
 
@@ -348,7 +348,7 @@ int test_strchr(void)
 
 	MRS_free(&xample);
 	int failed = MRT_ctx_log(t_ctx);
-	MRT_ctx_free(t_ctx);
+	MRT_ctx_destroy(t_ctx);
 	return failed;
 }
 
@@ -388,7 +388,7 @@ int test_strndup(void)
 
 	MRS_free(&xample);
 	int failed = MRT_ctx_log(t_ctx);
-	MRT_ctx_free(t_ctx);
+	MRT_ctx_destroy(t_ctx);
 	return failed;
 }
 
@@ -410,7 +410,7 @@ int test_shrink_to_fit(void)
 	MRS_free(&example);
 
 	int failed = MRT_ctx_log(t_ctx);
-	MRT_ctx_free(t_ctx);
+	MRT_ctx_destroy(t_ctx);
 	return failed;
 }
 
@@ -469,7 +469,7 @@ int test_append(void)
 	MRV_destroy(int_array);
 
 	int failed = MRT_ctx_log(t_ctx);
-	MRT_ctx_free(t_ctx);
+	MRT_ctx_destroy(t_ctx);
 	return failed;
 }
 
@@ -504,7 +504,7 @@ int test_pop(void)
 	MRV_destroy(int_array);
 
 	int failed = MRT_ctx_log(t_ctx);
-	MRT_ctx_free(t_ctx);
+	MRT_ctx_destroy(t_ctx);
 	return failed;
 }
 
@@ -543,7 +543,7 @@ int test_get_item_where(void)
 	MRV_destroy(int_array);
 
 	int failed = MRT_ctx_log(t_ctx);
-	MRT_ctx_free(t_ctx);
+	MRT_ctx_destroy(t_ctx);
 	return failed;
 }
 
@@ -575,7 +575,7 @@ int test_get_item(void)
 	MRV_destroy(int_array);
 
 	int failed = MRT_ctx_log(t_ctx);
-	MRT_ctx_free(t_ctx);
+	MRT_ctx_destroy(t_ctx);
 	return failed;
 }
 

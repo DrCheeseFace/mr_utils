@@ -50,7 +50,7 @@ MRT_Context *MRT_ctx_create(const char *description)
 	return t_ctx;
 }
 
-void MRT_ctx_free(MRT_Context *t_ctx)
+void MRT_ctx_destroy(MRT_Context *t_ctx)
 {
 	for (size_t i = 0; i < t_ctx->cases.len; i++) {
 		struct MRT_Case *c = MRV_get_idx(&t_ctx->cases, i);
@@ -78,7 +78,7 @@ void MRT_ctx_append_case(MRT_Context *t_ctx, const char *description, Bool pass)
 		   &(struct MRT_Case){ .description = s, .pass = pass });
 }
 
-int MRT_ctx_log(struct MRT_Context *t_ctx)
+Err MRT_ctx_log(struct MRT_Context *t_ctx)
 {
 	MRL_logln("", MRL_SEVERITY_DEFAULT);
 
@@ -101,9 +101,9 @@ int MRT_ctx_log(struct MRT_Context *t_ctx)
 	MRL_log(MRT_TAB, MRL_SEVERITY_DEFAULT);
 	if (t_ctx->pass_count != t_ctx->cases.len) {
 		MRL_logln("FAILED", MRL_SEVERITY_ERROR);
-		return 1;
+		return ERR;
 	} else {
 		MRL_logln("PASSED", MRL_SEVERITY_OK);
-		return 0;
+		return OK;
 	}
 }

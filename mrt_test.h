@@ -23,23 +23,28 @@
 #define MRT_ASSERT_NOT_NULL(actual) (actual != NULL)
 
 /*
- * MRT_Context holds test cases and a description for the group of test cases 
+ * MRT_Context holds test cases and a description for the group of test cases
+ *
+ * \ MRT_ctx_create         - create context
+ * \ MRT_ctx_destroy        - frees itself and contents
+ * \ MRT_ctx_append_case    - adds test case to context
+ * \ MRT_ctx_log            - provides logs for context and test cases
  *
  */
 typedef struct MRT_Context MRT_Context;
 
-Bool MRT_assert_eq(void *expected, void *actual, size_t size_of);
-
 MRT_Context *MRT_ctx_create(const char *description);
 
-void MRT_ctx_free(MRT_Context *t_ctx);
+void MRT_ctx_destroy(MRT_Context *t_ctx);
 
 void MRT_ctx_append_case(MRT_Context *t_ctx, const char *description,
 			 Bool pass);
 
 /*
- * `returns` 0 if passed 
+ * `returns` 0 if passed
  */
-int MRT_ctx_log(struct MRT_Context *t_ctx);
+Err MRT_ctx_log(struct MRT_Context *t_ctx);
+
+Bool MRT_assert_eq(void *expected, void *actual, size_t size_of);
 
 #endif // !MRT_TEST_H

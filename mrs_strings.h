@@ -9,6 +9,28 @@
 
 #define MRS_MAX_STRING_LENGTH 100
 
+/*
+ * strings!
+ *
+ * \ MRS_create               - allocates a MRS_String on the heap and initializes it
+ * \ MRS_init                 - initialize MRS_String
+ * \ MRS_free                 - free contents of MRS_String
+ * \ MRS_setstr               - set MRS_String to str
+ * \ MRS_setstrn              - set n characters of str to MRS_String
+ * \ MRS_strcmp               - memcmp on contents of MRS_String
+ * \ MRS_strcat               - concatinates two MRS_String. reallocating if needed
+ * \ MRS_pushstr              - concatinates str to MRS_String. reallocating if needed
+ * \ MRS_strstr               - find MRS_String (needle) in MRS_String (haystack)
+ * \ MRS_get_char             - get char at index
+ * \ MRS_get_idx              - get index of first occurance of char
+ * \ MRS_strchr               - return pointer to first occurance of char
+ * \ MRS_is_whitespace        - checks if characters at index is \t \n or ' '
+ * \ MRS_remove_whitespace    - removes \t \n and ' '
+ * \ MRS_filter               - filters out char from MRS_String
+ * \ MRS_strndup              - return malloced copy of MRS_String
+ * \ MRS_shrink_to_fit        - sets capacity to length and reallocates to fit
+ *
+ */
 typedef struct {
 	char *value;
 	size_t len;
@@ -68,9 +90,9 @@ char MRS_get_char(MRS_String *src, size_t idx);
 
 /*
  * populates `found_position` with idx
- * 
+ *
  * `returns` -1 if not found
- * `returns` 0 if successful 
+ * `returns` 0 if successful
  */
 int MRS_get_idx(MRS_String *src, char *idx, size_t *found_position);
 
@@ -85,7 +107,7 @@ char *MRS_strchr(MRS_String *src, char target);
  *
  * `returns` 0 is true
  *
- * `returns` 1 if false 
+ * `returns` 1 if false
  *
  * `returns` -1 if idx OOB
  */

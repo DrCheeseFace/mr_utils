@@ -83,6 +83,7 @@ build-debug:
 - [ ] log to defined out 
 - [x] dynamic array lib
 - [ ] doc generator tool 
+- [ ] whitespace remover
 - [ ] useful runtime error message. something with coredump file abort()
 - [x] debug maintain only active allocations. eg: freed and not realloced to something not freed
 
