@@ -22,12 +22,23 @@
  * MrtContext holds test cases and a description for the group of test cases
  *
  * MrtContext has the following functions
- *
  * \ mrt_ctx_create         - create context
  * \ mrt_ctx_destroy        - frees itself and contents
  * \ mrt_ctx_append_case    - adds test case to context
  * \ mrt_ctx_log            - logs context and test case results within context
- *
+ * \
+ * \ eg:
+ * \
+ * \     MrtContext *t_ctx = mrt_ctx_create("my test context description");
+ * \
+ * \     mrt_ctx_append_case(t_ctx, "my test description 1", 1 == 2);
+ * \     mrt_ctx_append_case(t_ctx, "my test description 2", 1 == 1);
+ * \
+ * \     Err err = mrt_ctx_log(t_ctx);
+ * \
+ * \     mrt_ctx_destroy(t_ctx);
+ * \
+ * \     return err;
  */
 typedef void MrtContext;
 
