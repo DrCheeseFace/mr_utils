@@ -49,9 +49,9 @@ int test_strstr(void)
 	mrs_free(&a);
 	mrs_free(&b);
 
-	int failed = mrt_ctx_log(t_ctx);
+	Err err = mrt_ctx_log(t_ctx);
 	mrt_ctx_destroy(t_ctx);
-	return failed;
+	return err;
 }
 
 int test_filter(void)
@@ -82,9 +82,9 @@ int test_filter(void)
 	mrs_free(&actual);
 	mrs_free(&expected);
 
-	int failed = mrt_ctx_log(t_ctx);
+	Err err = mrt_ctx_log(t_ctx);
 	mrt_ctx_destroy(t_ctx);
-	return failed;
+	return err;
 }
 
 int test_strcat(void)
@@ -154,9 +154,9 @@ int test_strcat(void)
 	mrs_free(&expected);
 	mrs_free(&append);
 
-	int failed = mrt_ctx_log(t_ctx);
+	Err err = mrt_ctx_log(t_ctx);
 	mrt_ctx_destroy(t_ctx);
-	return failed;
+	return err;
 }
 
 int test_pushstr(void)
@@ -193,9 +193,9 @@ int test_pushstr(void)
 	mrs_free(&actual);
 	mrs_free(&expected);
 
-	int failed = mrt_ctx_log(t_ctx);
+	Err err = mrt_ctx_log(t_ctx);
 	mrt_ctx_destroy(t_ctx);
-	return failed;
+	return err;
 }
 
 int test_get_char(void)
@@ -230,9 +230,9 @@ int test_get_char(void)
 
 	mrs_free(&src);
 
-	int failed = mrt_ctx_log(t_ctx);
+	Err err = mrt_ctx_log(t_ctx);
 	mrt_ctx_destroy(t_ctx);
-	return failed;
+	return err;
 }
 
 int test_setstr(void)
@@ -259,9 +259,10 @@ int test_setstr(void)
 
 	mrs_free(&actual);
 	mrs_free(&expected);
-	int failed = mrt_ctx_log(t_ctx);
+
+	Err err = mrt_ctx_log(t_ctx);
 	mrt_ctx_destroy(t_ctx);
-	return failed;
+	return err;
 }
 
 int test_setstrn(void)
@@ -289,9 +290,10 @@ int test_setstrn(void)
 
 	mrs_free(&actual);
 	mrs_free(&expected);
-	int failed = mrt_ctx_log(t_ctx);
+
+	Err err = mrt_ctx_log(t_ctx);
 	mrt_ctx_destroy(t_ctx);
-	return failed;
+	return err;
 }
 
 int test_get_idx(void)
@@ -320,9 +322,10 @@ int test_get_idx(void)
 
 	mrs_free(&example);
 	mrs_free(&random_example);
-	int failed = mrt_ctx_log(t_ctx);
+
+	Err err = mrt_ctx_log(t_ctx);
 	mrt_ctx_destroy(t_ctx);
-	return failed;
+	return err;
 }
 
 int test_strchr(void)
@@ -347,9 +350,10 @@ int test_strchr(void)
 			    MRT_ASSERT_NULL(result));
 
 	mrs_free(&xample);
-	int failed = mrt_ctx_log(t_ctx);
+
+	Err err = mrt_ctx_log(t_ctx);
 	mrt_ctx_destroy(t_ctx);
-	return failed;
+	return err;
 }
 
 int test_strndup(void)
@@ -385,11 +389,11 @@ int test_strndup(void)
 	mrt_ctx_append_case(t_ctx, "dup string len + 1", result == ERR);
 
 	mrs_free(&xample_dup);
-
 	mrs_free(&xample);
-	int failed = mrt_ctx_log(t_ctx);
+
+	Err err = mrt_ctx_log(t_ctx);
 	mrt_ctx_destroy(t_ctx);
-	return failed;
+	return err;
 }
 
 int test_shrink_to_fit(void)
@@ -409,9 +413,9 @@ int test_shrink_to_fit(void)
 
 	mrs_free(&example);
 
-	int failed = mrt_ctx_log(t_ctx);
+	Err err = mrt_ctx_log(t_ctx);
 	mrt_ctx_destroy(t_ctx);
-	return failed;
+	return err;
 }
 
 int test_append(void)
@@ -454,11 +458,11 @@ int test_append(void)
 	mrt_ctx_append_case(t_ctx, "empty array append to capacity len",
 			    int_array->len == 10);
 
-	Err err = mrv_append(int_array, &append_val);
+	Err error = mrv_append(int_array, &append_val);
 	val = mrv_get_idx(int_array, 10);
 
 	mrt_ctx_append_case(t_ctx, "empty array append over capacity OK",
-			    err == OK);
+			    error == OK);
 	mrt_ctx_append_case(t_ctx, "empty array append over capacity value",
 			    *val == append_val);
 	mrt_ctx_append_case(t_ctx, "empty array append over capacity len",
@@ -468,9 +472,9 @@ int test_append(void)
 
 	mrv_destroy(int_array);
 
-	int failed = mrt_ctx_log(t_ctx);
+	Err err = mrt_ctx_log(t_ctx);
 	mrt_ctx_destroy(t_ctx);
-	return failed;
+	return err;
 }
 
 int test_pop(void)
@@ -489,23 +493,23 @@ int test_pop(void)
 			    int_array->capacity == 10);
 
 	mrv_pop(int_array);
-	Err err = mrv_pop(int_array);
+	Err error = mrv_pop(int_array);
 
 	mrt_ctx_append_case(t_ctx, "pop to len = 0 len", int_array->len == 0);
 	mrt_ctx_append_case(t_ctx, "pop to len = 0 capacity",
 			    int_array->capacity == 10);
-	mrt_ctx_append_case(t_ctx, "pop to len = 0 err", err == OK);
+	mrt_ctx_append_case(t_ctx, "pop to len = 0 err", error == OK);
 
-	err = mrv_pop(int_array);
+	error = mrv_pop(int_array);
 
 	mrt_ctx_append_case(t_ctx, "pop at len = 0 len", int_array->len == 0);
-	mrt_ctx_append_case(t_ctx, "pop at len = 0 err", err == ERR);
+	mrt_ctx_append_case(t_ctx, "pop at len = 0 err", error == ERR);
 
 	mrv_destroy(int_array);
 
-	int failed = mrt_ctx_log(t_ctx);
+	Err err = mrt_ctx_log(t_ctx);
 	mrt_ctx_destroy(t_ctx);
-	return failed;
+	return err;
 }
 
 Bool is_two(void *x)
@@ -542,9 +546,9 @@ int test_get_item_where(void)
 
 	mrv_destroy(int_array);
 
-	int failed = mrt_ctx_log(t_ctx);
+	Err err = mrt_ctx_log(t_ctx);
 	mrt_ctx_destroy(t_ctx);
-	return failed;
+	return err;
 }
 
 int test_get_item(void)
@@ -574,9 +578,9 @@ int test_get_item(void)
 
 	mrv_destroy(int_array);
 
-	int failed = mrt_ctx_log(t_ctx);
+	Err err = mrt_ctx_log(t_ctx);
 	mrt_ctx_destroy(t_ctx);
-	return failed;
+	return err;
 }
 
 int bruh(void)
@@ -593,7 +597,7 @@ int bruh(void)
 
 int main(void)
 {
-	int err = 0;
+	Err err = OK;
 
 	// mrs_strings
 	err = err || test_strstr();
