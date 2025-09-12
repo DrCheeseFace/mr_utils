@@ -6,9 +6,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-MRV_Vector *MRV_create(size_t capacity, size_t stride)
+MrvVector *mrv_create(size_t capacity, size_t stride)
 {
-	MRV_Vector *vec = malloc(sizeof(MRV_Vector));
+	MrvVector *vec = malloc(sizeof(MrvVector));
 
 	vec->arr = malloc(capacity * stride);
 	memset(vec->arr, CAFE_BABE, capacity * stride);
@@ -20,13 +20,13 @@ MRV_Vector *MRV_create(size_t capacity, size_t stride)
 	return vec;
 }
 
-void MRV_destroy(MRV_Vector *vec)
+void mrv_destroy(MrvVector *vec)
 {
-	MRV_free(vec);
+	mrv_free(vec);
 	free(vec);
 }
 
-void MRV_free(MRV_Vector *vec)
+void mrv_free(MrvVector *vec)
 {
 	if (vec != NULL && vec->arr != NULL) {
 		free(vec->arr);
@@ -38,7 +38,7 @@ void MRV_free(MRV_Vector *vec)
 	vec->capacity = CAFE_BABE;
 }
 
-void MRV_init(MRV_Vector *vec, size_t capacity, size_t stride)
+void mrv_init(MrvVector *vec, size_t capacity, size_t stride)
 {
 	vec->arr = malloc(capacity * stride);
 	memset(vec->arr, CAFE_BABE, capacity * stride);
@@ -49,7 +49,7 @@ void MRV_init(MRV_Vector *vec, size_t capacity, size_t stride)
 	return;
 }
 
-Err MRV_clear(MRV_Vector *vec)
+Err mrv_clear(MrvVector *vec)
 {
 	if (vec == NULL) {
 		return ERR;
@@ -67,7 +67,7 @@ Err MRV_clear(MRV_Vector *vec)
 	return OK;
 }
 
-Err MRV_append(MRV_Vector *vec, void *item)
+Err mrv_append(MrvVector *vec, void *item)
 {
 	if (vec == NULL) {
 		return ERR;
@@ -85,7 +85,7 @@ Err MRV_append(MRV_Vector *vec, void *item)
 	return OK;
 }
 
-Err MRV_realloc_to_fit(MRV_Vector *vec)
+Err mrv_realloc_to_fit(MrvVector *vec)
 {
 	if (vec == NULL) {
 		return ERR;
@@ -101,7 +101,7 @@ Err MRV_realloc_to_fit(MRV_Vector *vec)
 	return OK;
 }
 
-Err MRV_pop(MRV_Vector *vec)
+Err mrv_pop(MrvVector *vec)
 {
 	if (vec == NULL) {
 		return ERR;
@@ -116,7 +116,7 @@ Err MRV_pop(MRV_Vector *vec)
 	return OK;
 }
 
-void *MRV_get_idx(MRV_Vector *vec, size_t n)
+void *mrv_get_idx(MrvVector *vec, size_t n)
 {
 	if (vec == NULL) {
 		return NULL;
@@ -129,7 +129,7 @@ void *MRV_get_idx(MRV_Vector *vec, size_t n)
 	return &vec->arr[n * vec->stride];
 }
 
-void *MRV_get_item_where(MRV_Vector *vec, Bool (*is_item)(void *))
+void *mrv_get_item_where(MrvVector *vec, Bool (*is_item)(void *))
 {
 	for (size_t i = 0; i < vec->len; i++) {
 		if (is_item(&vec->arr[i * vec->stride]) == TRUE) {
@@ -140,7 +140,7 @@ void *MRV_get_item_where(MRV_Vector *vec, Bool (*is_item)(void *))
 	return NULL;
 }
 
-void *MRV_get_item(MRV_Vector *vec, void *item)
+void *mrv_get_item(MrvVector *vec, void *item)
 {
 	for (size_t i = 0; i < vec->len; i++) {
 		if (memcmp(&vec->arr[i * vec->stride], item, vec->stride) ==
@@ -152,7 +152,7 @@ void *MRV_get_item(MRV_Vector *vec, void *item)
 	return NULL;
 }
 
-void MRV_qsort(MRV_Vector *vec, int (*compare)(const void *, const void *))
+void mrv_qsort(MrvVector *vec, int (*compare)(const void *, const void *))
 {
 	qsort(vec->arr, vec->len, vec->stride, compare);
 }

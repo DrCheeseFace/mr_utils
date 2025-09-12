@@ -26,14 +26,14 @@ typedef enum {
 	MRL_SEVERITY_ERROR,
 	MRL_SEVERITY_WARNING,
 	MRL_SEVERITY_COUNT
-} MRL_Severity;
+} MrlSeverity;
 
-void MRL_reset_severity(void);
+void mrl_reset_severity(void);
 
-void MRL_set_severity(MRL_Severity severity);
+void mrl_set_severity(MrlSeverity severity);
 
-void MRL_logln(const char *message, MRL_Severity severity);
+void mrl_logln(const char *message, MrlSeverity severity);
 
-void MRL_log(const char *message, MRL_Severity severity);
+void mrl_log(const char *message, MrlSeverity severity);
 
 #endif // !MRL_LOGGER_H

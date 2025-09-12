@@ -9,38 +9,39 @@
 #include <stddef.h>
 
 #define MRT_ASSERT_EQ(expected, actual)                                        \
-	(MRT_assert_eq((&expected), (&actual), (sizeof(expected))))
+	(mrt_assert_eq((&expected), (&actual), (sizeof(expected))))
 
 #define MRT_ASSERT(actual)                                                     \
-	(MRT_assert_eq(&(bool){ actual }, &(bool){ true }, sizeof(bool)))
+	(mrt_assert_eq(&(bool){ actual }, &(bool){ true }, sizeof(bool)))
 
 #define MRT_ASSERT_NULL(actual) (actual == NULL)
 
 #define MRT_ASSERT_NOT_NULL(actual) (actual != NULL)
 
 /*
- * MRT_Context holds test cases and a description for the group of test cases
+ * MrtContext holds test cases and a description for the group of test cases
  *
- * \ MRT_ctx_create         - create context
- * \ MRT_ctx_destroy        - frees itself and contents
- * \ MRT_ctx_append_case    - adds test case to context
- * \ MRT_ctx_log            - logs context and test case results within context
+ * MrtContext has the following functions
+ *
+ * \ mrt_ctx_create         - create context
+ * \ mrt_ctx_destroy        - frees itself and contents
+ * \ mrt_ctx_append_case    - adds test case to context
+ * \ mrt_ctx_log            - logs context and test case results within context
  *
  */
-typedef void MRT_Context;
+typedef void MrtContext;
 
-MRT_Context *MRT_ctx_create(const char *description);
+MrtContext *mrt_ctx_create(const char *description);
 
-void MRT_ctx_destroy(MRT_Context *t_ctx);
+void mrt_ctx_destroy(MrtContext *t_ctx);
 
-void MRT_ctx_append_case(MRT_Context *t_ctx, const char *description,
-			 Bool pass);
+void mrt_ctx_append_case(MrtContext *t_ctx, const char *description, Bool pass);
 
 /*
  * `returns` 0 if passed
  */
-Err MRT_ctx_log(MRT_Context *t_ctx);
+Err mrt_ctx_log(MrtContext *t_ctx);
 
-Bool MRT_assert_eq(void *expected, void *actual, size_t size_of);
+Bool mrt_assert_eq(void *expected, void *actual, size_t size_of);
 
 #endif // !MRT_TEST_H

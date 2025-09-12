@@ -11,18 +11,20 @@
 /*
  * vectors!
  *
- * \ MRV_create            - allocates a MRV_Vector on the heap and initializes it
- * \ MRV_destroy           - frees contents of MRV_Vector and itself
- * \ MRV_free              - frees contents of MRV_Vector
- * \ MRV_init              - set arr to CAFE_BABE and length/capacity to 0
- * \ MRV_clear             - set arr to CAFE_BABE and length/capacity to 0
- * \ MRV_append            - appends element
- * \ MRV_realloc_to_fit    - sets capacity to length and reallocates to fit
- * \ MRV_pop               - removes last element
- * \ MRV_get_idx           - get pointer to idx
- * \ MRV_get_item          - get pointer to first memcmp identical items
- * \ MRV_get_item_where    - get pointer to item that satisfies user defined method
- * \ MRV_qsort             - quicksort
+ * MrvVector has the following functions
+ *
+ * \ mrv_create            - allocates a MRV_Vector on the heap and initializes it
+ * \ mrv_destroy           - frees contents of MRV_Vector and itself
+ * \ mrv_free              - frees contents of MRV_Vector
+ * \ mrv_init              - set arr to CAFE_BABE and length/capacity to 0
+ * \ mrv_clear             - set arr to CAFE_BABE and length/capacity to 0
+ * \ mrv_append            - appends element
+ * \ mrv_realloc_to_fit    - sets capacity to length and reallocates to fit
+ * \ mrv_pop               - removes last element
+ * \ mrv_get_idx           - get pointer to idx
+ * \ mrv_get_item          - get pointer to first memcmp identical items
+ * \ mrv_get_item_where    - get pointer to item that satisfies user defined method
+ * \ mrv_qsort             - quicksort
  *
  */
 typedef struct {
@@ -30,31 +32,31 @@ typedef struct {
 	size_t stride;
 	size_t len;
 	size_t capacity;
-} MRV_Vector;
+} MrvVector;
 
-MRV_Vector *MRV_create(size_t capacity, size_t stride);
+MrvVector *mrv_create(size_t capacity, size_t stride);
 
-void MRV_destroy(MRV_Vector *vec);
+void mrv_destroy(MrvVector *vec);
 
-void MRV_free(MRV_Vector *vec);
+void mrv_free(MrvVector *vec);
 
-void MRV_init(MRV_Vector *vec, size_t capacity, size_t stride);
+void mrv_init(MrvVector *vec, size_t capacity, size_t stride);
 
-Err MRV_clear(MRV_Vector *vec);
+Err mrv_clear(MrvVector *vec);
 
 // resizes vec->arr if needed
-Err MRV_append(MRV_Vector *vec, void *item);
+Err mrv_append(MrvVector *vec, void *item);
 
-Err MRV_realloc_to_fit(MRV_Vector *vec);
+Err mrv_realloc_to_fit(MrvVector *vec);
 
-Err MRV_pop(MRV_Vector *vec);
+Err mrv_pop(MrvVector *vec);
 
-void *MRV_get_idx(MRV_Vector *vec, size_t n);
+void *mrv_get_idx(MrvVector *vec, size_t n);
 
-void *MRV_get_item(MRV_Vector *vec, void *item);
+void *mrv_get_item(MrvVector *vec, void *item);
 
-void *MRV_get_item_where(MRV_Vector *vec, Bool (*is_item)(void *));
+void *mrv_get_item_where(MrvVector *vec, Bool (*is_item)(void *));
 
-void MRV_qsort(MRV_Vector *vec, int (*compare)(const void *, const void *));
+void mrv_qsort(MrvVector *vec, int (*compare)(const void *, const void *));
 
 #endif // !MRV_VECTORS_H

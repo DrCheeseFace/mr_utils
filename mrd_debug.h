@@ -21,10 +21,10 @@
 #define DEBUG_LOG_HEAD "MRD_DEBUG LOG: "
 #define _GNU_SOURCE
 
-void *MRD_malloc(size_t size, const char *file_name, int line);
-void *MRD_calloc(size_t nmemb, size_t size, const char *file_name, int line);
-void *MRD_realloc(void *ptr, size_t size, const char *file_name, int line);
-void MRD_free(void *ptr, const char *file_name, int line);
+void *mrd_malloc(size_t size, const char *file_name, int line);
+void *mrd_calloc(size_t nmemb, size_t size, const char *file_name, int line);
+void *mrd_realloc(void *ptr, size_t size, const char *file_name, int line);
+void mrd_free(void *ptr, const char *file_name, int line);
 
 #endif // !DEBUG
 
@@ -32,9 +32,9 @@ void MRD_free(void *ptr, const char *file_name, int line);
 
 #include <stdlib.h>
 
-#define malloc(size) MRD_malloc(size, __FILE__, __LINE__)
-#define calloc(nmemb, size) MRD_calloc(nmemb, size, __FILE__, __LINE__)
-#define realloc(ptr, size) MRD_realloc(ptr, size, __FILE__, __LINE__)
-#define free(ptr) MRD_free(ptr, __FILE__, __LINE__)
+#define malloc(size) mrd_malloc(size, __FILE__, __LINE__)
+#define calloc(nmemb, size) mrd_calloc(nmemb, size, __FILE__, __LINE__)
+#define realloc(ptr, size) mrd_realloc(ptr, size, __FILE__, __LINE__)
+#define free(ptr) mrd_free(ptr, __FILE__, __LINE__)
 
 #endif // !MRD_DEBUG_H

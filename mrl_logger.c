@@ -17,26 +17,26 @@ const char *terminal_color_codes[MRL_SEVERITY_COUNT] = {
 	MRL_YELLOW_COLOR_CODE,
 };
 
-void MRL_reset_severity(void)
+void mrl_reset_severity(void)
 {
 	fprintf(stderr, "%s", terminal_color_codes[MRL_SEVERITY_DEFAULT]);
 }
 
-void MRL_set_severity(MRL_Severity severity)
+void mrl_set_severity(MrlSeverity severity)
 {
 	fprintf(stderr, "%s", terminal_color_codes[severity]);
 }
 
-void MRL_logln(const char *message, MRL_Severity severity)
+void mrl_logln(const char *message, MrlSeverity severity)
 {
-	MRL_set_severity(severity);
+	mrl_set_severity(severity);
 	fprintf(stderr, "%s\n", message);
-	MRL_reset_severity();
+	mrl_reset_severity();
 }
 
-void MRL_log(const char *message, MRL_Severity severity)
+void mrl_log(const char *message, MrlSeverity severity)
 {
-	MRL_set_severity(severity);
+	mrl_set_severity(severity);
 	fprintf(stderr, "%s", message);
-	MRL_reset_severity();
+	mrl_reset_severity();
 }
