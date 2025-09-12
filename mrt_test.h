@@ -8,10 +8,6 @@
 #include "mrm_misc.h"
 #include <stddef.h>
 
-#define MRT_INIT_TEST_CASES_PER_CONTEXT 64
-
-#define MRT_TAB "    "
-
 #define MRT_ASSERT_EQ(expected, actual)                                        \
 	(MRT_assert_eq((&expected), (&actual), (sizeof(expected))))
 
@@ -28,10 +24,10 @@
  * \ MRT_ctx_create         - create context
  * \ MRT_ctx_destroy        - frees itself and contents
  * \ MRT_ctx_append_case    - adds test case to context
- * \ MRT_ctx_log            - provides logs for context and test cases
+ * \ MRT_ctx_log            - logs context and test case results within context
  *
  */
-typedef struct MRT_Context MRT_Context;
+typedef void MRT_Context;
 
 MRT_Context *MRT_ctx_create(const char *description);
 
@@ -43,7 +39,7 @@ void MRT_ctx_append_case(MRT_Context *t_ctx, const char *description,
 /*
  * `returns` 0 if passed
  */
-Err MRT_ctx_log(struct MRT_Context *t_ctx);
+Err MRT_ctx_log(MRT_Context *t_ctx);
 
 Bool MRT_assert_eq(void *expected, void *actual, size_t size_of);
 

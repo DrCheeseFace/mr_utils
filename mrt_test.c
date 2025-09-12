@@ -1,4 +1,3 @@
-#include "mrt_test.h"
 #include "mrd_debug.h"
 #include "mrl_logger.h"
 #include "mrs_strings.h"
@@ -8,23 +7,21 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct MRT_Case {
+#define MRT_INIT_TEST_CASES_PER_CONTEXT 64
+#define MRT_TAB "    "
+
+typedef struct {
 	MRS_String description;
 	Bool pass;
-};
+} MRT_Case;
 
-struct MRT_Context {
+typedef struct {
 	MRS_String *description;
 	MRV_Vector cases;
 	uint pass_count;
-};
+} MRT_Context;
 
-Bool MRT_assert_eq(void *expected, void *actual, size_t size_of)
-{
-	return memcmp(expected, actual, size_of) == 0;
-}
-
-void MRT_case_log(struct MRT_Case test_case)
+internal void MRT_case_log(MRT_Case test_case)
 {
 	MRL_log(test_case.description.value, MRL_SEVERITY_DEFAULT);
 	if (test_case.pass) {
@@ -35,9 +32,14 @@ void MRT_case_log(struct MRT_Case test_case)
 	MRL_reset_severity();
 }
 
+Bool MRT_assert_eq(void *expected, void *actual, size_t size_of)
+{
+	return memcmp(expected, actual, size_of) == 0;
+}
+
 MRT_Context *MRT_ctx_create(const char *description)
 {
-	struct MRT_Context *t_ctx = malloc(sizeof(struct MRT_Context));
+	MRT_Context *t_ctx = malloc(sizeof(MRT_Context));
 	memset(t_ctx, 0, sizeof(*t_ctx));
 
 	MRS_String *s = MRS_create(strlen(description));
@@ -45,7 +47,7 @@ MRT_Context *MRT_ctx_create(const char *description)
 	t_ctx->description = s;
 
 	MRV_init(&t_ctx->cases, MRT_INIT_TEST_CASES_PER_CONTEXT,
-		 sizeof(struct MRT_Case));
+		 sizeof(MRT_Case));
 
 	return t_ctx;
 }
@@ -53,7 +55,7 @@ MRT_Context *MRT_ctx_create(const char *description)
 void MRT_ctx_destroy(MRT_Context *t_ctx)
 {
 	for (size_t i = 0; i < t_ctx->cases.len; i++) {
-		struct MRT_Case *c = MRV_get_idx(&t_ctx->cases, i);
+		MRT_Case *c = MRV_get_idx(&t_ctx->cases, i);
 		MRS_free(&c->description);
 	}
 
@@ -75,10 +77,10 @@ void MRT_ctx_append_case(MRT_Context *t_ctx, const char *description, Bool pass)
 	MRS_init(strlen(description), description, strlen(description), &s);
 
 	MRV_append(&t_ctx->cases,
-		   &(struct MRT_Case){ .description = s, .pass = pass });
+		   &(MRT_Case){ .description = s, .pass = pass });
 }
 
-Err MRT_ctx_log(struct MRT_Context *t_ctx)
+Err MRT_ctx_log(MRT_Context *t_ctx)
 {
 	MRL_logln("", MRL_SEVERITY_DEFAULT);
 
@@ -87,7 +89,7 @@ Err MRT_ctx_log(struct MRT_Context *t_ctx)
 
 	for (size_t i = 0; i < t_ctx->cases.len; i++) {
 		MRL_log(MRT_TAB, MRL_SEVERITY_DEFAULT);
-		struct MRT_Case *c = MRV_get_idx(&t_ctx->cases, i);
+		MRT_Case *c = MRV_get_idx(&t_ctx->cases, i);
 		MRT_case_log(*c);
 	}
 	MRL_logln("", MRL_SEVERITY_DEFAULT);
