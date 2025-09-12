@@ -2,6 +2,7 @@
 #include "mrl_logger.h"
 #include "mrm_misc.h"
 #include "mrs_strings.h"
+#include <string.h>
 
 #ifdef malloc
 #undef malloc
@@ -149,7 +150,7 @@ internal void unused MRD_log_backtrace(void)
 
 		// build addr2line command
 		char addr2line_command[128] = "";
-		strcat(addr2line_command, "addr2line -e ");
+		strcat(addr2line_command, "addr2line -f -i -e ");
 		strcat(addr2line_command, path);
 		strcat(addr2line_command, " ");
 		strcat(addr2line_command, addr_diff_hex);
@@ -164,21 +165,18 @@ internal void unused MRD_log_backtrace(void)
 			       addr2line_output_buffer);
 		}
 
-		char *semi_colon = strchr(addr2line_output_full_out, ':');
-		char line_string[6];
-		strtok(semi_colon, " ");
-		strcpy(line_string, semi_colon + 1);
-		strtok(line_string, "\n");
-		*semi_colon = '\0';
+		char func_name[MAX_FUNC_NAME_LEN + 1] = "";
+		func_name[MAX_FUNC_NAME_LEN] = '\0';
 
-		char *start_func = strchr(symbols[i], '(') + 1;
-		char *end_func = strchr(symbols[i], '+');
-		char func_name[64] = "";
-		strncpy(func_name, start_func, end_func - start_func);
+		char *newline_pos = strchr(addr2line_output_full_out, '\n');
+		*newline_pos = '\0';
+		strtok(addr2line_output_full_out, "\n");
+		size_t func_name_len = newline_pos - addr2line_output_full_out;
+		strncpy(func_name, addr2line_output_full_out, func_name_len);
+		strtok(newline_pos + 1, "\n");
 
 		char log[256];
-		sprintf(log, "%s:%s => %s()", addr2line_output_full_out,
-			line_string, func_name);
+		sprintf(log, "%s => %s()", newline_pos + 1, func_name);
 
 		for (size_t j = 0; j < indent_level; j++) {
 			MRL_log("  ", MRL_SEVERITY_DEFAULT);
