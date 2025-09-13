@@ -260,3 +260,26 @@ void mrs_shrink_to_fit(MrsString *src)
 	src->capacity = src->len;
 	src->value[src->len] = '\0';
 }
+
+Err mrs_pop_char(MrsString *src)
+{
+	if (src->len == 0) {
+		return ERR;
+	}
+	src->len--;
+	src->value[src->len] = '\0';
+	return OK;
+}
+
+void mrs_trim_trailing_whitespace(MrsString *src)
+{
+	while (TRUE) {
+		if (src->len == 0) {
+			return;
+		}
+		if (mrs_is_whitespace(src, src->len - 1) != OK) {
+			return;
+		}
+		mrs_pop_char(src);
+	}
+}

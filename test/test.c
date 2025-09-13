@@ -7,7 +7,7 @@
 #include "../mrt_test.h"
 #include "../mrv_vectors.h"
 
-int test_strstr(void)
+Err test_strstr(void)
 {
 	MrtContext *t_ctx = mrt_ctx_create("test_strstr");
 
@@ -54,7 +54,7 @@ int test_strstr(void)
 	return err;
 }
 
-int test_filter(void)
+Err test_filter(void)
 {
 	MrtContext *t_ctx = mrt_ctx_create("test_filter");
 
@@ -87,7 +87,7 @@ int test_filter(void)
 	return err;
 }
 
-int test_strcat(void)
+Err test_strcat(void)
 {
 	MrtContext *t_ctx = mrt_ctx_create("test_strcat");
 
@@ -159,7 +159,7 @@ int test_strcat(void)
 	return err;
 }
 
-int test_pushstr(void)
+Err test_pushstr(void)
 {
 	MrtContext *t_ctx = mrt_ctx_create("test_pushstr");
 
@@ -198,7 +198,7 @@ int test_pushstr(void)
 	return err;
 }
 
-int test_get_char(void)
+Err test_get_char(void)
 {
 	MrtContext *t_ctx = mrt_ctx_create("test_strcat");
 
@@ -235,7 +235,7 @@ int test_get_char(void)
 	return err;
 }
 
-int test_setstr(void)
+Err test_setstr(void)
 {
 	MrtContext *t_ctx = mrt_ctx_create("test_setstr");
 
@@ -265,7 +265,7 @@ int test_setstr(void)
 	return err;
 }
 
-int test_setstrn(void)
+Err test_setstrn(void)
 {
 	MrtContext *t_ctx = mrt_ctx_create("test_setstrn");
 
@@ -296,7 +296,7 @@ int test_setstrn(void)
 	return err;
 }
 
-int test_get_idx(void)
+Err test_get_idx(void)
 {
 	MrtContext *t_ctx = mrt_ctx_create("test_get_idx");
 
@@ -328,7 +328,7 @@ int test_get_idx(void)
 	return err;
 }
 
-int test_strchr(void)
+Err test_strchr(void)
 {
 	MrtContext *t_ctx = mrt_ctx_create("test_strchr");
 
@@ -356,7 +356,7 @@ int test_strchr(void)
 	return err;
 }
 
-int test_strndup(void)
+Err test_strndup(void)
 {
 	MrtContext *t_ctx = mrt_ctx_create("test_strndup");
 
@@ -396,7 +396,7 @@ int test_strndup(void)
 	return err;
 }
 
-int test_shrink_to_fit(void)
+Err test_shrink_to_fit(void)
 {
 	MrtContext *t_ctx = mrt_ctx_create("test_shrink_to_fit");
 
@@ -418,7 +418,56 @@ int test_shrink_to_fit(void)
 	return err;
 }
 
-int test_append(void)
+Err test_trim_trailing_whitespace(void)
+{
+	MrtContext *t_ctx = mrt_ctx_create("test_trim_trailing_whitespace");
+
+	MrsString test;
+	mrs_init(20, "1234567890", strlen("1234567890"), &test);
+	mrs_trim_trailing_whitespace(&test);
+
+	mrt_ctx_append_case(t_ctx, "trim no trailing whitespace",
+			    test.len == 10);
+
+	mrs_free(&test);
+
+	mrs_init(20, "123    890", strlen("123    890"), &test);
+	mrs_trim_trailing_whitespace(&test);
+
+	mrt_ctx_append_case(t_ctx,
+			    "trim no trailing whitespace. inner whitespace",
+			    test.len == 10);
+
+	mrs_free(&test);
+
+	mrs_init(20, "        ", strlen("        "), &test);
+	mrs_trim_trailing_whitespace(&test);
+
+	mrt_ctx_append_case(t_ctx, "only whitespace", test.len == 0);
+
+	mrs_free(&test);
+
+	mrs_init(20, "qqqqq   ", strlen("qqqqq   "), &test);
+	mrs_trim_trailing_whitespace(&test);
+
+	mrt_ctx_append_case(t_ctx, "trailing whitespace", test.len == 5);
+
+	mrs_free(&test);
+
+	mrs_init(20, "q   q   ", strlen("q   q   "), &test);
+	mrs_trim_trailing_whitespace(&test);
+
+	mrt_ctx_append_case(t_ctx, "trailing whitespace white inner whitespace",
+			    test.len == 5);
+
+	mrs_free(&test);
+
+	Err err = mrt_ctx_log(t_ctx);
+	mrt_ctx_destroy(t_ctx);
+	return err;
+}
+
+Err test_append(void)
 {
 	MrtContext *t_ctx = mrt_ctx_create("test_append");
 
@@ -477,7 +526,7 @@ int test_append(void)
 	return err;
 }
 
-int test_pop(void)
+Err test_pop(void)
 {
 	MrtContext *t_ctx = mrt_ctx_create("test_strstr");
 
@@ -523,7 +572,7 @@ Bool always_false(void *_)
 	return FALSE;
 }
 
-int test_get_item_where(void)
+Err test_get_item_where(void)
 {
 	MrtContext *t_ctx = mrt_ctx_create("test_get_item_where");
 
@@ -551,7 +600,7 @@ int test_get_item_where(void)
 	return err;
 }
 
-int test_get_item(void)
+Err test_get_item(void)
 {
 	MrtContext *t_ctx = mrt_ctx_create("test_get_item");
 
@@ -583,7 +632,7 @@ int test_get_item(void)
 	return err;
 }
 
-int bruh(void)
+Err bruh(void)
 {
 	void *ptr = malloc(69);
 	free(ptr);
@@ -611,6 +660,7 @@ int main(void)
 	err = err || test_strchr();
 	err = err || test_strndup();
 	err = err || test_shrink_to_fit();
+	err = err || test_trim_trailing_whitespace();
 
 	// mrv_vectors
 	err = err || test_append();

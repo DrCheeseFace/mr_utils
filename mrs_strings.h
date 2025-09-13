@@ -13,23 +13,25 @@
  *
  * MrsString has the following functions
  *
- * \ mrs_create               - allocates a MRS_String on the heap and initializes it
- * \ mrs_init                 - initialize MRS_String
- * \ mrs_free                 - free contents of MRS_String
- * \ mrs_setstr               - set MRS_String to str
- * \ mrs_setstrn              - set n characters of str to MRS_String
- * \ mrs_strcmp               - memcmp on contents of MRS_String
- * \ mrs_strcat               - concatinates two MRS_String. reallocating if needed
- * \ mrs_pushstr              - concatinates str to MRS_String. reallocating if needed
- * \ mrs_strstr               - find MRS_String (needle) in MRS_String (haystack)
- * \ mrs_get_char             - get char at index
- * \ mrs_get_idx              - get index of first occurance of char
- * \ mrs_strchr               - return pointer to first occurance of char
- * \ mrs_is_whitespace        - checks if characters at index is \t \n or ' '
- * \ mrs_remove_whitespace    - removes \t \n and ' '
- * \ mrs_filter               - filters out char from MRS_String
- * \ mrs_strndup              - return malloced copy of MRS_String
- * \ mrs_shrink_to_fit        - sets capacity to length and reallocates to fit
+ * \ mrs_create                      - allocates a MRS_String on the heap and initializes it
+ * \ mrs_init                        - initialize MRS_String
+ * \ mrs_free                        - free contents of MRS_String
+ * \ mrs_setstr                      - set MRS_String to str
+ * \ mrs_setstrn                     - set n characters of str to MRS_String
+ * \ mrs_strcmp                      - memcmp on contents of MRS_String
+ * \ mrs_strcat                      - concatinates two MRS_String. reallocating if needed
+ * \ mrs_pushstr                     - concatinates str to MRS_String. reallocating if needed
+ * \ mrs_strstr                      - find MRS_String (needle) in MRS_String (haystack)
+ * \ mrs_get_char                    - get char at index
+ * \ mrs_get_idx                     - get index of first occurance of char
+ * \ mrs_strchr                      - return pointer to first occurance of char
+ * \ mrs_is_whitespace               - checks if characters at index is \t \n or ' '
+ * \ mrs_remove_whitespace           - removes \t \n and ' '
+ * \ mrs_filter                      - filters out char from MRS_String
+ * \ mrs_strndup                     - return malloced copy of MRS_String
+ * \ mrs_shrink_to_fit               - sets capacity to length and reallocates to fit
+ * \ mrs_pop_char                    - removes last char
+ * \ mrs_trim_trailing_whitespace    - removes trailing whitespace
  *
  */
 typedef struct {
@@ -110,5 +112,17 @@ Err mrs_strndup(MrsString *src, size_t len, MrsString *dest);
  * reallocs `value` to set `capacity` = `length`
  */
 void mrs_shrink_to_fit(MrsString *src);
+
+/*
+ * removes last char 
+ *
+ * `returns` ERR if src.len = 0 
+ */
+Err mrs_pop_char(MrsString *src);
+
+/*
+ * removes trailing space 
+ */
+void mrs_trim_trailing_whitespace(MrsString *src);
 
 #endif // !MRS_STRINGS_H
