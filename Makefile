@@ -17,14 +17,14 @@ CFLAGS_DEBUG = -Wall -Wextra -Werror \
 	       -fsanitize=address \
 	       # -DDEBUG -rdynamic \
 	       # BEWARE -rdynamic breaks leak check on fsanitize
-	 
+
 CFLAGS = -Wall -Wextra -Werror \
-	 -O2 
+	 -O2
 
 TEST_TARGET = test.out
 TEST_SRC =  test/*.c *.c
 
-SPACERS_TARGET= spacers
+SPACERS_TARGET= ./spacers
 SPACERS_SRC =  tools/*.c  *.c
 
 
@@ -46,11 +46,11 @@ run:
 clean:
 	-rm -f $(TEST_TARGET) $(SPACERS_TARGET)
 
-format:
-	find *.c *.h test/* | xargs clang-format -i --verbose
+format: build-debug-spacers
+	find *.c *.h test/* | xargs clang-format -i --verbose && git ls-files | xargs $(SPACERS_TARGET)
 
-format-check:
-	find *.c *.h test/* | xargs clang-format --dry-run --Werror --verbose
+format-check: build-debug-spacers
+	find *.c *.h test/* | xargs clang-format --dry-run --Werror --verbose && git ls-files | xargs $(SPACERS_TARGET) --check
 
 bear: # this is for creating the compile_commands.json file
 	rm -f compile_commands.json && bear -- make build-debug
@@ -62,10 +62,5 @@ debug:  build-debug run
 build-debug:
 	$(CC) -std=$(CSTANDARD) $(CFLAGS_DEBUG) -D $(DEBUG_LEVEL) -o $(TEST_TARGET) $(TEST_SRC)
 
-debug-spacers: build-debug-spacers run-spacers
-
 build-debug-spacers:
 	$(CC) -std=$(CSTANDARD) $(CFLAGS_DEBUG) -D $(DEBUG_LEVEL) -o $(SPACERS_TARGET) $(SPACERS_SRC)
-
-run-spacers:
-	./$(SPACERS_TARGET)
