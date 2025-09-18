@@ -114,14 +114,14 @@ Err mrs_strndup(MrsString *src, size_t len, MrsString *dest);
 void mrs_shrink_to_fit(MrsString *src);
 
 /*
- * removes last char 
+ * removes last char
  *
- * `returns` ERR if src.len = 0 
+ * `returns` ERR if src.len = 0
  */
 Err mrs_pop_char(MrsString *src);
 
 /*
- * removes trailing space 
+ * removes trailing space
  */
 void mrs_trim_trailing_whitespace(MrsString *src);
 

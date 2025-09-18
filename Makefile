@@ -24,10 +24,14 @@ CFLAGS = -Wall -Wextra -Werror \
 TEST_TARGET = test.out
 TEST_SRC =  test/*.c *.c
 
+SPACERS_TARGET= spacers
+SPACERS_SRC =  tools/*.c  *.c
+
+
 DEBUG_LEVEL = MRD_DEBUG_BACKTRACE
 # DEBUG_LEVEL = MRD_DEBUG_DEFAULT
 
-.PHONY: all build run clean format format-check bear test check debug build-debug 
+.PHONY: all build run clean format format-check bear test check debug build-debug build-debug-spacers
 
 all: test
 
@@ -40,7 +44,7 @@ run:
 	./$(TEST_TARGET)
 
 clean:
-	-rm -f $(TEST_TARGET)
+	-rm -f $(TEST_TARGET) $(SPACERS_TARGET)
 
 format:
 	find *.c *.h test/* | xargs clang-format -i --verbose
@@ -57,3 +61,11 @@ debug:  build-debug run
 
 build-debug:
 	$(CC) -std=$(CSTANDARD) $(CFLAGS_DEBUG) -D $(DEBUG_LEVEL) -o $(TEST_TARGET) $(TEST_SRC)
+
+debug-spacers: build-debug-spacers run-spacers
+
+build-debug-spacers:
+	$(CC) -std=$(CSTANDARD) $(CFLAGS_DEBUG) -D $(DEBUG_LEVEL) -o $(SPACERS_TARGET) $(SPACERS_SRC)
+
+run-spacers:
+	./$(SPACERS_TARGET)

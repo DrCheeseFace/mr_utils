@@ -2,8 +2,8 @@
 
 - `mrs_strings.h`: string manipulation library
 - `mrv_vector.h`: vector library
-- `mrt_test.h`: mini test library 
-- `mrl_logger.h`: logging utilities 
+- `mrt_test.h`: mini test library
+- `mrl_logger.h`: logging utilities
 - `mrd_debug.h`: memory allocation debugging info. enable by defining DEBUG eg: `#define DEBUG` or the `-DDEBUG` gcc flag
 - `mrm_misc.h`: useful defines and cafebabe!
 
@@ -28,7 +28,7 @@ CFLAGS_DEBUG = -Wall -Wextra -Werror \
      -DDEBUG \
 	 -fsanitize=address \
      # BEWARE -rdynamic breaks leak check on fsanitize
-	 
+
 CFLAGS = -Wall -Wextra -Werror \
 	 -std=$(CSTANDARD) \
 	 -O2
@@ -39,7 +39,7 @@ TEST_SRC =  test/*.c *.c
 DEBUG_LEVEL = MRD_DEBUG_BACKTRACE
 # DEBUG_LEVEL = MRD_DEBUG_DEFAULT
 
-.PHONY: all build run clean format format-check bear test check build-debugger-preload debug build-debug 
+.PHONY: all build run clean format format-check bear test check build-debugger-preload debug build-debug
 
 all: test
 
@@ -77,12 +77,12 @@ build-debug:
 
 
 ### TODO
-- [ ] add left rigth comparison for failed tests 
+- [ ] add left rigth comparison for failed tests
 - [ ] malloc calloc realloc free wrappers for debugging memory leaks eg: this PTR (id) with this DATA that was allocated HERE, was not freed
 - [ ] optimize mrd_debug. map offsets to log messages so i dont have to calculate multiple times
-- [ ] log to defined out 
+- [ ] log to defined out
 - [x] dynamic array lib
-- [ ] doc generator tool 
+- [ ] doc generator tool
 - [ ] whitespace remover
 - [ ] useful runtime error message. something with coredump file abort()
 - [x] debug maintain only active allocations. eg: freed and not realloced to something not freed
