@@ -310,7 +310,7 @@ Err test_get_idx(MrlLogger *logger)
 	mrs_init(strlen(random), random, strlen(random), &random_example);
 	mrs_init(strlen(from), from, strlen(from), &example);
 
-	size_t idx_found;
+	uint idx_found;
 	int result = mrs_get_idx(&example, &example.value[2], &idx_found);
 
 	mrt_ctx_append_case(t_ctx, "'from' find from[2]", idx_found == 2);

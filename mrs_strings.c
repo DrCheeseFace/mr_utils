@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-MrsString *mrs_create(size_t capacity)
+MrsString *mrs_create(uint capacity)
 {
 	MrsString *out = malloc(sizeof(*out));
 	out->value = malloc(sizeof(char) * (capacity + 1));
@@ -16,8 +16,7 @@ MrsString *mrs_create(size_t capacity)
 	return out;
 }
 
-Err mrs_init(size_t capacity, const char *value, size_t value_len,
-	     MrsString *dest)
+Err mrs_init(uint capacity, const char *value, uint value_len, MrsString *dest)
 {
 	if (capacity == 0) {
 		capacity = strlen(value);
@@ -53,8 +52,8 @@ void mrs_free(MrsString *string)
 void mrs_filter(MrsString *string, const char remove_me)
 {
 	char filtered[string->len];
-	size_t filtered_len = 0;
-	for (size_t i = 0; i < string->len; i++) {
+	uint filtered_len = 0;
+	for (uint i = 0; i < string->len; i++) {
 		if (string->value[i] != remove_me) {
 			filtered[filtered_len] = string->value[i];
 			filtered_len++;
@@ -63,7 +62,7 @@ void mrs_filter(MrsString *string, const char remove_me)
 	mrs_setstrn(string, filtered, filtered_len, filtered_len);
 }
 
-Err mrs_setstr(MrsString *string, const char *src, size_t src_len)
+Err mrs_setstr(MrsString *string, const char *src, uint src_len)
 {
 	if (src_len > string->capacity) {
 		return ERR;
@@ -76,7 +75,7 @@ Err mrs_setstr(MrsString *string, const char *src, size_t src_len)
 	return OK;
 }
 
-Err mrs_setstrn(MrsString *string, const char *src, size_t src_len, size_t len)
+Err mrs_setstrn(MrsString *string, const char *src, uint src_len, uint len)
 {
 	if (len > string->capacity) {
 		return ERR;
@@ -129,7 +128,7 @@ Err mrs_strcat(MrsString *dest, MrsString *src)
 	return OK;
 }
 
-Err mrs_pushstr(MrsString *dest, const char *append_me, size_t n)
+Err mrs_pushstr(MrsString *dest, const char *append_me, uint n)
 {
 	if (n + dest->len > dest->capacity) {
 		char *malloced = malloc(sizeof(char) * (dest->len + n + 1));
@@ -157,14 +156,14 @@ Err mrs_pushstr(MrsString *dest, const char *append_me, size_t n)
 }
 
 char *mrs_strstr(MrsString *haystack, MrsString *needle,
-		 size_t haystack_start_idx)
+		 uint haystack_start_idx)
 {
 	if (haystack->len < needle->len) {
 		return NULL;
 	}
-	for (size_t i = haystack_start_idx; i < haystack->len - needle->len + 1;
+	for (uint i = haystack_start_idx; i < haystack->len - needle->len + 1;
 	     i++) {
-		for (size_t j = 0; needle->len; j++) {
+		for (uint j = 0; needle->len; j++) {
 			if ((haystack->value[i + j] ^ needle->value[j]) != 0) {
 				break;
 			}
@@ -179,7 +178,7 @@ char *mrs_strstr(MrsString *haystack, MrsString *needle,
 	return NULL;
 }
 
-char mrs_get_char(MrsString *src, size_t idx)
+char mrs_get_char(MrsString *src, uint idx)
 {
 	if (idx >= src->len) {
 		return '\0';
@@ -188,16 +187,16 @@ char mrs_get_char(MrsString *src, size_t idx)
 	}
 }
 
-Err mrs_get_idx(MrsString *src, char *idx, size_t *found_position)
+Err mrs_get_idx(MrsString *src, char *idx, uint *found_position)
 {
 	if (idx < src->value || idx >= &src->value[src->len]) {
 		return NOT_FOUND;
 	}
-	*found_position = (size_t)(idx - src->value);
+	*found_position = (uint)(idx - src->value);
 	return OK;
 }
 
-Err mrs_is_whitespace(MrsString *src, size_t idx)
+Err mrs_is_whitespace(MrsString *src, uint idx)
 {
 	char c = mrs_get_char(src, idx);
 	if (c == '\0') {
@@ -218,7 +217,7 @@ void mrs_remove_whitespace(MrsString *src)
 
 char *mrs_strchr(MrsString *src, char target)
 {
-	for (size_t i = 0; i < src->len; i++) {
+	for (uint i = 0; i < src->len; i++) {
 		if (src->value[i] == target) {
 			return &src->value[i];
 		}
@@ -226,7 +225,7 @@ char *mrs_strchr(MrsString *src, char target)
 	return NULL;
 }
 
-Err mrs_strndup(MrsString *src, size_t len, MrsString *dest)
+Err mrs_strndup(MrsString *src, uint len, MrsString *dest)
 {
 	if (src->len < len) {
 		return ERR;

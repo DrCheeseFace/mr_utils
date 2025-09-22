@@ -5,8 +5,6 @@
 #ifndef MRS_STRINGS_H
 #define MRS_STRINGS_H
 #include "mrm_misc.h"
-#include <stddef.h>
-#include <string.h>
 
 /*
  * strings!
@@ -36,24 +34,23 @@
  */
 typedef struct {
 	char *value;
-	size_t len;
-	size_t capacity;
+	uint len;
+	uint capacity;
 } MrsString;
 
-MrsString *mrs_create(size_t capacity);
+MrsString *mrs_create(uint capacity);
 
 /*
  * if `capactity = 0` capacity is set to strlen(value)
  * `returns` ERR if failed (double check capacity is enough)
  */
-Err mrs_init(size_t capacity, const char *value, size_t value_len,
-	     MrsString *dest);
+Err mrs_init(uint capacity, const char *value, uint value_len, MrsString *dest);
 
 void mrs_free(MrsString *string);
 
-Err mrs_setstr(MrsString *string, const char *src, size_t src_len);
+Err mrs_setstr(MrsString *string, const char *src, uint src_len);
 
-Err mrs_setstrn(MrsString *string, const char *src, size_t src_len, size_t len);
+Err mrs_setstrn(MrsString *string, const char *src, uint src_len, uint len);
 
 /*
  * returns -1 if a.len != b.len
@@ -66,24 +63,24 @@ Err mrs_strcat(MrsString *dest, MrsString *src);
  * \ pushes n characters of str to dest
  * \ reallocs if capacity is exeeded
  */
-Err mrs_pushstr(MrsString *dest, const char *str, size_t n);
+Err mrs_pushstr(MrsString *dest, const char *str, uint n);
 
 /*
  * `returns` NULL if not found
  */
 char *mrs_strstr(MrsString *haystack, MrsString *needle,
-		 size_t haystack_start_idx);
+		 uint haystack_start_idx);
 
 /*
  * `returns` NULL terminator if out of bounds
  */
-char mrs_get_char(MrsString *src, size_t idx);
+char mrs_get_char(MrsString *src, uint idx);
 
 /*
  * populates `found_position` with idx
  *
  */
-Err mrs_get_idx(MrsString *src, char *idx, size_t *found_position);
+Err mrs_get_idx(MrsString *src, char *idx, uint *found_position);
 
 /*
  * `returns` pointer to first occurance of char
@@ -100,13 +97,13 @@ char *mrs_strchr(MrsString *src, char target);
  *
  * `returns` NOT_FOUND if idx OOB
  */
-Err mrs_is_whitespace(MrsString *src, size_t idx);
+Err mrs_is_whitespace(MrsString *src, uint idx);
 
 void mrs_remove_whitespace(MrsString *src);
 
 void mrs_filter(MrsString *string, const char remove_me);
 
-Err mrs_strndup(MrsString *src, size_t len, MrsString *dest);
+Err mrs_strndup(MrsString *src, uint len, MrsString *dest);
 
 /*
  * reallocs `value` to set `capacity` = `length`

@@ -101,13 +101,13 @@ Err mrt_ctx_log(MrtContext *t_ctx)
 	mrl_logln(t_ctx->logging_context, "", MRL_SEVERITY_DEFAULT);
 
 	char pass_rate[15];
-	sprintf(pass_rate, "%d/%d Passed", t_ctx->pass_count,
+	sprintf(pass_rate, "%u/%d Passed", t_ctx->pass_count,
 		(int)t_ctx->cases.len);
 	mrl_log(t_ctx->logging_context, MRT_TAB, MRL_SEVERITY_DEFAULT);
 	mrl_logln(t_ctx->logging_context, pass_rate, MRL_SEVERITY_DEFAULT);
 
 	mrl_log(t_ctx->logging_context, MRT_TAB, MRL_SEVERITY_DEFAULT);
-	if (t_ctx->pass_count != (unsigned int)t_ctx->cases.len) {
+	if (t_ctx->pass_count != t_ctx->cases.len) {
 		mrl_logln(t_ctx->logging_context, "FAILED", MRL_SEVERITY_ERROR);
 		return ERR;
 	} else {

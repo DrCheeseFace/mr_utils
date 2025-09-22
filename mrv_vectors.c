@@ -2,11 +2,10 @@
 #include "mrd_debug.h"
 #include "mrm_misc.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-MrvVector *mrv_create(size_t capacity, size_t stride)
+MrvVector *mrv_create(uint capacity, uint stride)
 {
 	MrvVector *vec = malloc(sizeof(MrvVector));
 
@@ -38,7 +37,7 @@ void mrv_free(MrvVector *vec)
 	vec->capacity = CAFE_BABE;
 }
 
-void mrv_init(MrvVector *vec, size_t capacity, size_t stride)
+void mrv_init(MrvVector *vec, uint capacity, uint stride)
 {
 	vec->arr = malloc(capacity * stride);
 	memset(vec->arr, CAFE_BABE, capacity * stride);
@@ -116,7 +115,7 @@ Err mrv_pop(MrvVector *vec)
 	return OK;
 }
 
-void *mrv_get_idx(MrvVector *vec, size_t n)
+void *mrv_get_idx(MrvVector *vec, uint n)
 {
 	if (vec == NULL) {
 		return NULL;
@@ -131,7 +130,7 @@ void *mrv_get_idx(MrvVector *vec, size_t n)
 
 void *mrv_get_item_where(MrvVector *vec, Bool (*is_item)(void *))
 {
-	for (size_t i = 0; i < vec->len; i++) {
+	for (uint i = 0; i < vec->len; i++) {
 		if (is_item(&vec->arr[i * vec->stride]) == TRUE) {
 			return &vec->arr[i * vec->stride];
 		}
@@ -142,7 +141,7 @@ void *mrv_get_item_where(MrvVector *vec, Bool (*is_item)(void *))
 
 void *mrv_get_item(MrvVector *vec, void *item)
 {
-	for (size_t i = 0; i < vec->len; i++) {
+	for (uint i = 0; i < vec->len; i++) {
 		if (memcmp(&vec->arr[i * vec->stride], item, vec->stride) ==
 		    0) {
 			return &vec->arr[i * vec->stride];
