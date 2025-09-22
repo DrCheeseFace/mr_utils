@@ -1,16 +1,20 @@
 /*
  * this file has logging utilities
  *
- * \ MRL_reset_severity    - sets log severity to MRL_SEVERITY_DEFAULT
- * \ MRL_set_severity      - sets log severity
- * \ MRL_log               - log line to stderr
- * \ MRL_logln             - log lint to stderr with newline
+ * default output stream is set to `stderr`
+ *
+ * \ mrl_set_output_stream - sets output stream.
+ * \ mrl_reset_severity    - sets log severity to MRL_SEVERITY_DEFAULT
+ * \ mrl_set_severity      - sets log severity
+ * \ mrl_log               - log line to stderr
+ * \ mrl_logln             - log lint to stderr with newline
  *
  */
 
 #ifndef MRL_LOGGER_H
 #define MRL_LOGGER_H
 
+#include <stdio.h>
 #define MRL_DEFAULT_COLOR_CODE "\x1b[0m"
 #define MRL_MAGENTA_COLOR_CODE "\x1b[35m"
 #define MRL_BLUE_COLOR_CODE "\x1b[34m"
@@ -27,6 +31,8 @@ typedef enum {
 	MRL_SEVERITY_WARNING,
 	MRL_SEVERITY_COUNT
 } MrlSeverity;
+
+void mrl_set_output_stream(FILE *out);
 
 void mrl_reset_severity(void);
 
