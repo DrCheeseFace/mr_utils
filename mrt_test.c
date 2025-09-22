@@ -19,17 +19,18 @@ typedef struct {
 	MrsString *description;
 	MrvVector cases;
 	uint pass_count;
+	MrlLogger *logging_context;
 } MrtContext;
 
-internal void mtr_case_log(MrtCase test_case)
+internal void mtr_case_log(MrlLogger *mrl_ctx, MrtCase test_case)
 {
-	mrl_log(test_case.description.value, MRL_SEVERITY_DEFAULT);
+	mrl_log(mrl_ctx, test_case.description.value, MRL_SEVERITY_DEFAULT);
 	if (test_case.pass) {
-		mrl_logln(" ... ok", MRL_SEVERITY_OK);
+		mrl_logln(mrl_ctx, " ... ok", MRL_SEVERITY_OK);
 	} else {
-		mrl_logln(" ... FAILED", MRL_SEVERITY_ERROR);
+		mrl_logln(mrl_ctx, " ... FAILED", MRL_SEVERITY_ERROR);
 	}
-	mrl_reset_severity();
+	mrl_reset_severity(mrl_ctx);
 }
 
 Bool mrt_assert_eq(void *expected, void *actual, size_t size_of)
@@ -37,7 +38,7 @@ Bool mrt_assert_eq(void *expected, void *actual, size_t size_of)
 	return memcmp(expected, actual, size_of) == 0;
 }
 
-MrtContext *mrt_ctx_create(const char *description)
+MrtContext *mrt_ctx_create(const char *description, MrlLogger *logging_ctx)
 {
 	MrtContext *t_ctx = malloc(sizeof(MrtContext));
 	memset(t_ctx, 0, sizeof(*t_ctx));
@@ -48,6 +49,8 @@ MrtContext *mrt_ctx_create(const char *description)
 
 	mrv_init(&t_ctx->cases, MRT_INIT_TEST_CASES_PER_CONTEXT,
 		 sizeof(MrtCase));
+
+	t_ctx->logging_context = logging_ctx;
 
 	return t_ctx;
 }
@@ -81,30 +84,31 @@ void mrt_ctx_append_case(MrtContext *t_ctx, const char *description, Bool pass)
 
 Err mrt_ctx_log(MrtContext *t_ctx)
 {
-	mrl_logln("", MRL_SEVERITY_DEFAULT);
+	mrl_logln(t_ctx->logging_context, "", MRL_SEVERITY_DEFAULT);
 
-	mrl_log("description: ", MRL_SEVERITY_DEFAULT);
-	mrl_logln(t_ctx->description->value, MRL_SEVERITY_INFO);
+	mrl_log(t_ctx->logging_context, "description: ", MRL_SEVERITY_DEFAULT);
+	mrl_logln(t_ctx->logging_context, t_ctx->description->value,
+		  MRL_SEVERITY_INFO);
 
 	for (size_t i = 0; i < t_ctx->cases.len; i++) {
-		mrl_log(MRT_TAB, MRL_SEVERITY_DEFAULT);
+		mrl_log(t_ctx->logging_context, MRT_TAB, MRL_SEVERITY_DEFAULT);
 		MrtCase *c = mrv_get_idx(&t_ctx->cases, i);
-		mtr_case_log(*c);
+		mtr_case_log(t_ctx->logging_context, *c);
 	}
-	mrl_logln("", MRL_SEVERITY_DEFAULT);
+	mrl_logln(t_ctx->logging_context, "", MRL_SEVERITY_DEFAULT);
 
 	char pass_rate[15];
 	sprintf(pass_rate, "%d/%d Passed", t_ctx->pass_count,
 		(int)t_ctx->cases.len);
-	mrl_log(MRT_TAB, MRL_SEVERITY_DEFAULT);
-	mrl_logln(pass_rate, MRL_SEVERITY_DEFAULT);
+	mrl_log(t_ctx->logging_context, MRT_TAB, MRL_SEVERITY_DEFAULT);
+	mrl_logln(t_ctx->logging_context, pass_rate, MRL_SEVERITY_DEFAULT);
 
-	mrl_log(MRT_TAB, MRL_SEVERITY_DEFAULT);
+	mrl_log(t_ctx->logging_context, MRT_TAB, MRL_SEVERITY_DEFAULT);
 	if (t_ctx->pass_count != t_ctx->cases.len) {
-		mrl_logln("FAILED", MRL_SEVERITY_ERROR);
+		mrl_logln(t_ctx->logging_context, "FAILED", MRL_SEVERITY_ERROR);
 		return ERR;
 	} else {
-		mrl_logln("PASSED", MRL_SEVERITY_OK);
+		mrl_logln(t_ctx->logging_context, "PASSED", MRL_SEVERITY_OK);
 		return OK;
 	}
 }

@@ -3,13 +3,14 @@
 #include <string.h>
 
 #include "../mrd_debug.h"
+#include "../mrl_logger.h"
 #include "../mrs_strings.h"
 #include "../mrt_test.h"
 #include "../mrv_vectors.h"
 
-Err test_strstr(void)
+Err test_strstr(MrlLogger *logger)
 {
-	MrtContext *t_ctx = mrt_ctx_create("test_strstr");
+	MrtContext *t_ctx = mrt_ctx_create("test_strstr", logger);
 
 	const char *haystack = "11151111111111111231";
 	const char *needle = "31";
@@ -54,9 +55,9 @@ Err test_strstr(void)
 	return err;
 }
 
-Err test_filter(void)
+Err test_filter(MrlLogger *logger)
 {
-	MrtContext *t_ctx = mrt_ctx_create("test_filter");
+	MrtContext *t_ctx = mrt_ctx_create("test_filter", logger);
 
 	MrsString actual;
 	mrs_init(20, "12121", strlen("12121"), &actual);
@@ -87,9 +88,9 @@ Err test_filter(void)
 	return err;
 }
 
-Err test_strcat(void)
+Err test_strcat(MrlLogger *logger)
 {
-	MrtContext *t_ctx = mrt_ctx_create("test_strcat");
+	MrtContext *t_ctx = mrt_ctx_create("test_strcat", logger);
 
 	MrsString actual;
 	mrs_init(10, "aaabbb", strlen("aaabbb"), &actual);
@@ -159,9 +160,9 @@ Err test_strcat(void)
 	return err;
 }
 
-Err test_pushstr(void)
+Err test_pushstr(MrlLogger *logger)
 {
-	MrtContext *t_ctx = mrt_ctx_create("test_pushstr");
+	MrtContext *t_ctx = mrt_ctx_create("test_pushstr", logger);
 
 	MrsString actual;
 	mrs_init(10, "aaabbb", strlen("aaabbb"), &actual);
@@ -198,9 +199,9 @@ Err test_pushstr(void)
 	return err;
 }
 
-Err test_get_char(void)
+Err test_get_char(MrlLogger *logger)
 {
-	MrtContext *t_ctx = mrt_ctx_create("test_strcat");
+	MrtContext *t_ctx = mrt_ctx_create("test_strcat", logger);
 
 	MrsString src;
 	mrs_init(10, "0123456789", strlen("0123456789"), &src);
@@ -235,9 +236,9 @@ Err test_get_char(void)
 	return err;
 }
 
-Err test_setstr(void)
+Err test_setstr(MrlLogger *logger)
 {
-	MrtContext *t_ctx = mrt_ctx_create("test_setstr");
+	MrtContext *t_ctx = mrt_ctx_create("test_setstr", logger);
 
 	const char *from = "from";
 	const char *to = "to";
@@ -265,9 +266,9 @@ Err test_setstr(void)
 	return err;
 }
 
-Err test_setstrn(void)
+Err test_setstrn(MrlLogger *logger)
 {
-	MrtContext *t_ctx = mrt_ctx_create("test_setstrn");
+	MrtContext *t_ctx = mrt_ctx_create("test_setstrn", logger);
 
 	const char *from = "from";
 	const char *to = "to";
@@ -296,9 +297,9 @@ Err test_setstrn(void)
 	return err;
 }
 
-Err test_get_idx(void)
+Err test_get_idx(MrlLogger *logger)
 {
-	MrtContext *t_ctx = mrt_ctx_create("test_get_idx");
+	MrtContext *t_ctx = mrt_ctx_create("test_get_idx", logger);
 
 	const char *from = "from";
 	const char *random = "random";
@@ -328,9 +329,9 @@ Err test_get_idx(void)
 	return err;
 }
 
-Err test_strchr(void)
+Err test_strchr(MrlLogger *logger)
 {
-	MrtContext *t_ctx = mrt_ctx_create("test_strchr");
+	MrtContext *t_ctx = mrt_ctx_create("test_strchr", logger);
 
 	const char *xample_str = "xample_str";
 	MrsString xample;
@@ -356,9 +357,9 @@ Err test_strchr(void)
 	return err;
 }
 
-Err test_strndup(void)
+Err test_strndup(MrlLogger *logger)
 {
-	MrtContext *t_ctx = mrt_ctx_create("test_strndup");
+	MrtContext *t_ctx = mrt_ctx_create("test_strndup", logger);
 
 	const char *xample_str = "xample_str";
 	MrsString xample;
@@ -396,9 +397,9 @@ Err test_strndup(void)
 	return err;
 }
 
-Err test_shrink_to_fit(void)
+Err test_shrink_to_fit(MrlLogger *logger)
 {
-	MrtContext *t_ctx = mrt_ctx_create("test_shrink_to_fit");
+	MrtContext *t_ctx = mrt_ctx_create("test_shrink_to_fit", logger);
 
 	const char *example_str = "example_str";
 	MrsString example;
@@ -418,9 +419,10 @@ Err test_shrink_to_fit(void)
 	return err;
 }
 
-Err test_trim_trailing_whitespace(void)
+Err test_trim_trailing_whitespace(MrlLogger *logger)
 {
-	MrtContext *t_ctx = mrt_ctx_create("test_trim_trailing_whitespace");
+	MrtContext *t_ctx =
+		mrt_ctx_create("test_trim_trailing_whitespace", logger);
 
 	MrsString test;
 	mrs_init(20, "1234567890", strlen("1234567890"), &test);
@@ -467,9 +469,9 @@ Err test_trim_trailing_whitespace(void)
 	return err;
 }
 
-Err test_append(void)
+Err test_append(MrlLogger *logger)
 {
-	MrtContext *t_ctx = mrt_ctx_create("test_append");
+	MrtContext *t_ctx = mrt_ctx_create("test_append", logger);
 
 	MrvVector *int_array = mrv_create(10, sizeof(int));
 	int append_val = CAFE_BABE;
@@ -526,9 +528,9 @@ Err test_append(void)
 	return err;
 }
 
-Err test_pop(void)
+Err test_pop(MrlLogger *logger)
 {
-	MrtContext *t_ctx = mrt_ctx_create("test_strstr");
+	MrtContext *t_ctx = mrt_ctx_create("test_strstr", logger);
 
 	MrvVector *int_array = mrv_create(10, sizeof(int));
 	int append_val = CAFE_BABE;
@@ -572,9 +574,9 @@ Bool always_false(void *_)
 	return FALSE;
 }
 
-Err test_get_item_where(void)
+Err test_get_item_where(MrlLogger *logger)
 {
-	MrtContext *t_ctx = mrt_ctx_create("test_get_item_where");
+	MrtContext *t_ctx = mrt_ctx_create("test_get_item_where", logger);
 
 	MrvVector *int_array = mrv_create(10, sizeof(int));
 	int append_val = 1;
@@ -600,9 +602,9 @@ Err test_get_item_where(void)
 	return err;
 }
 
-Err test_get_item(void)
+Err test_get_item(MrlLogger *logger)
 {
-	MrtContext *t_ctx = mrt_ctx_create("test_get_item");
+	MrtContext *t_ctx = mrt_ctx_create("test_get_item", logger);
 
 	MrvVector *int_array = mrv_create(10, sizeof(int));
 	int append_val = 1;
@@ -646,29 +648,32 @@ Err bruh(void)
 
 int main(void)
 {
-	Err err = OK;
+	MrlLogger *logger = mrl_create(stderr, TRUE, FALSE);
 
+	Err err = OK;
 	// mrs_strings
-	err = err || test_strstr();
-	err = err || test_filter();
-	err = err || test_strcat();
-	err = err || test_pushstr();
-	err = err || test_get_char();
-	err = err || test_setstr();
-	err = err || test_setstrn();
-	err = err || test_get_idx();
-	err = err || test_strchr();
-	err = err || test_strndup();
-	err = err || test_shrink_to_fit();
-	err = err || test_trim_trailing_whitespace();
+	err = err || test_strstr(logger);
+	err = err || test_filter(logger);
+	err = err || test_strcat(logger);
+	err = err || test_pushstr(logger);
+	err = err || test_get_char(logger);
+	err = err || test_setstr(logger);
+	err = err || test_setstrn(logger);
+	err = err || test_get_idx(logger);
+	err = err || test_strchr(logger);
+	err = err || test_strndup(logger);
+	err = err || test_shrink_to_fit(logger);
+	err = err || test_trim_trailing_whitespace(logger);
 
 	// mrv_vectors
-	err = err || test_append();
-	err = err || test_pop();
-	err = err || test_get_item_where();
-	err = err || test_get_item();
+	err = err || test_append(logger);
+	err = err || test_pop(logger);
+	err = err || test_get_item_where(logger);
+	err = err || test_get_item(logger);
 
 	// err = err || bruh();
+
+	mrl_destroy(logger);
 
 	return err;
 }

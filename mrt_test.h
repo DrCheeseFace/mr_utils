@@ -20,6 +20,8 @@
 
 /*
  * MrtContext holds test cases and a description for the group of test cases
+
+ * mrl_init should be called for logging
  *
  * MrtContext has the following functions
  * \ mrt_ctx_create         - create context
@@ -42,7 +44,7 @@
  */
 typedef void MrtContext;
 
-MrtContext *mrt_ctx_create(const char *description);
+MrtContext *mrt_ctx_create(const char *description, MrtContext *logging_ctx);
 
 void mrt_ctx_destroy(MrtContext *t_ctx);
 

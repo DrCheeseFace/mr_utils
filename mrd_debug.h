@@ -1,6 +1,8 @@
 /*
  * this is a tool used for memory debugging
  *
+ * mrl_init should be called for logging
+ *
  * MRD_DEBUG_BACKTRACE
  *
  * MRD_DEBUG_DEFAULT

@@ -1,4 +1,5 @@
 #include "mrd_debug.h"
+#include "internals.h"
 #include "mrl_logger.h"
 #include "mrm_misc.h"
 #include "mrs_strings.h"
@@ -35,6 +36,15 @@ global_variable int current_allocation_id = 0;
 global_variable struct MrdAllocation active_allocations[MAX_ACTIVE_ALLOCATIONS];
 global_variable long base_address = CAFE_BABE;
 
+struct MrlContext logger = { .out = NULL,
+			     .log_header_enabled = FALSE,
+			     .terminal_color_enabled = TRUE };
+
+internal void mrd_init_logger(void)
+{
+	logger.out = stderr;
+}
+
 // cant call MRS_init due to it calling malloc
 internal void mrd_init_code_snippet(MrsString *dest)
 {
@@ -46,8 +56,8 @@ internal void mrd_init_code_snippet(MrsString *dest)
 
 internal void mrd_log_err(const char *msg)
 {
-	mrl_log(DEBUG_LOG_HEAD, MRL_SEVERITY_INFO);
-	mrl_logln(msg, MRL_SEVERITY_ERROR);
+	mrl_log(&logger, DEBUG_LOG_HEAD, MRL_SEVERITY_INFO);
+	mrl_logln(&logger, msg, MRL_SEVERITY_ERROR);
 }
 
 internal void mrd_get_code_snippet(const char *file_name, int line,
@@ -179,11 +189,11 @@ internal void unused mrd_log_backtrace(void)
 		sprintf(log, "%s => %s()", newline_pos + 1, func_name);
 
 		for (size_t j = 0; j < indent_level; j++) {
-			mrl_log("  ", MRL_SEVERITY_DEFAULT);
+			mrl_log(&logger, "  ", MRL_SEVERITY_DEFAULT);
 		}
 		indent_level++;
-		mrl_log("↪ ", MRL_SEVERITY_DEFAULT);
-		mrl_logln(log, MRL_SEVERITY_DEFAULT);
+		mrl_log(&logger, "↪ ", MRL_SEVERITY_DEFAULT);
+		mrl_logln(&logger, log, MRL_SEVERITY_DEFAULT);
 	}
 
 	free(symbols);
@@ -225,7 +235,7 @@ internal void mrd_log_command(enum MRD_Command command, size_t size,
 			      struct MrdAllocation *realloc_free_src,
 			      const char *file_name, int line)
 {
-	mrl_log(DEBUG_LOG_HEAD, MRL_SEVERITY_INFO);
+	mrl_log(&logger, DEBUG_LOG_HEAD, MRL_SEVERITY_INFO);
 	char text[MAX_LOG_LENGTH];
 	if (command == MRD_COMMAND_REALLOC) {
 		sprintf(text, "allocation (%d>%d) of ", realloc_free_src->id,
@@ -237,50 +247,54 @@ internal void mrd_log_command(enum MRD_Command command, size_t size,
 		sprintf(text, "allocation (%d) of ", current_allocation_id);
 	}
 
-	mrl_log(text, MRL_SEVERITY_DEFAULT);
+	mrl_log(&logger, text, MRL_SEVERITY_DEFAULT);
 
 	if (command == MRD_COMMAND_REALLOC) {
 		sprintf(text, "[%lu>%lu] ", realloc_free_src->size, size);
 	} else {
 		sprintf(text, "[%lu] ", size);
 	}
-	mrl_log(text, MRL_SEVERITY_OK);
+	mrl_log(&logger, text, MRL_SEVERITY_OK);
 
-	mrl_log("bytes ", MRL_SEVERITY_DEFAULT);
+	mrl_log(&logger, "bytes ", MRL_SEVERITY_DEFAULT);
 	switch (command) {
 	case MRD_COMMAND_MALLOC:
-		mrl_log("malloc allocated ", MRL_SEVERITY_INFO);
+		mrl_log(&logger, "malloc allocated ", MRL_SEVERITY_INFO);
 		break;
 	case MRD_COMMAND_CALLOC:
-		mrl_log("calloc allocated ", MRL_SEVERITY_INFO);
+		mrl_log(&logger, "calloc allocated ", MRL_SEVERITY_INFO);
 		break;
 	case MRD_COMMAND_REALLOC:
-		mrl_log("realloc allocated ", MRL_SEVERITY_ALT_INFO);
+		mrl_log(&logger, "realloc allocated ", MRL_SEVERITY_ALT_INFO);
 		break;
 	case MRD_COMMAND_FREE:
-		mrl_log("free'd ", MRL_SEVERITY_WARNING);
+		mrl_log(&logger, "free'd ", MRL_SEVERITY_WARNING);
 		break;
 	default:
 		break;
 	}
 
-	mrl_log("in ", MRL_SEVERITY_DEFAULT);
+	mrl_log(&logger, "in ", MRL_SEVERITY_DEFAULT);
 	sprintf(text, "%s:%d ", file_name, line);
-	mrl_log(text, MRL_SEVERITY_OK);
+	mrl_log(&logger, text, MRL_SEVERITY_OK);
 
 	MrsString code_snippet;
 	mrd_init_code_snippet(&code_snippet);
 
 	mrd_get_code_snippet(file_name, line, &code_snippet);
 	sprintf(text, "%s", code_snippet.value);
-	mrl_log(text, MRL_SEVERITY_DEFAULT);
+	mrl_log(&logger, text, MRL_SEVERITY_DEFAULT);
 	free(code_snippet.value);
 
-	mrl_logln("", MRL_SEVERITY_DEFAULT);
+	mrl_logln(&logger, "", MRL_SEVERITY_DEFAULT);
 }
 
 void *mrd_malloc(size_t size, const char *file_name, int line)
 {
+	if (logger.out == NULL) {
+		mrd_init_logger();
+	}
+
 	mrd_log_command(MRD_COMMAND_MALLOC, size, NULL, file_name, line);
 
 #ifdef MRD_DEBUG_BACKTRACE
@@ -301,13 +315,17 @@ void *mrd_malloc(size_t size, const char *file_name, int line)
 		mrd_log_err("FAILED TO MALLOC ALLOCATE ");
 	}
 
-	mrl_logln("", MRL_SEVERITY_DEFAULT);
+	mrl_logln(&logger, "", MRL_SEVERITY_DEFAULT);
 
 	return ptr;
 }
 
 void *mrd_calloc(size_t nmemb, size_t size, const char *file_name, int line)
 {
+	if (logger.out == NULL) {
+		mrd_init_logger();
+	}
+
 	mrd_log_command(MRD_COMMAND_CALLOC, size, NULL, file_name, line);
 
 #ifdef MRD_DEBUG_BACKTRACE
@@ -327,13 +345,17 @@ void *mrd_calloc(size_t nmemb, size_t size, const char *file_name, int line)
 		mrd_log_err("FAILED TO CALLOC ALLOCATE");
 	}
 
-	mrl_logln("", MRL_SEVERITY_DEFAULT);
+	mrl_logln(&logger, "", MRL_SEVERITY_DEFAULT);
 
 	return ptr;
 }
 
 void *mrd_realloc(void *ptr, size_t size, const char *file_name, int line)
 {
+	if (logger.out == NULL) {
+		mrd_init_logger();
+	}
+
 	struct MrdAllocation *src_allocation = NULL;
 	for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {
 		if (ptr == active_allocations[i].ptr) {
@@ -366,13 +388,17 @@ void *mrd_realloc(void *ptr, size_t size, const char *file_name, int line)
 		mrd_log_err("FAILED TO REALLOCATE");
 	}
 
-	mrl_logln("", MRL_SEVERITY_DEFAULT);
+	mrl_logln(&logger, "", MRL_SEVERITY_DEFAULT);
 
 	return realloc_ptr;
 }
 
 void mrd_free(void *ptr, const char *file_name, int line)
 {
+	if (logger.out == NULL) {
+		mrd_init_logger();
+	}
+
 	struct MrdAllocation *allocation = NULL;
 	for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {
 		if (ptr == active_allocations[i].ptr) {
@@ -392,7 +418,7 @@ void mrd_free(void *ptr, const char *file_name, int line)
 	mrd_log_backtrace();
 #endif
 
-	mrl_logln("", MRL_SEVERITY_DEFAULT);
+	mrl_logln(&logger, "", MRL_SEVERITY_DEFAULT);
 
 	// if the pointer to free is ever realloced somewhere, we need to set this to NULL
 	for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {

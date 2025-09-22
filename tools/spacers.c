@@ -30,34 +30,39 @@ const char *optionToStr[OPTION_COUNT] = { "-h",	       "--help", "-v",
 
 Bool is_check = FALSE;
 
-void log_help(void)
+void log_help(MrlLogger *logger)
 {
-	mrl_logln("tool to remove trailing whitespace", MRL_SEVERITY_DEFAULT);
-	mrl_logln("Usage: spacers [OPTION] [FILE]... ", MRL_SEVERITY_DEFAULT);
-	mrl_logln("", MRL_SEVERITY_DEFAULT);
-	mrl_logln("Options:", MRL_SEVERITY_DEFAULT);
+	mrl_logln(logger, "tool to remove trailing whitespace",
+		  MRL_SEVERITY_DEFAULT);
+	mrl_logln(logger, "Usage: spacers [OPTION] [FILE]... ",
+		  MRL_SEVERITY_DEFAULT);
+	mrl_logln(logger, "", MRL_SEVERITY_DEFAULT);
+	mrl_logln(logger, "Options:", MRL_SEVERITY_DEFAULT);
 	mrl_logln(
+		logger,
 		"  -c, --check        Checks for whitespace. does not mutate files",
 		MRL_SEVERITY_DEFAULT);
-	mrl_logln("  -h, --help         Print help ", MRL_SEVERITY_DEFAULT);
-	mrl_logln("  -v, --version      Print version", MRL_SEVERITY_DEFAULT);
+	mrl_logln(logger, "  -h, --help         Print help ",
+		  MRL_SEVERITY_DEFAULT);
+	mrl_logln(logger, "  -v, --version      Print version",
+		  MRL_SEVERITY_DEFAULT);
 }
 
-void log_version(void)
+void log_version(MrlLogger *logger)
 {
-	mrl_log("spacers ", MRL_SEVERITY_DEFAULT);
-	mrl_logln(VERSION, MRL_SEVERITY_DEFAULT);
+	mrl_log(logger, "spacers ", MRL_SEVERITY_DEFAULT);
+	mrl_logln(logger, VERSION, MRL_SEVERITY_DEFAULT);
 }
 
-void log_invalid_arg(MrsString *arg)
+void log_invalid_arg(MrlLogger *logger, MrsString *arg)
 {
-	mrl_log("error: invalid argument ", MRL_SEVERITY_ERROR);
-	mrl_log("\"", MRL_SEVERITY_ERROR);
-	mrl_log(arg->value, MRL_SEVERITY_ERROR);
-	mrl_logln("\"", MRL_SEVERITY_ERROR);
+	mrl_log(logger, "error: invalid argument ", MRL_SEVERITY_ERROR);
+	mrl_log(logger, "\"", MRL_SEVERITY_ERROR);
+	mrl_log(logger, arg->value, MRL_SEVERITY_ERROR);
+	mrl_logln(logger, "\"", MRL_SEVERITY_ERROR);
 }
 
-Err process_arg(MrsString *arg)
+Err process_arg(MrlLogger *logger, MrsString *arg)
 {
 	Option option = OPTION_COUNT;
 
@@ -70,18 +75,18 @@ Err process_arg(MrsString *arg)
 	switch (option) {
 	case OPTION_HELP_SHORT:
 	case OPTION_HELP:
-		log_help();
+		log_help(logger);
 		break;
 	case OPTION_VERSION_SHORT:
 	case OPTION_VERSION:
-		log_version();
+		log_version(logger);
 		break;
 	case OPTION_CHECK_SHORT:
 	case OPTION_CHECK:
 		is_check = TRUE;
 		break;
 	case OPTION_COUNT:
-		log_invalid_arg(arg);
+		log_invalid_arg(logger, arg);
 		return ERR;
 	default:
 		break;
@@ -151,7 +156,7 @@ internal Err check_file(FILE *file)
 	return OK;
 }
 
-internal Err write_file(FILE *file)
+internal Err write_file(MrlLogger *logger, FILE *file)
 {
 	FILE *tmp_file = tmpfile();
 
@@ -176,7 +181,8 @@ internal Err write_file(FILE *file)
 
 		Err err = write_to_temp(tmp_file, &trimed_line);
 		if (err != OK) {
-			mrl_logln("couldnt write all elements to a line",
+			mrl_logln(logger,
+				  "couldnt write all elements to a line",
 				  MRL_SEVERITY_ERROR);
 			return ERR;
 		}
@@ -199,41 +205,43 @@ internal Err write_file(FILE *file)
 	return OK;
 }
 
-internal Err process_files(MrvVector *file_paths)
+internal Err process_files(MrlLogger *logger, MrvVector *file_paths)
 {
 	for (size_t i = 0; i < file_paths->len; i++) {
 		MrsString *file_path = mrv_get_idx(file_paths, i);
 
 		FILE *file = fopen(file_path->value, "r+");
 		if (file == NULL) {
-			mrl_log("File could not be opened -> ",
+			mrl_log(logger, "File could not be opened -> ",
 				MRL_SEVERITY_ERROR);
-			mrl_logln(file_path->value, MRL_SEVERITY_ERROR);
+			mrl_logln(logger, file_path->value, MRL_SEVERITY_ERROR);
 			continue;
 		}
 
 		if (is_check == FALSE) {
-			Err err = write_file(file);
+			Err err = write_file(logger, file);
 			if (err != OK) {
 				mrs_free(file_path);
 				fclose(file);
 				exit(1);
 			} else {
-				mrl_logln(file_path->value,
+				mrl_logln(logger, file_path->value,
 					  MRL_SEVERITY_DEFAULT);
 			}
 		} else {
 			Err err = check_file(file);
 			if (err != OK) {
-				mrl_log(file_path->value, MRL_SEVERITY_DEFAULT);
-				mrl_logln(" whitespace found",
+				mrl_log(logger, file_path->value,
+					MRL_SEVERITY_DEFAULT);
+				mrl_logln(logger, " whitespace found",
 					  MRL_SEVERITY_ERROR);
 				mrs_free(file_path);
 				fclose(file);
 				exit(1);
 			} else {
-				mrl_log(file_path->value, MRL_SEVERITY_DEFAULT);
-				mrl_logln(" OK", MRL_SEVERITY_OK);
+				mrl_log(logger, file_path->value,
+					MRL_SEVERITY_DEFAULT);
+				mrl_logln(logger, " OK", MRL_SEVERITY_OK);
 			}
 		}
 
@@ -244,6 +252,8 @@ internal Err process_files(MrvVector *file_paths)
 
 int main(int argc, char **argv)
 {
+	MrlLogger *logger = mrl_create(stderr, TRUE, FALSE);
+
 	MrvVector args;
 	mrv_init(&args, MAX_ARGS, sizeof(MrsString));
 
@@ -255,7 +265,7 @@ int main(int argc, char **argv)
 	}
 
 	if (argc == 1) {
-		log_help();
+		log_help(logger);
 	}
 
 	MrvVector file_paths;
@@ -267,7 +277,7 @@ int main(int argc, char **argv)
 
 		switch (arg->value[0]) {
 		case '-':
-			err = process_arg(arg);
+			err = process_arg(logger, arg);
 			break;
 		default:
 			(void)err; // dafak
@@ -284,7 +294,7 @@ int main(int argc, char **argv)
 	}
 
 	if (err == OK) {
-		err = process_files(&file_paths);
+		err = process_files(logger, &file_paths);
 	}
 
 	for (size_t i = 0; i < file_paths.len; i++) {
@@ -296,4 +306,6 @@ int main(int argc, char **argv)
 		mrs_free(mrv_get_idx(&args, i));
 	}
 	mrv_free(&args);
+
+	mrl_destroy(logger);
 }
