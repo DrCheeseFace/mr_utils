@@ -17,13 +17,6 @@ typedef struct {
 	Bool pass;
 } MrtCase;
 
-typedef struct {
-	MrsString *description;
-	MrvVector cases;
-	uint pass_count;
-	MrlLogger *logging_context;
-} MrtContext;
-
 internal void mtr_case_log(MrlLogger *mrl_ctx, MrtCase test_case)
 {
 	mrl_log(mrl_ctx, test_case.description.value, MRL_SEVERITY_DEFAULT);
@@ -40,9 +33,10 @@ Bool mrt_assert_eq(void *expected, void *actual, size_t size_of)
 	return memcmp(expected, actual, size_of) == 0;
 }
 
-MrtContext *mrt_ctx_create(const char *description, MrlLogger *logging_ctx)
+struct MrtContext *mrt_ctx_create(const char *description,
+				  MrlLogger *logging_ctx)
 {
-	MrtContext *t_ctx = malloc(sizeof(MrtContext));
+	struct MrtContext *t_ctx = malloc(sizeof(struct MrtContext));
 	memset(t_ctx, 0, sizeof(*t_ctx));
 
 	MrsString *s = mrs_create(strlen(description));
@@ -58,7 +52,7 @@ MrtContext *mrt_ctx_create(const char *description, MrlLogger *logging_ctx)
 	return t_ctx;
 }
 
-void mrt_ctx_destroy(MrtContext *t_ctx)
+void mrt_ctx_destroy(struct MrtContext *t_ctx)
 {
 	for (size_t i = 0; i < t_ctx->cases.len; i++) {
 		MrtCase *c = mrv_get_idx(&t_ctx->cases, i);
@@ -73,7 +67,8 @@ void mrt_ctx_destroy(MrtContext *t_ctx)
 	free(t_ctx);
 }
 
-void mrt_ctx_append_case(MrtContext *t_ctx, const char *description, Bool pass)
+void mrt_ctx_append_case(struct MrtContext *t_ctx, const char *description,
+			 Bool pass)
 {
 	if (pass) {
 		t_ctx->pass_count++;
@@ -85,7 +80,7 @@ void mrt_ctx_append_case(MrtContext *t_ctx, const char *description, Bool pass)
 	mrv_append(&t_ctx->cases, &(MrtCase){ .description = s, .pass = pass });
 }
 
-Err mrt_ctx_log(MrtContext *t_ctx)
+Err mrt_ctx_log(struct MrtContext *t_ctx)
 {
 	mrl_logln(t_ctx->logging_context, "", MRL_SEVERITY_DEFAULT);
 
