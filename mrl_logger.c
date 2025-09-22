@@ -31,7 +31,7 @@ const char *severity_to_log_header[MRL_SEVERITY_COUNT] = { "[LOG]"
 
 MrlLogger *mrl_create(FILE *out, Bool color, Bool log_header)
 {
-	struct MrlContext *ctx = malloc(sizeof(struct MrlContext));
+	struct MrlLogger *ctx = malloc(sizeof(struct MrlLogger));
 
 	ctx->out = out;
 	ctx->terminal_color_enabled = color;
@@ -42,17 +42,17 @@ MrlLogger *mrl_create(FILE *out, Bool color, Bool log_header)
 
 void mrl_destroy(MrlLogger *ctx)
 {
-	struct MrlContext *mrl_ctx = (struct MrlContext *)ctx;
+	struct MrlLogger *mrl_ctx = (struct MrlLogger *)ctx;
 
 	if (mrl_ctx->out != NULL) {
-		fclose(((struct MrlContext *)ctx)->out);
+		fclose(((struct MrlLogger *)ctx)->out);
 	}
 	free(ctx);
 }
 
 void mrl_reset_severity(MrlLogger *ctx)
 {
-	struct MrlContext *mrl_ctx = (struct MrlContext *)ctx;
+	struct MrlLogger *mrl_ctx = (struct MrlLogger *)ctx;
 
 	if (mrl_ctx->terminal_color_enabled == TRUE) {
 		fprintf(mrl_ctx->out, "%s",
@@ -62,7 +62,7 @@ void mrl_reset_severity(MrlLogger *ctx)
 
 void mrl_set_severity(MrlLogger *ctx, MrlSeverity severity)
 {
-	struct MrlContext *mrl_ctx = (struct MrlContext *)ctx;
+	struct MrlLogger *mrl_ctx = (struct MrlLogger *)ctx;
 
 	if (mrl_ctx->terminal_color_enabled == TRUE) {
 		fprintf(mrl_ctx->out, "%s", terminal_color_codes[severity]);
@@ -71,7 +71,7 @@ void mrl_set_severity(MrlLogger *ctx, MrlSeverity severity)
 
 void mrl_logln(MrlLogger *ctx, const char *message, MrlSeverity severity)
 {
-	struct MrlContext *mrl_ctx = (struct MrlContext *)ctx;
+	struct MrlLogger *mrl_ctx = (struct MrlLogger *)ctx;
 
 	mrl_set_severity(ctx, severity);
 
@@ -88,7 +88,7 @@ void mrl_logln(MrlLogger *ctx, const char *message, MrlSeverity severity)
 
 void mrl_log(MrlLogger *ctx, const char *message, MrlSeverity severity)
 {
-	struct MrlContext *mrl_ctx = (struct MrlContext *)ctx;
+	struct MrlLogger *mrl_ctx = (struct MrlLogger *)ctx;
 
 	mrl_set_severity(ctx, severity);
 

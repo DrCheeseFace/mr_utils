@@ -1,3 +1,4 @@
+#include "internals.h"
 #include "mrd_debug.h"
 #include "mrl_logger.h"
 #include "mrs_strings.h"
@@ -18,7 +19,7 @@ typedef struct {
 typedef struct {
 	MrsString *description;
 	MrvVector cases;
-	uint pass_count;
+	unsigned int pass_count;
 	MrlLogger *logging_context;
 } MrtContext;
 
@@ -50,7 +51,8 @@ MrtContext *mrt_ctx_create(const char *description, MrlLogger *logging_ctx)
 	mrv_init(&t_ctx->cases, MRT_INIT_TEST_CASES_PER_CONTEXT,
 		 sizeof(MrtCase));
 
-	t_ctx->logging_context = logging_ctx;
+	struct MrlLogger *logger = (struct MrlLogger *)logging_ctx;
+	t_ctx->logging_context = logger;
 
 	return t_ctx;
 }
@@ -104,7 +106,7 @@ Err mrt_ctx_log(MrtContext *t_ctx)
 	mrl_logln(t_ctx->logging_context, pass_rate, MRL_SEVERITY_DEFAULT);
 
 	mrl_log(t_ctx->logging_context, MRT_TAB, MRL_SEVERITY_DEFAULT);
-	if (t_ctx->pass_count != t_ctx->cases.len) {
+	if (t_ctx->pass_count != (unsigned int)t_ctx->cases.len) {
 		mrl_logln(t_ctx->logging_context, "FAILED", MRL_SEVERITY_ERROR);
 		return ERR;
 	} else {

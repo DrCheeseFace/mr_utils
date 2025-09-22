@@ -36,9 +36,9 @@ global_variable int current_allocation_id = 0;
 global_variable struct MrdAllocation active_allocations[MAX_ACTIVE_ALLOCATIONS];
 global_variable long base_address = CAFE_BABE;
 
-struct MrlContext logger = { .out = NULL,
-			     .log_header_enabled = FALSE,
-			     .terminal_color_enabled = TRUE };
+struct MrlLogger logger = { .out = NULL,
+			    .log_header_enabled = FALSE,
+			    .terminal_color_enabled = TRUE };
 
 internal void mrd_init_logger(void)
 {

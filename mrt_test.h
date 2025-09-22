@@ -20,11 +20,9 @@
 
 /*
  * MrtContext holds test cases and a description for the group of test cases
-
- * mrl_init should be called for logging
  *
  * MrtContext has the following functions
- * \ mrt_ctx_create         - create context
+ * \ mrt_ctx_create         - create context. NOTE: requires logger to have "logging_headers" turned off
  * \ mrt_ctx_destroy        - frees itself and contents
  * \ mrt_ctx_append_case    - adds test case to context
  * \ mrt_ctx_log            - logs context and test case results within context

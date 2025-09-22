@@ -27,6 +27,7 @@
  * \ mrv_qsort             - quicksort
  *
  */
+
 typedef struct {
 	unsigned char *arr;
 	size_t stride;

@@ -4,7 +4,7 @@
 #include "mrm_misc.h"
 #include <stdio.h>
 
-struct MrlContext {
+struct MrlLogger {
 	FILE *out;
 	Bool terminal_color_enabled;
 	Bool log_header_enabled;
