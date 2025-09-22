@@ -12,6 +12,8 @@
 #define global_variable static
 #define local_persist static
 
+typedef unsigned int uint;
+
 /*
  * good placeholder value to use for unintialized data
  * especially mallocs and such

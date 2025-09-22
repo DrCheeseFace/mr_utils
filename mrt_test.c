@@ -1,6 +1,7 @@
 #include "internals.h"
 #include "mrd_debug.h"
 #include "mrl_logger.h"
+#include "mrm_misc.h"
 #include "mrs_strings.h"
 #include "mrv_vectors.h"
 
@@ -19,7 +20,7 @@ typedef struct {
 typedef struct {
 	MrsString *description;
 	MrvVector cases;
-	unsigned int pass_count;
+	uint pass_count;
 	MrlLogger *logging_context;
 } MrtContext;
 
