@@ -22,12 +22,9 @@ const char *terminal_color_codes[MRL_SEVERITY_COUNT] = {
 	MRL_YELLOW_COLOR_CODE,
 };
 
-const char *severity_to_log_header[MRL_SEVERITY_COUNT] = { "[LOG]"
-							   "[INFO]"
-							   "[INFO]"
-							   "[OK]"
-							   "[ERROR]"
-							   "[WARNING]" };
+const char *severity_to_log_header[MRL_SEVERITY_COUNT] = {
+	"[LOG]", "[INFO]", "[INFO]", "[OK]", "[ERROR]", "[WARNING]"
+};
 
 MrlLogger *mrl_create(FILE *out, Bool color, Bool log_header)
 {
@@ -69,6 +66,13 @@ void mrl_set_severity(MrlLogger *ctx, MrlSeverity severity)
 	}
 }
 
+internal void mrl_log_header(struct MrlLogger *ctx, MrlSeverity severity)
+{
+	fprintf(ctx->out, "%s:", severity_to_log_header[severity]);
+	fprintf(ctx->out, "%ld: ", time(NULL));
+	mrl_reset_severity(ctx);
+}
+
 void mrl_logln(MrlLogger *ctx, const char *message, MrlSeverity severity)
 {
 	struct MrlLogger *mrl_ctx = (struct MrlLogger *)ctx;
@@ -76,9 +80,7 @@ void mrl_logln(MrlLogger *ctx, const char *message, MrlSeverity severity)
 	mrl_set_severity(ctx, severity);
 
 	if (mrl_ctx->log_header_enabled) {
-		fprintf(mrl_ctx->out, "%s:", severity_to_log_header[severity]);
-		fprintf(mrl_ctx->out, "%ld:", time(NULL));
-		mrl_reset_severity(ctx);
+		mrl_log_header(ctx, severity);
 	}
 
 	fprintf(mrl_ctx->out, "%s\n", message);
@@ -93,9 +95,7 @@ void mrl_log(MrlLogger *ctx, const char *message, MrlSeverity severity)
 	mrl_set_severity(ctx, severity);
 
 	if (mrl_ctx->log_header_enabled) {
-		fprintf(mrl_ctx->out, "%s:", severity_to_log_header[severity]);
-		fprintf(mrl_ctx->out, "%ld:", time(NULL));
-		mrl_reset_severity(ctx);
+		mrl_log_header(ctx, severity);
 	}
 
 	fprintf(mrl_ctx->out, "%s", message);

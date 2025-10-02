@@ -5,7 +5,6 @@
 #include "mrs_strings.h"
 #include "mrv_vectors.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
