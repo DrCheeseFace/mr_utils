@@ -6,6 +6,7 @@
 #define MRV_VECTORS_H
 
 #include "mrm_misc.h"
+#include <stddef.h>
 
 /*
  * vectors!
@@ -34,7 +35,7 @@ typedef struct {
 	uint capacity;
 } MrvVector;
 
-MrvVector *mrv_create(uint capacity, uint stride);
+MrvVector *mrv_create(uint capacity, size_t stride);
 
 void mrv_destroy(MrvVector *vec);
 

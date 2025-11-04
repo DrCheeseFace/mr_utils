@@ -14,6 +14,7 @@ CFLAGS_DEBUG = -Wall -Wextra -Werror \
                -Wcast-qual  -Wfloat-equal -Wnested-externs \
 	       -Wpedantic  -pedantic-errors \
 	       -O0 -g \
+	       -fno-omit-frame-pointer \
 	       -fsanitize=address \
 	       # -DDEBUG -rdynamic \
 	       # BEWARE -rdynamic breaks leak check on fsanitize
@@ -28,8 +29,8 @@ SPACERS_TARGET= ./spacers
 SPACERS_SRC =  tools/*.c  *.c
 
 
-DEBUG_LEVEL = MRD_DEBUG_BACKTRACE
-# DEBUG_LEVEL = MRD_DEBUG_DEFAULT
+# DEBUG_LEVEL = MRD_DEBUG_BACKTRACE
+DEBUG_LEVEL = MRD_DEBUG_DEFAULT
 
 .PHONY: all build run clean format format-check bear test check debug build-debug build-debug-spacers
 
@@ -46,10 +47,10 @@ run:
 clean:
 	-rm -f $(TEST_TARGET) $(SPACERS_TARGET)
 
-format: build-debug-spacers
+format: build-spacers
 	find *.c *.h test/* | xargs clang-format -i --verbose && git ls-files | xargs $(SPACERS_TARGET)
 
-format-check: build-debug-spacers
+format-check: build-spacers
 	find *.c *.h test/* | xargs clang-format --dry-run --Werror --verbose && git ls-files | xargs $(SPACERS_TARGET) --check
 
 bear: # this is for creating the compile_commands.json file
@@ -62,5 +63,5 @@ debug:  build-debug run
 build-debug:
 	$(CC) -std=$(CSTANDARD) $(CFLAGS_DEBUG) -D $(DEBUG_LEVEL) -o $(TEST_TARGET) $(TEST_SRC)
 
-build-debug-spacers:
-	$(CC) -std=$(CSTANDARD) $(CFLAGS_DEBUG) -D $(DEBUG_LEVEL) -o $(SPACERS_TARGET) $(SPACERS_SRC)
+build-spacers:
+	$(CC) -std=$(CSTANDARD) $(CFLAGS) -o $(SPACERS_TARGET) $(SPACERS_SRC)

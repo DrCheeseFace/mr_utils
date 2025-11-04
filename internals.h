@@ -12,11 +12,18 @@ struct MrlLogger {
 	Bool log_header_enabled;
 };
 
-struct MrtContext {
+struct MrtGroup {
 	MrsString *description;
 	MrvVector cases;
 	uint pass_count;
-	struct MrlLogger *logging_context;
 };
+
+struct MrtCtx {
+	MrvVector test_funcs;
+	MrvVector test_groups;
+	struct MrlLogger *logger;
+};
+
+typedef void (*MrtTestFunc)(struct MrtGroup *t_group);
 
 #endif // !INTERNALS_H

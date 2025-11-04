@@ -25,6 +25,7 @@ void *mrd_malloc(size_t size, const char *file_name, int line);
 void *mrd_calloc(size_t nmemb, size_t size, const char *file_name, int line);
 void *mrd_realloc(void *ptr, size_t size, const char *file_name, int line);
 void mrd_free(void *ptr, const char *file_name, int line);
+// void mrd_log_dump_at(void);
 
 #endif // !DEBUG
 

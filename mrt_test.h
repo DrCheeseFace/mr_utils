@@ -1,10 +1,11 @@
-/*
+/**
  * this file is a mini testing lib
  */
 
 #ifndef MRT_TEST_H
 #define MRT_TEST_H
 
+#include "mrl_logger.h"
 #include "mrm_misc.h"
 #include <stddef.h>
 
@@ -19,39 +20,55 @@
 #define MRT_ASSERT_NOT_NULL(actual) (actual != NULL)
 
 /*
- * MrtContext holds test cases and a description for the group of test cases
+ * MrtContext lets you register your test functions for standardised running and logging
  *
  * MrtContext has the following functions
- * \ mrt_ctx_create         - create context. NOTE: requires logger to have "logging_headers" turned off
- * \ mrt_ctx_destroy        - frees itself and contents
- * \ mrt_ctx_append_case    - adds test case to context
- * \ mrt_ctx_log            - logs context and test case results within context
+ * \ mrt_ctx_create                - create context. NOTE: requires logger to have "logging_headers" turned off
+ * \ mrt_ctx_destroy               - frees itself and contents
+ * \ mrt_ctx_run                   - runs and logs registered test functions for context
+ * \ mrt_ctx_register_test_func    - registers test functions to run for context
+ * \ mrt_group_append_case         - adds test case for test function
  * \
- * \ eg:
+ * \ example usage:
  * \
- * \     MrtContext *t_ctx = mrt_ctx_create("my test context description");
+ * \   void test_strstr(MrtGroup *t_ctx)
+ * \   {
+ * \           mrt_group_append_case(t_ctx, "11151111111111111231 | 31", 1 == 1);
+ * \           return;
+ * \   }
  * \
- * \     mrt_ctx_append_case(t_ctx, "my test description 1", 1 == 2);
- * \     mrt_ctx_append_case(t_ctx, "my test description 2", 1 == 1);
+ * \   int main(void)
+ * \   {
+ * \           MrlLogger *logger = mrl_create(stderr, TRUE, FALSE);
+ * \           MrtCtx *ctx = mrt_ctx_create(logger);
  * \
- * \     Err err = mrt_ctx_log(t_ctx);
+ * \           mrt_ctx_register_test_func(ctx, test_strstr, "test_strstr");
  * \
- * \     mrt_ctx_destroy(t_ctx);
+ * \           Err err = mrt_ctx_run(ctx);
  * \
- * \     return err;
+ * \           mrt_ctx_destroy(ctx);
+ * \           mrl_destroy(logger);
+ * \
+ * \           exit(err);
+ * \           return err;
+ * \    }
+ * \
  */
-typedef void MrtContext;
 
-MrtContext *mrt_ctx_create(const char *description, MrtContext *logging_ctx);
+typedef void MrtCtx;
+typedef void MrtGroup;
+typedef void (*MrtTestFunc)(MrtGroup *t_group);
 
-void mrt_ctx_destroy(MrtContext *t_ctx);
+MrtCtx *mrt_ctx_create(MrlLogger *logger);
 
-void mrt_ctx_append_case(MrtContext *t_ctx, const char *description, Bool pass);
+void mrt_ctx_destroy(MrtCtx *ctx);
 
-/*
- * `returns` 0 if passed
- */
-Err mrt_ctx_log(MrtContext *t_ctx);
+Err mrt_ctx_run(MrtCtx *ctx);
+
+void mrt_ctx_register_test_func(MrtCtx *ctx, MrtTestFunc test_func,
+				const char *description);
+
+void mrt_group_append_case(MrtGroup *t_ctx, const char *description, Bool pass);
 
 Bool mrt_assert_eq(void *expected, void *actual, size_t size_of);
 

@@ -200,9 +200,14 @@ internal Err write_file(MrlLogger *logger, FILE *file)
 		fputc(a, file);
 	}
 
-	ftruncate(fileno(file), ftell(tmp_file));
+	int trunc_err  = ftruncate(fileno(file), ftell(tmp_file));
 
-	fclose(tmp_file);
+        fclose(tmp_file);
+
+        if(trunc_err != 0) {
+                return ERR;
+        }
+
 	return OK;
 }
 

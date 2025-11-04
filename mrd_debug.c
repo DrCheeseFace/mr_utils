@@ -32,7 +32,7 @@ typedef enum MRD_Command {
 	MRD_COMMAND_FREE,
 } MrdCommand;
 
-global_variable int current_allocation_id = 0;
+global_variable size_t current_allocation_id = 0;
 global_variable struct MrdAllocation active_allocations[MAX_ACTIVE_ALLOCATIONS];
 global_variable long base_address = CAFE_BABE;
 
@@ -40,7 +40,7 @@ struct MrlLogger logger = { .out = NULL,
 			    .log_header_enabled = FALSE,
 			    .terminal_color_enabled = TRUE };
 
-internal void mrd_init_logger(void)
+internal void mrd_init(void)
 {
 	logger.out = stderr;
 }
@@ -238,13 +238,13 @@ internal void mrd_log_command(enum MRD_Command command, size_t size,
 	mrl_log(&logger, DEBUG_LOG_HEAD, MRL_SEVERITY_INFO);
 	char text[MAX_LOG_LENGTH];
 	if (command == MRD_COMMAND_REALLOC) {
-		sprintf(text, "allocation (%d>%d) of ", realloc_free_src->id,
+		sprintf(text, "allocation (%d>%zu) of ", realloc_free_src->id,
 			current_allocation_id);
 
 	} else if (command == MRD_COMMAND_FREE) {
 		sprintf(text, "allocation (%d) of ", realloc_free_src->id);
 	} else {
-		sprintf(text, "allocation (%d) of ", current_allocation_id);
+		sprintf(text, "allocation (%zu) of ", current_allocation_id);
 	}
 
 	mrl_log(&logger, text, MRL_SEVERITY_DEFAULT);
@@ -292,7 +292,7 @@ internal void mrd_log_command(enum MRD_Command command, size_t size,
 void *mrd_malloc(size_t size, const char *file_name, int line)
 {
 	if (logger.out == NULL) {
-		mrd_init_logger();
+		mrd_init();
 	}
 
 	mrd_log_command(MRD_COMMAND_MALLOC, size, NULL, file_name, line);
@@ -323,7 +323,7 @@ void *mrd_malloc(size_t size, const char *file_name, int line)
 void *mrd_calloc(size_t nmemb, size_t size, const char *file_name, int line)
 {
 	if (logger.out == NULL) {
-		mrd_init_logger();
+		mrd_init();
 	}
 
 	mrd_log_command(MRD_COMMAND_CALLOC, size, NULL, file_name, line);
@@ -353,7 +353,7 @@ void *mrd_calloc(size_t nmemb, size_t size, const char *file_name, int line)
 void *mrd_realloc(void *ptr, size_t size, const char *file_name, int line)
 {
 	if (logger.out == NULL) {
-		mrd_init_logger();
+		mrd_init();
 	}
 
 	struct MrdAllocation *src_allocation = NULL;
@@ -396,7 +396,7 @@ void *mrd_realloc(void *ptr, size_t size, const char *file_name, int line)
 void mrd_free(void *ptr, const char *file_name, int line)
 {
 	if (logger.out == NULL) {
-		mrd_init_logger();
+		mrd_init();
 	}
 
 	struct MrdAllocation *allocation = NULL;
@@ -432,3 +432,25 @@ void mrd_free(void *ptr, const char *file_name, int line)
 
 	allocation->active = FALSE;
 }
+
+// void mrd_log_allocation(struct MrdAllocation *allocation)
+// {
+// 	(void)allocation;
+// }
+//
+// void mrd_log_dump_at(void)
+// {
+// 	size_t total_active_allocations = 0;
+// 	size_t total_active_bytes = 0;
+// 	(void)total_active_allocations;
+// 	(void)total_active_bytes;
+//
+// 	for (size_t i = 0;
+// 	     i < MAX_ACTIVE_ALLOCATIONS && i > current_allocation_id; i++) {
+// 		if (active_allocations[i].active) {
+// 			total_active_allocations++;
+// 			total_active_bytes += sizeof(active_allocations[i]);
+// 			// mrd_log_allocation(&active_allocations[i]);
+// 		}
+// 	}
+// }

@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-MrvVector *mrv_create(uint capacity, uint stride)
+MrvVector *mrv_create(uint capacity, size_t stride)
 {
 	MrvVector *vec = malloc(sizeof(MrvVector));
 
@@ -118,10 +118,6 @@ Err mrv_pop(MrvVector *vec)
 void *mrv_get_idx(MrvVector *vec, uint n)
 {
 	if (vec == NULL) {
-		return NULL;
-	}
-
-	if (n >= vec->len) {
 		return NULL;
 	}
 

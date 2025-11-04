@@ -28,7 +28,7 @@ const char *severity_to_log_header[MRL_SEVERITY_COUNT] = {
 
 MrlLogger *mrl_create(FILE *out, Bool color, Bool log_header)
 {
-	struct MrlLogger *ctx = malloc(sizeof(struct MrlLogger));
+	struct MrlLogger *ctx = malloc(sizeof(*ctx));
 
 	ctx->out = out;
 	ctx->terminal_color_enabled = color;
