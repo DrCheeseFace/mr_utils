@@ -6,6 +6,10 @@
 #include "mrv_vectors.h"
 #include <stdio.h>
 
+struct MrtGroup;
+
+typedef void (*MrtTestFunc)(struct MrtGroup *t_group);
+
 struct MrlLogger {
 	FILE *out;
 	Bool terminal_color_enabled;
@@ -15,15 +19,13 @@ struct MrlLogger {
 struct MrtGroup {
 	MrsString *description;
 	MrvVector cases;
-	uint pass_count;
+	size_t pass_count;
+	MrtTestFunc func;
 };
 
 struct MrtContext {
-	MrvVector test_funcs;
 	MrvVector test_groups;
 	struct MrlLogger *logger;
 };
-
-typedef void (*MrtTestFunc)(struct MrtGroup *t_group);
 
 #endif // !INTERNALS_H

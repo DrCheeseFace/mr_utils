@@ -36,13 +36,15 @@ Bool mrt_assert_eq(void *expected, void *actual, size_t size_of)
 	return memcmp(expected, actual, size_of) == 0;
 }
 
-internal void mrt_group_init(struct MrtGroup *t_group, const char *description)
+internal void mrt_group_init(struct MrtGroup *t_group, const char *description,
+			     MrtTestFunc func)
 {
 	memset(t_group, 0, sizeof(*t_group));
 
 	MrsString *s = mrs_create(strlen(description));
 	mrs_setstr(s, description, strlen(description));
 	t_group->description = s;
+	t_group->func = func;
 
 	mrv_init(&t_group->cases, MRT_INIT_TEST_CASES_PER_CONTEXT,
 		 sizeof(MrtCase));
@@ -53,7 +55,6 @@ struct MrtContext *mrt_ctx_create(MrlLogger *logger)
 	struct MrtContext *t_ctx = malloc(sizeof(*t_ctx));
 	memset(t_ctx, 0, sizeof(*t_ctx));
 
-	mrv_init(&t_ctx->test_funcs, 64, sizeof(MrtTestFunc));
 	mrv_init(&t_ctx->test_groups, 64, sizeof(struct MrtGroup *));
 
 	t_ctx->logger = logger;
@@ -69,7 +70,6 @@ void mrt_ctx_destroy(struct MrtContext *ctx)
 		mrt_group_destroy(t_group);
 	}
 
-	mrv_free(&ctx->test_funcs);
 	mrv_free(&ctx->test_groups);
 
 	free(ctx);
@@ -78,11 +78,9 @@ void mrt_ctx_destroy(struct MrtContext *ctx)
 void mrt_ctx_register_test_func(struct MrtContext *ctx, MrtTestFunc t_func,
 				const char *description)
 {
-	mrv_append(&ctx->test_funcs, &t_func);
-
 	struct MrtGroup *t_group = malloc(sizeof(struct MrtGroup));
 
-	mrt_group_init(t_group, description);
+	mrt_group_init(t_group, description, t_func);
 
 	mrv_append(&ctx->test_groups, &t_group);
 
@@ -93,14 +91,11 @@ Err mrt_ctx_run(struct MrtContext *ctx)
 {
 	Err err = OK;
 
-	for (uint i = 0; i < ctx->test_funcs.len; i++) {
-		MrtTestFunc *test_func =
-			(MrtTestFunc *)mrv_get_idx(&ctx->test_funcs, i);
-
+	for (uint i = 0; i < ctx->test_groups.len; i++) {
 		struct MrtGroup *t_group =
 			*(struct MrtGroup **)mrv_get_idx(&ctx->test_groups, i);
 
-		(*test_func)(t_group);
+		(*t_group->func)(t_group);
 
 		err = err || mrt_group_log(t_group, ctx->logger);
 	}
@@ -152,7 +147,7 @@ internal Err mrt_group_log(struct MrtGroup *t_group, struct MrlLogger *logger)
 	mrl_logln(logger, "", MRL_SEVERITY_DEFAULT);
 
 	char pass_rate[15];
-	sprintf(pass_rate, "%u/%d Passed", t_group->pass_count,
+	sprintf(pass_rate, "%zu/%d Passed", t_group->pass_count,
 		(int)t_group->cases.len);
 	mrl_log(logger, MRT_TAB, MRL_SEVERITY_DEFAULT);
 	mrl_logln(logger, pass_rate, MRL_SEVERITY_DEFAULT);

@@ -30,18 +30,18 @@
 
 typedef struct {
 	unsigned char *arr;
-	uint stride;
-	uint len;
-	uint capacity;
+	size_t stride;
+	size_t len;
+	size_t capacity;
 } MrvVector;
 
-MrvVector *mrv_create(uint capacity, size_t stride);
+MrvVector *mrv_create(size_t capacity, size_t stride);
 
 void mrv_destroy(MrvVector *vec);
 
 void mrv_free(MrvVector *vec);
 
-void mrv_init(MrvVector *vec, uint capacity, uint stride);
+void mrv_init(MrvVector *vec, size_t capacity, size_t stride);
 
 Err mrv_clear(MrvVector *vec);
 
@@ -52,7 +52,7 @@ Err mrv_realloc_to_fit(MrvVector *vec);
 
 Err mrv_pop(MrvVector *vec);
 
-void *mrv_get_idx(MrvVector *vec, uint n);
+void *mrv_get_idx(MrvVector *vec, size_t n);
 
 void *mrv_get_item(MrvVector *vec, void *item);
 

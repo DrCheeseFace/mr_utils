@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-MrvVector *mrv_create(uint capacity, size_t stride)
+MrvVector *mrv_create(size_t capacity, size_t stride)
 {
 	MrvVector *vec = malloc(sizeof(MrvVector));
 
@@ -37,7 +37,7 @@ void mrv_free(MrvVector *vec)
 	vec->capacity = CAFE_BABE;
 }
 
-void mrv_init(MrvVector *vec, uint capacity, uint stride)
+void mrv_init(MrvVector *vec, size_t capacity, size_t stride)
 {
 	vec->arr = malloc(capacity * stride);
 	memset(vec->arr, CAFE_BABE, capacity * stride);
@@ -115,9 +115,13 @@ Err mrv_pop(MrvVector *vec)
 	return OK;
 }
 
-void *mrv_get_idx(MrvVector *vec, uint n)
+void *mrv_get_idx(MrvVector *vec, size_t n)
 {
 	if (vec == NULL) {
+		return NULL;
+	}
+
+	if (n >= vec->len) {
 		return NULL;
 	}
 
