@@ -553,7 +553,7 @@ void test_get_item(MrtGroup *t_ctx)
 int main(void)
 {
 	MrlLogger *logger = mrl_create(stderr, TRUE, FALSE);
-	MrtCtx *ctx = mrt_ctx_create(logger);
+	MrtContext *ctx = mrt_ctx_create(logger);
 
 	// mrs_strings
 	mrt_ctx_register_test_func(ctx, test_strstr, "test_strstr");

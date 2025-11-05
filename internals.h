@@ -18,7 +18,7 @@ struct MrtGroup {
 	uint pass_count;
 };
 
-struct MrtCtx {
+struct MrtContext {
 	MrvVector test_funcs;
 	MrvVector test_groups;
 	struct MrlLogger *logger;

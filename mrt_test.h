@@ -65,17 +65,17 @@
  * \
  */
 
-typedef void MrtCtx;
+typedef void MrtContext;
 typedef void MrtGroup;
 typedef void (*MrtTestFunc)(MrtGroup *t_group);
 
-MrtCtx *mrt_ctx_create(MrlLogger *logger);
+MrtContext *mrt_ctx_create(MrlLogger *logger);
 
-void mrt_ctx_destroy(MrtCtx *ctx);
+void mrt_ctx_destroy(MrtContext *ctx);
 
-Err mrt_ctx_run(MrtCtx *ctx);
+Err mrt_ctx_run(MrtContext *ctx);
 
-void mrt_ctx_register_test_func(MrtCtx *ctx, MrtTestFunc test_func,
+void mrt_ctx_register_test_func(MrtContext *ctx, MrtTestFunc test_func,
 				const char *description);
 
 void mrt_group_append_case(MrtGroup *t_ctx, const char *description, Bool pass);

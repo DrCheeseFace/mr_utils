@@ -48,9 +48,9 @@ internal void mrt_group_init(struct MrtGroup *t_group, const char *description)
 		 sizeof(MrtCase));
 }
 
-struct MrtCtx *mrt_ctx_create(MrlLogger *logger)
+struct MrtContext *mrt_ctx_create(MrlLogger *logger)
 {
-	struct MrtCtx *t_ctx = malloc(sizeof(*t_ctx));
+	struct MrtContext *t_ctx = malloc(sizeof(*t_ctx));
 	memset(t_ctx, 0, sizeof(*t_ctx));
 
 	mrv_init(&t_ctx->test_funcs, 64, sizeof(MrtTestFunc));
@@ -61,7 +61,7 @@ struct MrtCtx *mrt_ctx_create(MrlLogger *logger)
 	return t_ctx;
 }
 
-void mrt_ctx_destroy(struct MrtCtx *ctx)
+void mrt_ctx_destroy(struct MrtContext *ctx)
 {
 	for (uint i = 0; i < ctx->test_groups.len; i++) {
 		struct MrtGroup *t_group =
@@ -75,7 +75,7 @@ void mrt_ctx_destroy(struct MrtCtx *ctx)
 	free(ctx);
 }
 
-void mrt_ctx_register_test_func(struct MrtCtx *ctx, MrtTestFunc t_func,
+void mrt_ctx_register_test_func(struct MrtContext *ctx, MrtTestFunc t_func,
 				const char *description)
 {
 	mrv_append(&ctx->test_funcs, &t_func);
@@ -89,7 +89,7 @@ void mrt_ctx_register_test_func(struct MrtCtx *ctx, MrtTestFunc t_func,
 	return;
 }
 
-Err mrt_ctx_run(struct MrtCtx *ctx)
+Err mrt_ctx_run(struct MrtContext *ctx)
 {
 	Err err = OK;
 
