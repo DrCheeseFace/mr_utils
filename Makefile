@@ -30,7 +30,8 @@ SPACERS_SRC =  tools/*.c  *.c
 
 
 # DEBUG_LEVEL = MRD_DEBUG_BACKTRACE
-DEBUG_LEVEL = MRD_DEBUG_DEFAULT
+DEBUG_LEVEL = MRD_DEBUG_ONLY_CALLED_AND_ERR
+# DEBUG_LEVEL = MRD_DEBUG_DEFAULT
 
 .PHONY: all build run clean format format-check bear test check debug build-debug build-debug-spacers
 

@@ -231,9 +231,9 @@ mrd_add_allocation_to_active_allocations(struct MrdAllocation new_allocation)
 	mrd_log_err(err);
 }
 
-internal void mrd_log_command(enum MRD_Command command, size_t size,
-			      struct MrdAllocation *realloc_free_src,
-			      const char *file_name, int line)
+internal void unused mrd_log_command(enum MRD_Command command, size_t size,
+				     struct MrdAllocation *realloc_free_src,
+				     const char *file_name, int line)
 {
 	mrl_log(&logger, DEBUG_LOG_HEAD, MRL_SEVERITY_INFO);
 	char text[MAX_LOG_LENGTH];
@@ -289,13 +289,15 @@ internal void mrd_log_command(enum MRD_Command command, size_t size,
 	mrl_logln(&logger, "", MRL_SEVERITY_DEFAULT);
 }
 
-void *mrd_malloc(size_t size, const char *file_name, int line)
+void *mrd_malloc(size_t size, unused const char *file_name, unused int line)
 {
 	if (logger.out == NULL) {
 		mrd_init();
 	}
 
+#ifndef MRD_DEBUG_ONLY_CALLED_AND_ERR
 	mrd_log_command(MRD_COMMAND_MALLOC, size, NULL, file_name, line);
+#endif
 
 #ifdef MRD_DEBUG_BACKTRACE
 	mrd_log_backtrace();
@@ -315,18 +317,23 @@ void *mrd_malloc(size_t size, const char *file_name, int line)
 		mrd_log_err("FAILED TO MALLOC ALLOCATE ");
 	}
 
+#ifndef MRD_DEBUG_ONLY_CALLED_AND_ERR
 	mrl_logln(&logger, "", MRL_SEVERITY_DEFAULT);
+#endif
 
 	return ptr;
 }
 
-void *mrd_calloc(size_t nmemb, size_t size, const char *file_name, int line)
+void *mrd_calloc(size_t nmemb, size_t size, unused const char *file_name,
+		 unused int line)
 {
 	if (logger.out == NULL) {
 		mrd_init();
 	}
 
+#ifndef MRD_DEBUG_ONLY_CALLED_AND_ERR
 	mrd_log_command(MRD_COMMAND_CALLOC, size, NULL, file_name, line);
+#endif
 
 #ifdef MRD_DEBUG_BACKTRACE
 	mrd_log_backtrace();
@@ -345,12 +352,15 @@ void *mrd_calloc(size_t nmemb, size_t size, const char *file_name, int line)
 		mrd_log_err("FAILED TO CALLOC ALLOCATE");
 	}
 
+#ifndef MRD_DEBUG_ONLY_CALLED_AND_ERR
 	mrl_logln(&logger, "", MRL_SEVERITY_DEFAULT);
+#endif
 
 	return ptr;
 }
 
-void *mrd_realloc(void *ptr, size_t size, const char *file_name, int line)
+void *mrd_realloc(void *ptr, size_t size, unused const char *file_name,
+		  unused int line)
 {
 	if (logger.out == NULL) {
 		mrd_init();
@@ -364,8 +374,10 @@ void *mrd_realloc(void *ptr, size_t size, const char *file_name, int line)
 		}
 	}
 
+#ifndef MRD_DEBUG_ONLY_CALLED_AND_ERR
 	mrd_log_command(MRD_COMMAND_REALLOC, size, src_allocation, file_name,
 			line);
+#endif
 
 #ifdef MRD_DEBUG_BACKTRACE
 	mrd_log_backtrace();
@@ -388,12 +400,14 @@ void *mrd_realloc(void *ptr, size_t size, const char *file_name, int line)
 		mrd_log_err("FAILED TO REALLOCATE");
 	}
 
+#ifndef MRD_DEBUG_ONLY_CALLED_AND_ERR
 	mrl_logln(&logger, "", MRL_SEVERITY_DEFAULT);
+#endif
 
 	return realloc_ptr;
 }
 
-void mrd_free(void *ptr, const char *file_name, int line)
+void mrd_free(void *ptr, unused const char *file_name, unused int line)
 {
 	if (logger.out == NULL) {
 		mrd_init();
@@ -410,15 +424,19 @@ void mrd_free(void *ptr, const char *file_name, int line)
 	if (ptr == NULL) {
 		mrd_log_err("ATTEMPTED TO FREE NULL");
 	} else {
+#ifndef MRD_DEBUG_ONLY_CALLED_AND_ERR
 		mrd_log_command(MRD_COMMAND_FREE, allocation->size, allocation,
 				file_name, line);
+#endif
 	}
 
 #ifdef MRD_DEBUG_BACKTRACE
 	mrd_log_backtrace();
 #endif
 
+#ifndef MRD_DEBUG_ONLY_CALLED_AND_ERR
 	mrl_logln(&logger, "", MRL_SEVERITY_DEFAULT);
+#endif
 
 	// if the pointer to free is ever realloced somewhere, we need to set this to NULL
 	for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {
