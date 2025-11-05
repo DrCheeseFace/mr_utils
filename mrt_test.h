@@ -33,7 +33,17 @@
  * \
  * \   void test_strstr(MrtGroup *t_ctx)
  * \   {
- * \           mrt_group_append_case(t_ctx, "11151111111111111231 | 31", 1 == 1);
+ * \           mrt_group_append_case(t_ctx, "this is true", 1 == 1);
+ * \           mrt_group_append_case(t_ctx, "this is false", 1 == 2);
+ * \
+ * \           return;
+ * \   }
+ * \
+ * \   void test_filter(MrtGroup *t_ctx)
+ * \   {
+ * \           mrt_group_append_case(t_ctx, "this way", 1 == 1);
+ * \           mrt_group_append_case(t_ctx, "that way", 1 == 2);
+ * \
  * \           return;
  * \   }
  * \
@@ -43,13 +53,13 @@
  * \           MrtCtx *ctx = mrt_ctx_create(logger);
  * \
  * \           mrt_ctx_register_test_func(ctx, test_strstr, "test_strstr");
+ * \           mrt_ctx_register_test_func(ctx, test_filter, "test_filter");
  * \
  * \           Err err = mrt_ctx_run(ctx);
  * \
  * \           mrt_ctx_destroy(ctx);
  * \           mrl_destroy(logger);
  * \
- * \           exit(err);
  * \           return err;
  * \    }
  * \
