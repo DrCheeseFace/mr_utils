@@ -21,11 +21,13 @@
 #define DEBUG_LOG_HEAD "MRD_DEBUG LOG: "
 #define _GNU_SOURCE
 
+void mrd_log_dump_active_allocations_here(void);
+void *mrd_inspect_allocation(size_t allocation_id);
+
 void *mrd_malloc(size_t size, const char *file_name, int line);
 void *mrd_calloc(size_t nmemb, size_t size, const char *file_name, int line);
 void *mrd_realloc(void *ptr, size_t size, const char *file_name, int line);
 void mrd_free(void *ptr, const char *file_name, int line);
-// void mrd_log_dump_at(void);
 
 #endif // !DEBUG
 
