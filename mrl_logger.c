@@ -8,6 +8,13 @@
 #include <time.h>
 #include <unistd.h>
 
+#define MRL_DEFAULT_COLOR_CODE "\x1b[0m"
+#define MRL_MAGENTA_COLOR_CODE "\x1b[35m"
+#define MRL_BLUE_COLOR_CODE "\x1b[34m"
+#define MRL_YELLOW_COLOR_CODE "\x1b[33m"
+#define MRL_GREEN_COLOR_CODE "\x1b[32m"
+#define MRL_RED_COLOR_CODE "\x1b[31m"
+
 const char *terminal_color_codes[MRL_SEVERITY_COUNT] = {
 	MRL_DEFAULT_COLOR_CODE,
 

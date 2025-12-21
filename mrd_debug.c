@@ -42,7 +42,7 @@ struct MrlLogger logger = { .out = NULL,
 
 internal void mrd_init(void)
 {
-	logger.out = stderr;
+	logger.out = stdout;
 }
 
 // cant call MRS_init due to it calling malloc
@@ -476,7 +476,7 @@ void mrd_log_dump_active_allocations_here(void)
 
 	char text[MAX_LOG_LENGTH];
 
-	sprintf(text, "=======ACTIVE=ALLOCATION=======");
+	sprintf(text, "=======ACTIVE=ALLOCATIONS=======");
 	mrl_logln(&logger, text, MRL_SEVERITY_ALT_INFO);
 
 	for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {
@@ -486,7 +486,7 @@ void mrd_log_dump_active_allocations_here(void)
 			mrd_log_allocation(&active_allocations[i]);
 		}
 	}
-	sprintf(text, "===============================\n");
+	sprintf(text, "================================\n");
 	mrl_logln(&logger, text, MRL_SEVERITY_ALT_INFO);
 
 	sprintf(text, "TOTAL ACTIVE ALLOCATIONS: %zu",
