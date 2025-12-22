@@ -13,7 +13,7 @@ WARNINGS += -Wredundant-decls -Wnested-externs
 
 ifneq (,$(filter debug build-debug,$(MAKECMDGOALS)))
     BUILD_TYPE := debug
-    CFLAGS     := -O0 -g -fno-omit-frame-pointer -rdynamic -DDEBUG -DMRD_DEBUG_DEFAULT $(WARNINGS) $(INCLUDES)
+    CFLAGS     := -O0 -g -fno-omit-frame-pointer -rdynamic -DDEBUG -DMRD_DEBUG_BACKTRACE $(WARNINGS) $(INCLUDES)
 else
     BUILD_TYPE := release
     CFLAGS     := -O2 $(WARNINGS) $(INCLUDES)

@@ -22,11 +22,11 @@ internal void mrt_group_destroy(struct MrtGroup *t_group);
 
 internal void mtr_case_log(MrlLogger *mrl_ctx, MrtCase test_case)
 {
-	mrl_log(mrl_ctx, test_case.description.value, MRL_SEVERITY_DEFAULT);
+	mrl_log(mrl_ctx, MRL_SEVERITY_DEFAULT, test_case.description.value);
 	if (test_case.pass) {
-		mrl_logln(mrl_ctx, " ... ok", MRL_SEVERITY_OK);
+		mrl_logln(mrl_ctx, MRL_SEVERITY_OK, " ... ok");
 	} else {
-		mrl_logln(mrl_ctx, " ... FAILED", MRL_SEVERITY_ERROR);
+		mrl_logln(mrl_ctx, MRL_SEVERITY_ERROR, " ... FAILED");
 	}
 	mrl_reset_severity(mrl_ctx);
 }
@@ -100,15 +100,13 @@ int mrt_ctx_run(struct MrtContext *ctx)
 		err_count += mrt_group_log(t_group, ctx->logger);
 	}
 
-	char pass_rate[32];
-	sprintf(pass_rate, "\n%lu/%lu Passed", ctx->test_groups.len - err_count,
-		ctx->test_groups.len);
-	mrl_logln(ctx->logger, pass_rate, MRL_SEVERITY_DEFAULT);
+	mrl_logln(ctx->logger, MRL_SEVERITY_DEFAULT, "\n%lu/%lu Passed",
+		  ctx->test_groups.len - err_count, ctx->test_groups.len);
 
 	if (err_count) {
-		mrl_logln(ctx->logger, "FAILED", MRL_SEVERITY_ERROR);
+		mrl_logln(ctx->logger, MRL_SEVERITY_ERROR, "FAILED");
 	} else {
-		mrl_logln(ctx->logger, "PASSED", MRL_SEVERITY_OK);
+		mrl_logln(ctx->logger, MRL_SEVERITY_OK, "PASSED");
 	}
 
 	return err_count;
@@ -145,30 +143,30 @@ void internal_mrt_group_append_case(struct MrtGroup *t_group,
 
 internal Err mrt_group_log(struct MrtGroup *t_group, struct MrlLogger *logger)
 {
-	mrl_logln(logger, "", MRL_SEVERITY_DEFAULT);
+	mrl_logln(logger, MRL_SEVERITY_DEFAULT, "");
 
-	mrl_log(logger, "description: ", MRL_SEVERITY_DEFAULT);
-	mrl_logln(logger, t_group->description->value, MRL_SEVERITY_INFO);
+	mrl_log(logger, MRL_SEVERITY_DEFAULT, "description: ");
+	mrl_logln(logger, MRL_SEVERITY_INFO, t_group->description->value);
 
 	for (size_t i = 0; i < t_group->cases.len; i++) {
-		mrl_log(logger, MRT_TAB, MRL_SEVERITY_DEFAULT);
+		mrl_log(logger, MRL_SEVERITY_DEFAULT, MRT_TAB);
 		MrtCase *c = mrv_get_idx(&t_group->cases, i);
 		mtr_case_log(logger, *c);
 	}
-	mrl_logln(logger, "", MRL_SEVERITY_DEFAULT);
+	mrl_logln(logger, MRL_SEVERITY_DEFAULT, "");
 
 	char pass_rate[15];
 	sprintf(pass_rate, "%zu/%d Passed", t_group->pass_count,
 		(int)t_group->cases.len);
-	mrl_log(logger, MRT_TAB, MRL_SEVERITY_DEFAULT);
-	mrl_logln(logger, pass_rate, MRL_SEVERITY_DEFAULT);
+	mrl_log(logger, MRL_SEVERITY_DEFAULT, MRT_TAB);
+	mrl_logln(logger, MRL_SEVERITY_DEFAULT, pass_rate);
 
-	mrl_log(logger, MRT_TAB, MRL_SEVERITY_DEFAULT);
+	mrl_log(logger, MRL_SEVERITY_DEFAULT, MRT_TAB);
 	if (t_group->pass_count != t_group->cases.len) {
-		mrl_logln(logger, "FAILED", MRL_SEVERITY_ERROR);
+		mrl_logln(logger, MRL_SEVERITY_ERROR, "FAILED");
 		return ERR;
 	} else {
-		mrl_logln(logger, "PASSED", MRL_SEVERITY_OK);
+		mrl_logln(logger, MRL_SEVERITY_OK, "PASSED");
 		return OK;
 	}
 }

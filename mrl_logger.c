@@ -3,6 +3,7 @@
 #include <mrl_logger.h>
 #include <mrm_misc.h>
 
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -80,7 +81,7 @@ internal void mrl_log_header(struct MrlLogger *ctx, MrlSeverity severity)
 	mrl_reset_severity(ctx);
 }
 
-void mrl_logln(MrlLogger *ctx, const char *message, MrlSeverity severity)
+void mrl_logln(MrlLogger *ctx, MrlSeverity severity, const char *fmt, ...)
 {
 	struct MrlLogger *mrl_ctx = (struct MrlLogger *)ctx;
 
@@ -90,12 +91,19 @@ void mrl_logln(MrlLogger *ctx, const char *message, MrlSeverity severity)
 		mrl_log_header(ctx, severity);
 	}
 
-	fprintf(mrl_ctx->out, "%s\n", message);
+	va_list args;
+	va_start(args, fmt);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+	vfprintf(mrl_ctx->out, fmt, args);
+#pragma GCC diagnostic pop
+	va_end(args);
 
+	fprintf(mrl_ctx->out, "\n");
 	mrl_reset_severity(ctx);
 }
 
-void mrl_log(MrlLogger *ctx, const char *message, MrlSeverity severity)
+void mrl_log(MrlLogger *ctx, MrlSeverity severity, const char *fmt, ...)
 {
 	struct MrlLogger *mrl_ctx = (struct MrlLogger *)ctx;
 
@@ -105,7 +113,13 @@ void mrl_log(MrlLogger *ctx, const char *message, MrlSeverity severity)
 		mrl_log_header(ctx, severity);
 	}
 
-	fprintf(mrl_ctx->out, "%s", message);
+	va_list args;
+	va_start(args, fmt);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+	vfprintf(mrl_ctx->out, fmt, args);
+#pragma GCC diagnostic pop
+	va_end(args);
 
 	mrl_reset_severity(ctx);
 }

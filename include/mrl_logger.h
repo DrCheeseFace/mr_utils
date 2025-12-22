@@ -38,8 +38,8 @@ void mrl_reset_severity(MrlLogger *ctx);
 
 void mrl_set_severity(MrlLogger *ctx, MrlSeverity severity);
 
-void mrl_logln(MrlLogger *ctx, const char *message, MrlSeverity severity);
+void mrl_logln(MrlLogger *ctx, MrlSeverity severity, const char *fmt, ...);
 
-void mrl_log(MrlLogger *ctx, const char *message, MrlSeverity severity);
+void mrl_log(MrlLogger *ctx, MrlSeverity severity, const char *fmt, ...);
 
 #endif // !MRL_LOGGER_H
