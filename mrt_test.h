@@ -21,7 +21,6 @@
  * \ mrt_ctx_destroy               - frees itself and contents
  * \ mrt_ctx_run                   - runs and logs registered test functions for context. returns number of failed test groups
  * \ mrt_ctx_register_test_func    - registers test functions to run for context
- * \ mrt_group_append_case         - adds test case for test function
  * \
  * \ example usage:
  * \
@@ -49,12 +48,12 @@
  * \           mrt_ctx_register_test_func(ctx, test_strstr, "test_strstr");
  * \           mrt_ctx_register_test_func(ctx, test_filter, "test_filter");
  * \
- * \           Err err = mrt_ctx_run(ctx);
+ * \           int group_err_count = mrt_ctx_run(ctx); // returns number of failed test groups
  * \
  * \           mrt_ctx_destroy(ctx);
  * \           mrl_destroy(logger);
  * \
- * \           return err;
+ * \           return group_err_count;
  * \    }
  * \
  */
