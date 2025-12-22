@@ -22,6 +22,3 @@ jobs:
 
       - name: Run debug Command
         run: make debug
-
-      - name: Run make RELEASE
-        run: make

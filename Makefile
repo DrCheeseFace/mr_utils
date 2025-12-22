@@ -11,28 +11,36 @@ WARNINGS += -Wbad-function-cast -Wcast-qual -Wundef
 WARNINGS += -Wshadow -Wfloat-equal -Wformat=2
 WARNINGS += -Wredundant-decls -Wnested-externs
 
-CFLAGS      = -O2 $(WARNINGS) $(INCLUDES)
-DEBUG_FLAGS = -O0 -g -fno-omit-frame-pointer -rdynamic -DDEBUG -DMRD_DEBUG_DEFAULT
+ifneq (,$(filter debug build-debug,$(MAKECMDGOALS)))
+    BUILD_TYPE := debug
+    CFLAGS     := -O0 -g -fno-omit-frame-pointer -rdynamic -DDEBUG -DMRD_DEBUG_DEFAULT $(WARNINGS) $(INCLUDES)
+else
+    BUILD_TYPE := release
+    CFLAGS     := -O2 $(WARNINGS) $(INCLUDES)
+endif
 
-TARGET_TEST    = test.out
-TARGET_SPACERS = ./spacers
+BUILD_DIR := build
+OBJ_DIR   := $(BUILD_DIR)/$(BUILD_TYPE)
 
-SRC_COMMON     = $(wildcard *.c)
-SRC_TEST       = $(wildcard test/*.c)
-SRC_TOOLS      = $(wildcard tools/*.c)
+TARGET_TEST    = $(OBJ_DIR)/test.out
+TARGET_SPACERS = $(OBJ_DIR)/spacers
 
-OBJ_COMMON     = $(SRC_COMMON:.c=.o)
-OBJ_TEST       = $(SRC_TEST:.c=.o)
-OBJ_TOOLS      = $(SRC_TOOLS:.c=.o)
+SRC_COMMON     = mrd_debug.c \
+	         mrl_logger.c \
+	         mrs_strings.c \
+	         mrt_test.c \
+	         mrv_vectors.c \
+
+SRC_TEST       = test/test.c
+
+SRC_TOOLS      = tools/spacers.c
+
+OBJ_COMMON     = $(SRC_COMMON:%.c=$(OBJ_DIR)/%.o)
+OBJ_TEST       = $(SRC_TEST:%.c=$(OBJ_DIR)/%.o)
+OBJ_TOOLS      = $(SRC_TOOLS:%.c=$(OBJ_DIR)/%.o)
 
 ALL_TEST_OBJS  = $(OBJ_COMMON) $(OBJ_TEST)
 ALL_SPACERS_OBJS = $(OBJ_COMMON) $(OBJ_TOOLS)
-
-.SUFFIXES:
-.SUFFIXES: .c .o
-
-.c.o:
-	$(CC) -MD -c $< -o $@ -std=$(CSTANDARD) $(CFLAGS)
 
 .PHONY: all test run clean format format-check bear debug build-debug
 
@@ -44,21 +52,22 @@ $(TARGET_TEST): $(ALL_TEST_OBJS)
 $(TARGET_SPACERS): $(ALL_SPACERS_OBJS)
 	$(CC) $(ALL_SPACERS_OBJS) -o $@
 
+$(OBJ_DIR)/%.o: %.c
+	@mkdir -p $(dir $@)
+	$(CC) -MD -c $< -o $@ -std=$(CSTANDARD) $(CFLAGS)
+
 test: $(TARGET_TEST)
 	./$(TARGET_TEST)
 
 run: test
 
-build-debug: CFLAGS := $(DEBUG_FLAGS) $(WARNINGS) $(INCLUDES)
 build-debug: $(TARGET_TEST)
 
 debug: build-debug
 	./$(TARGET_TEST)
 
 clean:
-	rm -f $(TARGET_TEST) $(TARGET_SPACERS)
-	rm -f *.o test/*.o tools/*.o
-	rm -f *.d test/*.d tools/*.d
+	rm -rf $(BUILD_DIR)
 	rm -f compile_commands.json
 
 bear: clean
