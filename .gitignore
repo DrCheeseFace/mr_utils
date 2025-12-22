@@ -2,4 +2,6 @@
 .cache
 compile_commands.json
 *.so
+*.o
+*.d
 spacers

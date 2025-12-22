@@ -9,70 +9,90 @@
 
 #### mrd_debug example build
 ```Makefile
-CC = gcc
+CC          = gcc
+CSTANDARD   = c99
 
-CSTANDARD = c99
+INCLUDES    = -Iinclude
 
-CFLAGS_DEBUG = -Wall -Wextra -Werror \
-	 -Wpointer-arith -Wcast-align \
-     -Wstrict-prototypes -Wwrite-strings -Waggregate-return \
-     -Wswitch-default -Wswitch-enum -Wunreachable-code \
-	 -Wunused-parameter -Wuninitialized -Winit-self \
- 	 -Wbad-function-cast -Wcast-align\
-	 -Wformat=2 -Wlogical-op -Wmissing-include-dirs \
-     -Wredundant-decls -Wsequence-point -Wshadow \
-	 -Wswitch -Wundef -Wunused-but-set-parameter \
-	 -Wcast-qual  -Wfloat-equal -Wnested-externs \
-	 -O0 -g -rdynamic \
-	 -Wpedantic  -pedantic-errors \
-     -DDEBUG \
-	 -fsanitize=address \
-     # BEWARE -rdynamic breaks leak check on fsanitize
+WARNINGS  = -Wall -Wextra -Werror -Wpedantic -pedantic-errors
+WARNINGS += -Wpointer-arith -Wcast-align -Wwrite-strings
+WARNINGS += -Wstrict-prototypes
+WARNINGS += -Wswitch-default -Wswitch-enum -Wunreachable-code
+WARNINGS += -Wbad-function-cast -Wcast-qual -Wundef
+WARNINGS += -Wshadow -Wfloat-equal -Wformat=2
+WARNINGS += -Wredundant-decls -Wnested-externs
 
-CFLAGS = -Wall -Wextra -Werror \
-	 -std=$(CSTANDARD) \
-	 -O2
+CFLAGS      = -O2 $(WARNINGS) $(INCLUDES)
+DEBUG_FLAGS = -O0 -g -fno-omit-frame-pointer -rdynamic -DDEBUG -DMRD_DEBUG_DEFAULT
 
-TEST_TARGET = test.out
-TEST_SRC =  test/*.c *.c
+TARGET_TEST    = test.out
+TARGET_SPACERS = ./spacers
 
-DEBUG_LEVEL = MRD_DEBUG_BACKTRACE
-# DEBUG_LEVEL = MRD_DEBUG_DEFAULT
+SRC_COMMON     = $(wildcard *.c)
+SRC_TEST       = $(wildcard test/*.c)
+SRC_TOOLS      = $(wildcard tools/*.c)
 
-.PHONY: all build run clean format format-check bear test check build-debugger-preload debug build-debug
+OBJ_COMMON     = $(SRC_COMMON:.c=.o)
+OBJ_TEST       = $(SRC_TEST:.c=.o)
+OBJ_TOOLS      = $(SRC_TOOLS:.c=.o)
 
-all: test
+ALL_TEST_OBJS  = $(OBJ_COMMON) $(OBJ_TEST)
+ALL_SPACERS_OBJS = $(OBJ_COMMON) $(OBJ_TOOLS)
 
-test: build run
+.SUFFIXES:
+.SUFFIXES: .c .o
 
-build:
-	$(CC) $(CFLAGS) -o $(TEST_TARGET) $(TEST_SRC)
+.c.o:
+	$(CC) -MD -c $< -o $@ -std=$(CSTANDARD) $(CFLAGS)
 
-run:
-	./$(TEST_TARGET)
+.PHONY: all test run clean format format-check bear debug build-debug
+
+all: $(TARGET_TEST)
+
+$(TARGET_TEST): $(ALL_TEST_OBJS)
+	$(CC) $(ALL_TEST_OBJS) -o $@
+
+$(TARGET_SPACERS): $(ALL_SPACERS_OBJS)
+	$(CC) $(ALL_SPACERS_OBJS) -o $@
+
+test: $(TARGET_TEST)
+	./$(TARGET_TEST)
+
+run: test
+
+build-debug: CFLAGS := $(DEBUG_FLAGS) $(WARNINGS) $(INCLUDES)
+build-debug: $(TARGET_TEST)
+
+debug: build-debug
+	./$(TARGET_TEST)
 
 clean:
-	-rm -f $(TEST_TARGET)
+	rm -f $(TARGET_TEST) $(TARGET_SPACERS)
+	rm -f *.o test/*.o tools/*.o
+	rm -f *.d test/*.d tools/*.d
+	rm -f compile_commands.json
 
-format:
-	find *.c *.h test/* | xargs clang-format -i --verbose
+bear: clean
+	bear -- make build-debug
 
-format-check:
-	find *.c *.h test/* | xargs clang-format --dry-run --Werror --verbose
+format: $(TARGET_SPACERS)
+	find . -name "*.c" -o -name "*.h" | xargs clang-format -i --verbose
+	git ls-files | xargs  $(TARGET_SPACERS)
 
-bear: # this is for creating the compile_commands.json file
-	rm -f compile_commands.json && bear -- make build-debug
+format-check: $(TARGET_SPACERS)
+	find . -name "*.c" -o -name "*.h" | xargs clang-format --dry-run --Werror --verbose
+	git ls-files | xargs  $(TARGET_SPACERS)
 
-check: format-check build-debug run
+-include $(ALL_TEST_OBJS:.o=.d)
+-include $(ALL_SPACERS_OBJS:.o=.d)
 
-debug:  build-debug run
-
-build-debug:
-	$(CC) $(CFLAGS_DEBUG) -D $(MEMORY_DEBUGGER_LOG_LEVEL) -o $(TEST_TARGET) $(TEST_SRC)
 ```
+- note: -DDEBUG enables mrd_debug
+- note: -DMRD_DEBUG_DEFAULT sets log level of mrd_debug. see `mrd_debug.h` for options
 - note: `mrd_debug.h` requires the build flag `-rdynamic` do show backtrace symbols
 - note: `-rdynamic` breaks `-fsanitize=address`
 - note: `static` functions wont be displayed as the symbol isnt exported :(
+
 
 
 

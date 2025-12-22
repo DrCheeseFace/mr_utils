@@ -1,9 +1,9 @@
 #ifndef INTERNALS_H
 #define INTERNALS_H
 
-#include "mrm_misc.h"
-#include "mrs_strings.h"
-#include "mrv_vectors.h"
+#include <mrm_misc.h>
+#include <mrs_strings.h>
+#include <mrv_vectors.h>
 #include <stdio.h>
 
 struct MrtGroup;

@@ -1,9 +1,9 @@
-#include "internals.h"
-#include "mrd_debug.h"
-#include "mrl_logger.h"
-#include "mrm_misc.h"
-#include "mrs_strings.h"
-#include "mrv_vectors.h"
+#include <internals.h>
+#include <mrd_debug.h>
+#include <mrl_logger.h>
+#include <mrm_misc.h>
+#include <mrs_strings.h>
+#include <mrv_vectors.h>
 
 #include <stdint.h>
 #include <stdlib.h>

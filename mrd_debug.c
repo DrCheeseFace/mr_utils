@@ -1,8 +1,8 @@
-#include "mrd_debug.h"
-#include "internals.h"
-#include "mrl_logger.h"
-#include "mrm_misc.h"
-#include "mrs_strings.h"
+#include <internals.h>
+#include <mrd_debug.h>
+#include <mrl_logger.h>
+#include <mrm_misc.h>
+#include <mrs_strings.h>
 #include <string.h>
 
 #ifdef malloc
@@ -99,7 +99,7 @@ internal void mrd_get_base_address(const char *path)
 		"cat /proc/%d/maps | grep %s | head -n 1 | awk '{print $1}' | cut -d'-' -f1",
 		pid, path); // lol
 
-	FILE *fp = popen(command, "r");
+	FILE *fp = fopen(command, "r");
 	char output_buffer[BASE_ADDRESS_SIZE] = "";
 	// has newline and \0 hence the +2
 	char output_full_out[BASE_ADDRESS_SIZE + 2] = "";
@@ -166,7 +166,7 @@ internal void unused mrd_log_backtrace(void)
 		strcat(addr2line_command, addr_diff_hex);
 
 		// exec addr2line command
-		FILE *fp = popen(addr2line_command, "r");
+		FILE *fp = fopen(addr2line_command, "r");
 		char addr2line_output_buffer[128] = "";
 		char addr2line_output_full_out[128] = "";
 		while (fgets(addr2line_output_buffer,

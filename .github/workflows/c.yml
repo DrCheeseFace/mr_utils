@@ -14,8 +14,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Run Check Command
-        run: make check
+      - name: Run format check Command
+        run: make format-check
+
+      - name: Run test Command
+        run: make test
+
+      - name: Run debug Command
+        run: make debug
 
       - name: Run make RELEASE
         run: make

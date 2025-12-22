@@ -5,9 +5,9 @@
 #ifndef MRT_TEST_H
 #define MRT_TEST_H
 
-#include "internals.h" // IWYU pragma: keep
-#include "mrl_logger.h"
-#include "mrm_misc.h"
+#include <internals.h> // IWYU pragma: keep
+#include <mrl_logger.h>
+#include <mrm_misc.h>
 #include <stddef.h>
 
 #define MRT_ASSERT(t_ctx, predicate, desc)                                     \

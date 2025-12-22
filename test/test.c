@@ -1,11 +1,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../mrd_debug.h"
-#include "../mrl_logger.h"
-#include "../mrs_strings.h"
-#include "../mrt_test.h"
-#include "../mrv_vectors.h"
+#include <mrd_debug.h>
+#include <mrl_logger.h>
+#include <mrs_strings.h>
+#include <mrt_test.h>
+#include <mrv_vectors.h>
 
 void test_strstr(MrtGroup *t_ctx)
 {
@@ -49,7 +49,7 @@ void test_strstr(MrtGroup *t_ctx)
 	return;
 }
 
-void test_filter(MrtGroup *t_ctx)
+static void test_filter(MrtGroup *t_ctx)
 {
 	MrsString actual;
 	mrs_init(20, "12121", strlen("12121"), &actual);

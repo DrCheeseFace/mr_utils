@@ -1,7 +1,7 @@
-#include "../mrd_debug.h"
-#include "../mrl_logger.h"
-#include "../mrs_strings.h"
-#include "../mrv_vectors.h"
+#include <mrd_debug.h>
+#include <mrl_logger.h>
+#include <mrs_strings.h>
+#include <mrv_vectors.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -200,13 +200,13 @@ internal Err write_file(MrlLogger *logger, FILE *file)
 		fputc(a, file);
 	}
 
-	int trunc_err  = ftruncate(fileno(file), ftell(tmp_file));
+	int trunc_err = ftruncate(fileno(file), ftell(tmp_file));
 
-        fclose(tmp_file);
+	fclose(tmp_file);
 
-        if(trunc_err != 0) {
-                return ERR;
-        }
+	if (trunc_err != 0) {
+		return ERR;
+	}
 
 	return OK;
 }
