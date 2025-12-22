@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 200809L
 #include <internals.h>
 #include <mrd_debug.h>
 #include <mrl_logger.h>
@@ -99,7 +100,7 @@ internal void mrd_get_base_address(const char *path)
 		"cat /proc/%d/maps | grep %s | head -n 1 | awk '{print $1}' | cut -d'-' -f1",
 		pid, path); // lol
 
-	FILE *fp = fopen(command, "r");
+	FILE *fp = popen(command, "r");
 	char output_buffer[BASE_ADDRESS_SIZE] = "";
 	// has newline and \0 hence the +2
 	char output_full_out[BASE_ADDRESS_SIZE + 2] = "";
@@ -166,7 +167,7 @@ internal void unused mrd_log_backtrace(void)
 		strcat(addr2line_command, addr_diff_hex);
 
 		// exec addr2line command
-		FILE *fp = fopen(addr2line_command, "r");
+		FILE *fp = popen(addr2line_command, "r");
 		char addr2line_output_buffer[128] = "";
 		char addr2line_output_full_out[128] = "";
 		while (fgets(addr2line_output_buffer,
@@ -189,8 +190,8 @@ internal void unused mrd_log_backtrace(void)
 			mrl_log(&logger, MRL_SEVERITY_DEFAULT, "  ");
 		}
 		indent_level++;
-		mrl_log(&logger, MRL_SEVERITY_DEFAULT, "↪ %s => %s()",
-			newline_pos + 1, func_name);
+		mrl_logln(&logger, MRL_SEVERITY_DEFAULT, "↪ %s => %s()",
+			  newline_pos + 1, func_name);
 	}
 
 	free(symbols);
