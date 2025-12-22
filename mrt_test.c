@@ -87,9 +87,9 @@ void mrt_ctx_register_test_func(struct MrtContext *ctx, MrtTestFunc t_func,
 	return;
 }
 
-Err mrt_ctx_run(struct MrtContext *ctx)
+int mrt_ctx_run(struct MrtContext *ctx)
 {
-	Err err = OK;
+	size_t err_count = 0;
 
 	for (uint i = 0; i < ctx->test_groups.len; i++) {
 		struct MrtGroup *t_group =
@@ -97,10 +97,21 @@ Err mrt_ctx_run(struct MrtContext *ctx)
 
 		(*t_group->func)(t_group);
 
-		err = err || mrt_group_log(t_group, ctx->logger);
+		err_count += mrt_group_log(t_group, ctx->logger);
 	}
 
-	return err;
+	char pass_rate[32];
+	sprintf(pass_rate, "\n%lu/%lu Passed", ctx->test_groups.len - err_count,
+		ctx->test_groups.len);
+	mrl_logln(ctx->logger, pass_rate, MRL_SEVERITY_DEFAULT);
+
+	if (err_count) {
+		mrl_logln(ctx->logger, "FAILED", MRL_SEVERITY_ERROR);
+	} else {
+		mrl_logln(ctx->logger, "PASSED", MRL_SEVERITY_OK);
+	}
+
+	return err_count;
 }
 
 internal void mrt_group_destroy(struct MrtGroup *t_group)

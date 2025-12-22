@@ -19,7 +19,7 @@
  * MrtContext has the following functions
  * \ mrt_ctx_create                - create context. NOTE: requires logger to have "logging_headers" turned off
  * \ mrt_ctx_destroy               - frees itself and contents
- * \ mrt_ctx_run                   - runs and logs registered test functions for context
+ * \ mrt_ctx_run                   - runs and logs registered test functions for context. returns number of failed test groups
  * \ mrt_ctx_register_test_func    - registers test functions to run for context
  * \ mrt_group_append_case         - adds test case for test function
  * \
@@ -66,7 +66,7 @@ MrtContext *mrt_ctx_create(MrlLogger *logger);
 
 void mrt_ctx_destroy(MrtContext *ctx);
 
-Err mrt_ctx_run(MrtContext *ctx);
+int mrt_ctx_run(MrtContext *ctx);
 
 void mrt_ctx_register_test_func(MrtContext *ctx,
 				void (*test_func)(MrtGroup *t_group),
