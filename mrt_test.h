@@ -5,19 +5,13 @@
 #ifndef MRT_TEST_H
 #define MRT_TEST_H
 
+#include "internals.h" // IWYU pragma: keep
 #include "mrl_logger.h"
 #include "mrm_misc.h"
 #include <stddef.h>
 
-#define MRT_ASSERT_EQ(expected, actual)                                        \
-	(mrt_assert_eq((&expected), (&actual), (sizeof(expected))))
-
-#define MRT_ASSERT(actual)                                                     \
-	(mrt_assert_eq(&(bool){ actual }, &(bool){ true }, sizeof(bool)))
-
-#define MRT_ASSERT_NULL(actual) (actual == NULL)
-
-#define MRT_ASSERT_NOT_NULL(actual) (actual != NULL)
+#define MRT_ASSERT(t_ctx, predicate, desc)                                     \
+	internal_mrt_group_append_case(t_ctx, desc, predicate)
 
 /*
  * MrtContext lets you register your test functions for standardised running and logging
@@ -33,16 +27,16 @@
  * \
  * \   void test_strstr(MrtGroup *t_ctx)
  * \   {
- * \           mrt_group_append_case(t_ctx, "this is true", 1 == 1);
- * \           mrt_group_append_case(t_ctx, "this is false", 1 == 2);
+ * \           MRT_ASSERT(t_ctx, 1 == 1, "this is true");
+ * \           MRT_ASSERT(t_ctx, 1 == 2, "this is false");
  * \
  * \           return;
  * \   }
  * \
  * \   void test_filter(MrtGroup *t_ctx)
  * \   {
- * \           mrt_group_append_case(t_ctx, "this way", 1 == 1);
- * \           mrt_group_append_case(t_ctx, "that way", 1 == 2);
+ * \           MRT_ASSERT(t_ctx, 1 == 1, "this way");
+ * \           MRT_ASSERT(t_ctx, 1 == 2, "that way");
  * \
  * \           return;
  * \   }
@@ -77,8 +71,6 @@ Err mrt_ctx_run(MrtContext *ctx);
 void mrt_ctx_register_test_func(MrtContext *ctx,
 				void (*test_func)(MrtGroup *t_group),
 				const char *description);
-
-void mrt_group_append_case(MrtGroup *t_ctx, const char *description, Bool pass);
 
 Bool mrt_assert_eq(void *expected, void *actual, size_t size_of);
 

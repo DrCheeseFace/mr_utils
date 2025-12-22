@@ -118,8 +118,8 @@ internal void mrt_group_destroy(struct MrtGroup *t_group)
 	free(t_group);
 }
 
-void mrt_group_append_case(struct MrtGroup *t_group, const char *description,
-			   Bool pass)
+void internal_mrt_group_append_case(struct MrtGroup *t_group,
+				    const char *description, Bool pass)
 {
 	if (pass) {
 		t_group->pass_count++;

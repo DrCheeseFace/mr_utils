@@ -28,4 +28,7 @@ struct MrtContext {
 	struct MrlLogger *logger;
 };
 
+void internal_mrt_group_append_case(struct MrtGroup *t_ctx,
+				    const char *description, Bool pass);
+
 #endif // !INTERNALS_H
