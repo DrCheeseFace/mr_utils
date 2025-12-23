@@ -71,6 +71,4 @@ void mrt_ctx_register_test_func(MrtContext *ctx,
 	mrt_group_append_case(t_ctx, desc, predicate)
 void mrt_group_append_case(MrtGroup *t_ctx, const char *description, Bool pass);
 
-Bool mrt_assert_eq(void *expected, void *actual, size_t size_of);
-
 #endif // !MRT_TEST_H

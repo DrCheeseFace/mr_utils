@@ -27,11 +27,6 @@ internal void mtr_case_log(MrlLogger *mrl_ctx, MrtCase test_case)
 	mrl_reset_severity(mrl_ctx);
 }
 
-Bool mrt_assert_eq(void *expected, void *actual, size_t size_of)
-{
-	return memcmp(expected, actual, size_of) == 0;
-}
-
 internal void mrt_group_init(struct MrtGroup *t_group, const char *description,
 			     MrtTestFunc func)
 {
