@@ -1,11 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <mrd_debug.h>
-#include <mrl_logger.h>
-#include <mrs_strings.h>
-#include <mrt_test.h>
-#include <mrv_vectors.h>
+#include <mr_utils.h>
+#include <mr_utils/mrt_test.h>
 
 void test_strstr(MrtGroup *t_ctx)
 {

@@ -5,13 +5,8 @@
 #ifndef MRT_TEST_H
 #define MRT_TEST_H
 
-#include <internals.h> // IWYU pragma: keep
-#include <mrl_logger.h>
-#include <mrm_misc.h>
+#include <mr_utils.h>
 #include <stddef.h>
-
-#define MRT_ASSERT(t_ctx, predicate, desc)                                     \
-	internal_mrt_group_append_case(t_ctx, desc, predicate)
 
 /*
  * MrtContext lets you register your test functions for standardised running and logging
@@ -21,6 +16,7 @@
  * \ mrt_ctx_destroy               - frees itself and contents
  * \ mrt_ctx_run                   - runs and logs registered test functions for context. returns number of failed test groups
  * \ mrt_ctx_register_test_func    - registers test functions to run for context
+ * \ mrt_group_append_case         - add asserts to test group. for clarity use the macro MRT_ASSERT
  * \
  * \ example usage:
  * \
@@ -70,6 +66,10 @@ int mrt_ctx_run(MrtContext *ctx);
 void mrt_ctx_register_test_func(MrtContext *ctx,
 				void (*test_func)(MrtGroup *t_group),
 				const char *description);
+
+#define MRT_ASSERT(t_ctx, predicate, desc)                                     \
+	mrt_group_append_case(t_ctx, desc, predicate)
+void mrt_group_append_case(MrtGroup *t_ctx, const char *description, Bool pass);
 
 Bool mrt_assert_eq(void *expected, void *actual, size_t size_of);
 

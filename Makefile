@@ -25,11 +25,11 @@ OBJ_DIR   := $(BUILD_DIR)/$(BUILD_TYPE)
 TARGET_TEST    = $(OBJ_DIR)/test.out
 TARGET_SPACERS = $(OBJ_DIR)/spacers
 
-SRC_COMMON     = mrd_debug.c \
-	         mrl_logger.c \
-	         mrs_strings.c \
-	         mrt_test.c \
-	         mrv_vectors.c \
+SRC_COMMON     = src/mrd_debug.c \
+	         src/mrl_logger.c \
+	         src/mrs_strings.c \
+	         src/mrt_test.c \
+	         src/mrv_vectors.c \
 
 SRC_TEST       = test/test.c
 

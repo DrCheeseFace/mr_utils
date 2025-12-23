@@ -1,6 +1,4 @@
-#include <mrd_debug.h>
-#include <mrm_misc.h>
-#include <mrv_vectors.h>
+#include <mr_utils.h>
 
 #include <stdlib.h>
 #include <string.h>

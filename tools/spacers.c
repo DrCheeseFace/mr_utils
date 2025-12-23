@@ -1,7 +1,6 @@
-#include <mrd_debug.h>
-#include <mrl_logger.h>
-#include <mrs_strings.h>
-#include <mrv_vectors.h>
+#define _GNU_SOURCE
+
+#include <mr_utils.h>
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -1,9 +1,7 @@
 #ifndef INTERNALS_H
 #define INTERNALS_H
 
-#include <mrm_misc.h>
-#include <mrs_strings.h>
-#include <mrv_vectors.h>
+#include <mr_utils.h>
 #include <stdio.h>
 
 struct MrtGroup;
@@ -27,8 +25,5 @@ struct MrtContext {
 	MrvVector test_groups;
 	struct MrlLogger *logger;
 };
-
-void internal_mrt_group_append_case(struct MrtGroup *t_ctx,
-				    const char *description, Bool pass);
 
 #endif // !INTERNALS_H

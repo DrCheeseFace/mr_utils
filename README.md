@@ -99,6 +99,7 @@ format-check: $(TARGET_SPACERS)
 
 
 ### TODO
+- [ ] REWRITE spacers.c IT BAD VERY BAD
 - [x] log to defined out
 - [x] dynamic array lib
 - [x] whitespace remover

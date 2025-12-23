@@ -5,7 +5,7 @@
 #ifndef MRV_VECTORS_H
 #define MRV_VECTORS_H
 
-#include <mrm_misc.h>
+#include <mr_utils/mrm_misc.h>
 #include <stddef.h>
 
 /*

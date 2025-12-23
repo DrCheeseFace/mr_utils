@@ -1,9 +1,6 @@
 #define _POSIX_C_SOURCE 200809L
-#include <internals.h>
-#include <mrd_debug.h>
-#include <mrl_logger.h>
-#include <mrm_misc.h>
-#include <mrs_strings.h>
+#include "internals.h"
+#include <mr_utils.h>
 #include <string.h>
 
 #ifdef malloc
