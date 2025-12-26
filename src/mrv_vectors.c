@@ -126,6 +126,11 @@ void *mrv_get_idx(MrvVector *vec, size_t n)
 	return &vec->arr[n * vec->stride];
 }
 
+void *mrv_get_last(MrvVector *vec)
+{
+	return mrv_get_idx(vec, vec->len - 1);
+}
+
 void *mrv_get_item_where(MrvVector *vec, Bool (*is_item)(void *))
 {
 	for (uint i = 0; i < vec->len; i++) {
