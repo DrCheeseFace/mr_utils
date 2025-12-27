@@ -108,6 +108,7 @@ format-check: $(TARGET_SPACERS)
 - [ ] malloc calloc realloc free wrappers for debugging memory leaks eg: this PTR (id) with this DATA that was allocated HERE, was not freed
 - [ ] optimize mrd_debug. map offsets to log messages so i dont have to calculate multiple times
 - [ ] useful runtime error message. something with coredump file abort()
+- [ ] mrv_append, have flags for how to realloc if needed. double, log, increment etc
 
 
 i hope you like UB!

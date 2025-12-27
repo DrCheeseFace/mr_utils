@@ -1,15 +1,11 @@
-#include "mr_utils/mrv_vectors.h"
 #define _GNU_SOURCE
-#include <stdio.h>
+#include <mr_utils.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
-#include <mr_utils.h>
-
-#define MAX_ARGS 64
-#define MAX_FILES 256
-#define MAX_ARG_LENGTH
+#define INIT_ARGS_CAPACITY 64
+#define INIT_FILES_CAPACITY 256
 #define VERSION "0.1.1"
 
 typedef enum Option {
@@ -88,24 +84,14 @@ Err process_arg(MrlLogger *logger, MrsString *arg)
 	return OK;
 }
 
-size_t get_trimed_line_length(char *str, int len)
-{
-	MrsString string;
-	mrs_init(len, str, len, &string);
-	mrs_trim_trailing_whitespace(&string);
-	size_t trimed_len = string.len;
-	mrs_free(&string);
-	return trimed_len;
-}
-
 Err write_line_to_file(FILE *file, MrsString *line)
 {
+	mrs_pushstr(line, "\n", 1);
 	size_t written_len = fwrite(line->value, sizeof(char), line->len, file);
 	if (written_len != line->len) {
 		return ERR;
 	}
 
-	fwrite("\n", sizeof(char), 1, file);
 	return OK;
 }
 
@@ -113,12 +99,11 @@ Err check_file(MrlLogger *logger, FILE *file)
 {
 	Bool last_line_is_empty = FALSE;
 	uint line_number = 0;
-
 	for (;;) {
 		char *lineptr = NULL;
 		size_t space_count = CAFE_BABE;
-		ssize_t len = getline(&lineptr, &space_count, file);
 
+		ssize_t len = getline(&lineptr, &space_count, file);
 		if (len == -1) {
 			free(lineptr);
 			break;
@@ -271,7 +256,7 @@ int main(int argc, char **argv)
 {
 	MrlLogger *logger = mrl_create(stderr, TRUE, FALSE);
 	MrvVector args;
-	mrv_init(&args, MAX_ARGS, sizeof(MrsString));
+	mrv_init(&args, INIT_ARGS_CAPACITY, sizeof(MrsString));
 	for (size_t i = 0; i < (size_t)argc; i++) {
 		MrsString arg;
 		mrs_init(strlen(argv[i]), argv[i], strlen(argv[i]), &arg);
@@ -282,7 +267,7 @@ int main(int argc, char **argv)
 		log_help(logger);
 	}
 	MrvVector file_paths;
-	mrv_init(&file_paths, MAX_FILES, sizeof(MrsString));
+	mrv_init(&file_paths, INIT_FILES_CAPACITY, sizeof(MrsString));
 	Err err = OK;
 	for (size_t i = 1; i < args.len; i++) {
 		MrsString *arg = mrv_get_idx(&args, i);
