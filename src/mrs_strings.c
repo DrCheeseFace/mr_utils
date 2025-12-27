@@ -128,27 +128,22 @@ Err mrs_strcat(MrsString *dest, MrsString *src)
 
 Err mrs_pushstr(MrsString *dest, const char *append_me, uint n)
 {
-	if (n + dest->len > dest->capacity) {
-		char *malloced = malloc(sizeof(char) * (dest->len + n + 1));
-		if (malloced == NULL) {
-			return ERR;
-		}
-
-		memcpy(malloced, dest->value, dest->len);
-		memcpy(&malloced[dest->len], append_me, n);
-		free(dest->value);
-
-		dest->value = malloced;
-		dest->capacity = n + dest->len;
-		dest->len = n + dest->len;
-
-		dest->value[dest->len] = '\0';
-		return OK;
+	uint len = dest->len + n;
+	uint capacity = dest->capacity;
+	if (len > dest->capacity) {
+		capacity = len;
 	}
 
-	memcpy(&dest->value[dest->len], append_me, n);
-	dest->len += n;
-	dest->value[dest->len] = '\0';
+	char *realloced = realloc(dest->value, sizeof(char) * (len + 1));
+	if (realloced == NULL) {
+		return ERR;
+	}
+
+	strlcpy(&dest->value[dest->len], append_me, n + 1);
+
+	dest->value = realloced;
+	dest->capacity = capacity;
+	dest->len = len;
 
 	return OK;
 }

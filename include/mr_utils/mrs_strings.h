@@ -32,10 +32,11 @@
  * \ mrs_trim_trailing_whitespace    - removes trailing whitespace
  *
  */
+
 typedef struct {
-	char *value;
-	uint len;
-	uint capacity;
+	char *value; // pointer to null terminated string
+	uint len; // length of string. equivalent to the strlen()
+	uint capacity; // characters malloced, not including null terminator
 } MrsString;
 
 MrsString *mrs_create(uint capacity);
