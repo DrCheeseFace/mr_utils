@@ -376,7 +376,6 @@ void *mrd_realloc(void *ptr, size_t size, unused const char *file_name,
 
 	void *realloc_ptr = realloc(ptr, size);
 	if (realloc_ptr != NULL) {
-		memset(realloc_ptr, CAFE_BABE, size);
 		src_allocation->active = FALSE;
 		src_allocation->reallocated_to = realloc_ptr;
 
