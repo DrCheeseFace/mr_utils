@@ -16,7 +16,7 @@ typedef struct {
 internal Err mrt_group_log(struct MrtGroup *t_group, struct MrlLogger *logger);
 internal void mrt_group_destroy(struct MrtGroup *t_group);
 
-internal void mtr_case_log(MrlLogger *mrl_ctx, MrtCase test_case)
+internal void mtr_case_log(struct MrlLogger *mrl_ctx, MrtCase test_case)
 {
 	mrl_log(mrl_ctx, MRL_SEVERITY_DEFAULT, test_case.description.value);
 	if (test_case.pass) {
@@ -73,7 +73,7 @@ void mrt_ctx_register_test_func(struct MrtContext *ctx, MrtTestFunc t_func,
 
 	mrt_group_init(t_group, description, t_func);
 
-	mrv_append(&ctx->test_groups, &t_group);
+	mrv_append(&ctx->test_groups, &t_group, APPEND_SCALING_INCREMENT);
 
 	return;
 }
@@ -129,7 +129,8 @@ void mrt_group_append_case(struct MrtGroup *t_group, const char *description,
 	mrs_init(strlen(description), description, strlen(description), &s);
 
 	mrv_append(&t_group->cases,
-		   &(MrtCase){ .description = s, .pass = pass });
+		   &(MrtCase){ .description = s, .pass = pass },
+		   APPEND_SCALING_INCREMENT);
 }
 
 internal Err mrt_group_log(struct MrtGroup *t_group, struct MrlLogger *logger)

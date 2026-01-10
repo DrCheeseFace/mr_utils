@@ -35,7 +35,6 @@ const char *severity_to_log_header[MRL_SEVERITY_COUNT] = {
 MrlLogger *mrl_create(FILE *out, Bool color, Bool log_header)
 {
 	struct MrlLogger *ctx = malloc(sizeof(*ctx));
-
 	ctx->out = out;
 	ctx->terminal_color_enabled = color;
 	ctx->log_header_enabled = log_header;
@@ -46,7 +45,6 @@ MrlLogger *mrl_create(FILE *out, Bool color, Bool log_header)
 void mrl_destroy(MrlLogger *ctx)
 {
 	struct MrlLogger *mrl_ctx = (struct MrlLogger *)ctx;
-
 	if (mrl_ctx->out != NULL) {
 		fclose(((struct MrlLogger *)ctx)->out);
 	}
@@ -56,7 +54,6 @@ void mrl_destroy(MrlLogger *ctx)
 void mrl_reset_severity(MrlLogger *ctx)
 {
 	struct MrlLogger *mrl_ctx = (struct MrlLogger *)ctx;
-
 	if (mrl_ctx->terminal_color_enabled == TRUE) {
 		fprintf(mrl_ctx->out, "%s",
 			terminal_color_codes[MRL_SEVERITY_DEFAULT]);
@@ -95,6 +92,7 @@ void mrl_logln(MrlLogger *ctx, MrlSeverity severity, const char *fmt, ...)
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 	vfprintf(mrl_ctx->out, fmt, args);
 #pragma GCC diagnostic pop
+
 	va_end(args);
 
 	fprintf(mrl_ctx->out, "\n");
@@ -117,6 +115,7 @@ void mrl_log(MrlLogger *ctx, MrlSeverity severity, const char *fmt, ...)
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 	vfprintf(mrl_ctx->out, fmt, args);
 #pragma GCC diagnostic pop
+
 	va_end(args);
 
 	mrl_reset_severity(ctx);

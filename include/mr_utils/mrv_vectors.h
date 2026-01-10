@@ -36,6 +36,14 @@ typedef struct {
 	size_t capacity;
 } MrvVector;
 
+typedef enum {
+	APPEND_SCALING_INCREMENT,
+	APPEND_SCALING_DOUBLE,
+	APPEND_SCALING_ONE_POINT_FIVE,
+	APPEND_SCALING_POWER_OF_TWO,
+	// APPEND_SCALING_PAGE_ALIGNED // TODO IMPLEMENT
+} Scaling;
+
 MrvVector *mrv_create(size_t capacity, size_t stride);
 
 void mrv_destroy(MrvVector *vec);
@@ -47,7 +55,12 @@ void mrv_init(MrvVector *vec, size_t capacity, size_t stride);
 Err mrv_clear(MrvVector *vec);
 
 // resizes vec->arr if needed
-Err mrv_append(MrvVector *vec, void *item);
+// Scaling methods:
+// 	APPEND_SCALING_INCREMENT,
+// 	APPEND_SCALING_DOUBLE,
+// 	APPEND_SCALING_ONE_POINT_FIVE,
+// 	APPEND_SCALING_POWER_OF_TWO,
+Err mrv_append(MrvVector *vec, void *item, Scaling scaling_method);
 
 Err mrv_realloc_to_fit(MrvVector *vec);
 

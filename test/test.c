@@ -383,7 +383,7 @@ void test_append(MrtGroup *t_ctx)
 {
 	MrvVector *int_array = mrv_create(10, sizeof(int));
 	int append_val = CAFE_BABE;
-	mrv_append(int_array, &append_val);
+	mrv_append(int_array, &append_val, APPEND_SCALING_INCREMENT);
 
 	MRT_ASSERT(t_ctx, int_array->len == 1,
 		   "empty array append within capacity len");
@@ -405,7 +405,7 @@ void test_append(MrtGroup *t_ctx)
 		   "empty array append to capacity capacity");
 
 	for (size_t i = 0; i < 10; i++) {
-		mrv_append(int_array, &i);
+		mrv_append(int_array, &i, APPEND_SCALING_INCREMENT);
 		val = mrv_get_idx(int_array, i);
 
 		MRT_ASSERT(t_ctx, *val == (int)i,
@@ -415,7 +415,8 @@ void test_append(MrtGroup *t_ctx)
 	MRT_ASSERT(t_ctx, int_array->len == 10,
 		   "empty array append to capacity len");
 
-	Err error = mrv_append(int_array, &append_val);
+	Err error =
+		mrv_append(int_array, &append_val, APPEND_SCALING_INCREMENT);
 	val = mrv_get_idx(int_array, 10);
 
 	MRT_ASSERT(t_ctx, error == OK, "empty array append over capacity OK");
@@ -426,6 +427,26 @@ void test_append(MrtGroup *t_ctx)
 	MRT_ASSERT(t_ctx, int_array->capacity == 11,
 		   "empty array append over capacity capacity");
 
+	error = mrv_append(int_array, &append_val, APPEND_SCALING_DOUBLE);
+	MRT_ASSERT(t_ctx, error == OK, "append with double capacity OK");
+	MRT_ASSERT(t_ctx, int_array->capacity == 22,
+		   "append with double capacity capacity");
+
+	mrv_realloc_to_fit(int_array); // array now capacity = 12
+
+	error = mrv_append(int_array, &append_val,
+			   APPEND_SCALING_ONE_POINT_FIVE);
+	MRT_ASSERT(t_ctx, error == OK, "append with 1.5 capacity OK");
+	MRT_ASSERT(t_ctx, int_array->capacity == 18,
+		   "append with 1.5 capacity capacity");
+
+	mrv_realloc_to_fit(int_array); // array now capacity = 13
+
+	error = mrv_append(int_array, &append_val, APPEND_SCALING_POWER_OF_TWO);
+	MRT_ASSERT(t_ctx, error == OK, "append with power of 2 capacity OK");
+	MRT_ASSERT(t_ctx, int_array->capacity == 169,
+		   "append with power of 2 capacity capacity");
+
 	mrv_destroy(int_array);
 }
 
@@ -433,9 +454,9 @@ void test_pop(MrtGroup *t_ctx)
 {
 	MrvVector *int_array = mrv_create(10, sizeof(int));
 	int append_val = CAFE_BABE;
-	mrv_append(int_array, &append_val);
-	mrv_append(int_array, &append_val);
-	mrv_append(int_array, &append_val);
+	mrv_append(int_array, &append_val, APPEND_SCALING_INCREMENT);
+	mrv_append(int_array, &append_val, APPEND_SCALING_INCREMENT);
+	mrv_append(int_array, &append_val, APPEND_SCALING_INCREMENT);
 	mrv_pop(int_array);
 
 	MRT_ASSERT(t_ctx, int_array->len == 2, "pop len > 0 len");
@@ -471,11 +492,11 @@ void test_get_item_where(MrtGroup *t_ctx)
 {
 	MrvVector *int_array = mrv_create(10, sizeof(int));
 	int append_val = 1;
-	mrv_append(int_array, &append_val);
+	mrv_append(int_array, &append_val, APPEND_SCALING_INCREMENT);
 	append_val++;
-	mrv_append(int_array, &append_val);
+	mrv_append(int_array, &append_val, APPEND_SCALING_INCREMENT);
 	append_val++;
-	mrv_append(int_array, &append_val);
+	mrv_append(int_array, &append_val, APPEND_SCALING_INCREMENT);
 	append_val++;
 
 	void *two_ptr = mrv_get_idx(int_array, 1);
@@ -492,11 +513,11 @@ void test_get_item(MrtGroup *t_ctx)
 {
 	MrvVector *int_array = mrv_create(10, sizeof(int));
 	int append_val = 1;
-	mrv_append(int_array, &append_val);
+	mrv_append(int_array, &append_val, APPEND_SCALING_INCREMENT);
 	append_val++;
-	mrv_append(int_array, &append_val);
+	mrv_append(int_array, &append_val, APPEND_SCALING_INCREMENT);
 	append_val++;
-	mrv_append(int_array, &append_val);
+	mrv_append(int_array, &append_val, APPEND_SCALING_INCREMENT);
 	append_val++;
 
 	void *two_ptr = mrv_get_idx(int_array, 1);

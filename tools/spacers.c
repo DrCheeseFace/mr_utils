@@ -158,7 +158,7 @@ Err write_file(MrlLogger *logger, FILE *file)
 
 		mrs_trim_trailing_whitespace(&trimed_line);
 
-		mrv_append(&lines, &trimed_line);
+		mrv_append(&lines, &trimed_line, APPEND_SCALING_INCREMENT);
 		free(lineptr);
 	}
 
@@ -261,7 +261,7 @@ int main(int argc, char **argv)
 		MrsString arg;
 		mrs_init(strlen(argv[i]), argv[i], strlen(argv[i]), &arg);
 		mrs_remove_whitespace(&arg);
-		mrv_append(&args, &arg);
+		mrv_append(&args, &arg, APPEND_SCALING_INCREMENT);
 	}
 	if (argc == 1) {
 		log_help(logger);
@@ -280,7 +280,8 @@ int main(int argc, char **argv)
 			MrsString path;
 			mrs_init(strlen(argv[i]), argv[i], strlen(argv[i]),
 				 &path);
-			mrv_append(&file_paths, &path);
+			mrv_append(&file_paths, &path,
+				   APPEND_SCALING_INCREMENT);
 			break;
 		}
 		if (err == ERR) {

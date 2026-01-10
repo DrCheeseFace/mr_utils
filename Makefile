@@ -2,6 +2,7 @@ CC          = gcc
 CSTANDARD   = c99
 
 INCLUDES    = -Iinclude
+LDLIBS      = -lm
 
 WARNINGS  = -Wall -Wextra -Werror -Wpedantic -pedantic-errors
 WARNINGS += -Wpointer-arith -Wcast-align -Wwrite-strings
@@ -13,7 +14,7 @@ WARNINGS += -Wredundant-decls -Wnested-externs
 
 ifneq (,$(filter debug build-debug,$(MAKECMDGOALS)))
     BUILD_TYPE := debug
-    CFLAGS     := -O0 -g -fno-omit-frame-pointer -rdynamic -DDEBUG -DMRD_DEBUG_BACKTRACE $(WARNINGS) $(INCLUDES)
+    CFLAGS     := -O0 -g -fno-omit-frame-pointer -rdynamic -DDEBUG -DMRD_DEBUG_ONLY_CALLED_AND_ERR $(WARNINGS) $(INCLUDES)
 else
     BUILD_TYPE := release
     CFLAGS     := -O2 $(WARNINGS) $(INCLUDES)
@@ -47,7 +48,7 @@ ALL_SPACERS_OBJS = $(OBJ_COMMON) $(OBJ_TOOLS)
 all: $(TARGET_TEST)
 
 $(TARGET_TEST): $(ALL_TEST_OBJS)
-	$(CC) $(ALL_TEST_OBJS) -o $@
+	$(CC) $(ALL_TEST_OBJS) -o $@ $(LDLIBS)
 
 $(TARGET_SPACERS): $(ALL_SPACERS_OBJS)
 	$(CC) $(ALL_SPACERS_OBJS) -o $@

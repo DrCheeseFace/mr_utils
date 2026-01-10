@@ -1,5 +1,6 @@
 #include <mr_utils.h>
 
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -64,14 +65,29 @@ Err mrv_clear(MrvVector *vec)
 	return OK;
 }
 
-Err mrv_append(MrvVector *vec, void *item)
+Err mrv_append(MrvVector *vec, void *item, Scaling scaling_method)
 {
 	if (vec == NULL) {
 		return ERR;
 	}
 
 	if (vec->capacity == vec->len) {
-		vec->capacity++;
+		switch (scaling_method) {
+		case APPEND_SCALING_INCREMENT:
+			vec->capacity++;
+			break;
+		case APPEND_SCALING_DOUBLE:
+			vec->capacity *= 2;
+			break;
+		case APPEND_SCALING_ONE_POINT_FIVE:
+			vec->capacity *= 1.5;
+			break;
+		case APPEND_SCALING_POWER_OF_TWO:
+			vec->capacity = powl(vec->capacity, 2);
+			break;
+		default:
+			break;
+		}
 		vec->arr = realloc(vec->arr, vec->capacity * vec->stride);
 	}
 
