@@ -71,24 +71,28 @@ Err mrv_append(MrvVector *vec, void *item, Scaling scaling_method)
 		return ERR;
 	}
 
+	size_t new_capacity = vec->capacity;
+
 	if (vec->capacity == vec->len) {
 		switch (scaling_method) {
 		case APPEND_SCALING_INCREMENT:
-			vec->capacity++;
-			break;
-		case APPEND_SCALING_DOUBLE:
-			vec->capacity *= 2;
+			new_capacity++;
 			break;
 		case APPEND_SCALING_ONE_POINT_FIVE:
-			vec->capacity *= 1.5;
+			new_capacity += (vec->capacity >> 1);
 			break;
-		case APPEND_SCALING_POWER_OF_TWO:
-			vec->capacity = powl(vec->capacity, 2);
+		case APPEND_SCALING_DOUBLE:
+			new_capacity <<= 1;
 			break;
 		default:
 			break;
 		}
-		vec->arr = realloc(vec->arr, vec->capacity * vec->stride);
+
+		void *temp = realloc(vec->arr, new_capacity * vec->stride);
+		if (temp == NULL)
+			return ERR;
+		vec->arr = temp;
+		vec->capacity = new_capacity;
 	}
 
 	memcpy(&vec->arr[vec->len * vec->stride], item, vec->stride);

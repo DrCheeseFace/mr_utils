@@ -440,13 +440,6 @@ void test_append(MrtGroup *t_ctx)
 	MRT_ASSERT(t_ctx, int_array->capacity == 18,
 		   "append with 1.5 capacity capacity");
 
-	mrv_realloc_to_fit(int_array); // array now capacity = 13
-
-	error = mrv_append(int_array, &append_val, APPEND_SCALING_POWER_OF_TWO);
-	MRT_ASSERT(t_ctx, error == OK, "append with power of 2 capacity OK");
-	MRT_ASSERT(t_ctx, int_array->capacity == 169,
-		   "append with power of 2 capacity capacity");
-
 	mrv_destroy(int_array);
 }
 

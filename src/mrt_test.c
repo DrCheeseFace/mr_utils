@@ -73,7 +73,7 @@ void mrt_ctx_register_test_func(struct MrtContext *ctx, MrtTestFunc t_func,
 
 	mrt_group_init(t_group, description, t_func);
 
-	mrv_append(&ctx->test_groups, &t_group, APPEND_SCALING_INCREMENT);
+	mrv_append(&ctx->test_groups, &t_group, APPEND_SCALING_ONE_POINT_FIVE);
 
 	return;
 }
@@ -130,7 +130,7 @@ void mrt_group_append_case(struct MrtGroup *t_group, const char *description,
 
 	mrv_append(&t_group->cases,
 		   &(MrtCase){ .description = s, .pass = pass },
-		   APPEND_SCALING_INCREMENT);
+		   APPEND_SCALING_ONE_POINT_FIVE);
 }
 
 internal Err mrt_group_log(struct MrtGroup *t_group, struct MrlLogger *logger)
