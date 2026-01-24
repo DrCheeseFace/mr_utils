@@ -1,6 +1,5 @@
 #include <mr_utils.h>
 
-#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -126,6 +125,27 @@ Err mrv_pop(MrvVector *vec)
 
 	if (vec->len == 0) {
 		return ERR;
+	}
+
+	vec->len--;
+
+	return OK;
+}
+
+Err mrv_remove(MrvVector *vec, size_t idx)
+{
+	void *item = mrv_get_idx(vec, idx);
+	if (!item) {
+		return ERR;
+	}
+
+	size_t items_to_move = vec->len - 1 - idx;
+
+	if (items_to_move > 0) {
+		unsigned char *dest = (unsigned char *)item;
+		unsigned char *src = dest + vec->stride;
+
+		memmove(dest, src, items_to_move * vec->stride);
 	}
 
 	vec->len--;

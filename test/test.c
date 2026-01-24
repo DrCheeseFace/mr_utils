@@ -470,6 +470,63 @@ void test_pop(MrtGroup *t_ctx)
 	mrv_destroy(int_array);
 }
 
+void test_remove(MrtGroup *t_ctx)
+{
+	MrvVector *int_array = mrv_create(10, sizeof(int));
+
+	for (int i = 0; i < 5; i++) {
+		mrv_append(int_array, &i, APPEND_SCALING_INCREMENT);
+	}
+
+	MRT_ASSERT(t_ctx, int_array->len == 5, "setup length correct");
+
+	Err res = mrv_remove(int_array, 2);
+
+	MRT_ASSERT(t_ctx, res == OK, "remove middle OK");
+	MRT_ASSERT(t_ctx, int_array->len == 4, "remove middle len update");
+
+	int *val = mrv_get_idx(int_array, 2);
+	MRT_ASSERT(t_ctx, *val == 3, "remove middle: index 2 should be 3");
+
+	val = mrv_get_idx(int_array, 3);
+	MRT_ASSERT(t_ctx, *val == 4, "remove middle: index 3 should be 4");
+
+	res = mrv_remove(int_array, 0);
+
+	MRT_ASSERT(t_ctx, res == OK, "remove head OK");
+	MRT_ASSERT(t_ctx, int_array->len == 3, "remove head len update");
+
+	val = mrv_get_idx(int_array, 0);
+	MRT_ASSERT(t_ctx, *val == 1, "remove head: index 0 should be 1");
+
+	res = mrv_remove(int_array, 2);
+
+	MRT_ASSERT(t_ctx, res == OK, "remove tail OK");
+	MRT_ASSERT(t_ctx, int_array->len == 2, "remove tail len update");
+
+	val = mrv_get_idx(int_array, 1);
+	MRT_ASSERT(t_ctx, *val == 3, "remove tail: last value check");
+
+	val = mrv_get_idx(int_array, 2);
+	MRT_ASSERT(t_ctx, val == NULL, "remove tail: old index inaccessible");
+
+	res = mrv_remove(int_array, 100);
+	MRT_ASSERT(t_ctx, res == ERR, "remove invalid index returns ERR");
+	MRT_ASSERT(t_ctx, int_array->len == 2,
+		   "remove invalid index len unchanged");
+
+	mrv_remove(int_array, 0);
+	res = mrv_remove(int_array, 0);
+
+	MRT_ASSERT(t_ctx, res == OK, "remove last item OK");
+	MRT_ASSERT(t_ctx, int_array->len == 0, "remove until empty len is 0");
+
+	res = mrv_remove(int_array, 0);
+	MRT_ASSERT(t_ctx, res == ERR, "remove from empty returns ERR");
+
+	mrv_destroy(int_array);
+}
+
 Bool is_two(void *x)
 {
 	return *(int *)x == 2;
@@ -552,6 +609,7 @@ int main(void)
 	// mrv_vectors
 	mrt_ctx_register_test_func(ctx, test_append, "test_append");
 	mrt_ctx_register_test_func(ctx, test_pop, "test_pop");
+	mrt_ctx_register_test_func(ctx, test_remove, "test_remove");
 	mrt_ctx_register_test_func(ctx, test_get_item_where,
 				   "test_get_item_where");
 	mrt_ctx_register_test_func(ctx, test_get_item, "test_get_item");

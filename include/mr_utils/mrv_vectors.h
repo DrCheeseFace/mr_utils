@@ -21,6 +21,7 @@
  * \ mrv_append            - appends element
  * \ mrv_realloc_to_fit    - sets capacity to length and reallocates to fit
  * \ mrv_pop               - removes last element
+ * \ mrv_remove            - removes array[index]'th element
  * \ mrv_get_idx           - get pointer to idx
  * \ mrv_get_last          - get pointer to last item
  * \ mrv_get_item          - get pointer to first memcmp identical items
@@ -64,6 +65,8 @@ Err mrv_append(MrvVector *vec, void *item, Scaling scaling_method);
 Err mrv_realloc_to_fit(MrvVector *vec);
 
 Err mrv_pop(MrvVector *vec);
+
+Err mrv_remove(MrvVector *vec, size_t idx);
 
 void *mrv_get_idx(MrvVector *vec, size_t n);
 
