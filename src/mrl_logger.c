@@ -69,7 +69,7 @@ void mrl_set_severity(MrlLogger *ctx, MrlSeverity severity)
 	}
 }
 
-internal void mrl_log_header(struct MrlLogger *ctx, MrlSeverity severity)
+mr_internal void mrl_log_header(struct MrlLogger *ctx, MrlSeverity severity)
 {
 	fprintf(ctx->out, "%s:", severity_to_log_header[severity]);
 	fprintf(ctx->out, "%ld: ", time(NULL));

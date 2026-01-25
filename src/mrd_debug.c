@@ -30,21 +30,21 @@ typedef enum MRD_Command {
 	MRD_COMMAND_FREE,
 } MrdCommand;
 
-global_variable size_t current_allocation_id = 0;
-global_variable struct MrdAllocation active_allocations[MAX_ACTIVE_ALLOCATIONS];
-global_variable long base_address = CAFE_BABE;
+mr_global size_t current_allocation_id = 0;
+mr_global struct MrdAllocation active_allocations[MAX_ACTIVE_ALLOCATIONS];
+mr_global long base_address = CAFE_BABE;
 
 struct MrlLogger logger = { .out = NULL,
 			    .log_header_enabled = FALSE,
 			    .terminal_color_enabled = TRUE };
 
-internal void mrd_init(void)
+mr_internal void mrd_init(void)
 {
 	logger.out = stdout;
 }
 
 // cant call MRS_init due to it calling malloc
-internal void mrd_init_code_snippet(MrsString *dest)
+mr_internal void mrd_init_code_snippet(MrsString *dest)
 {
 	dest->value = malloc(sizeof(char) * (MAX_SNIPPET_LEN + 1));
 	dest->value[MAX_SNIPPET_LEN] = '\0';
@@ -52,14 +52,14 @@ internal void mrd_init_code_snippet(MrsString *dest)
 	dest->len = 0;
 }
 
-internal void mrd_log_err(const char *msg)
+mr_internal void mrd_log_err(const char *msg)
 {
 	mrl_log(&logger, MRL_SEVERITY_INFO, DEBUG_LOG_HEAD);
 	mrl_logln(&logger, MRL_SEVERITY_ERROR, msg);
 }
 
-internal void mrd_get_code_snippet(const char *file_name, int line,
-				   MrsString *dest)
+mr_internal void mrd_get_code_snippet(const char *file_name, int line,
+				      MrsString *dest)
 {
 	FILE *file = fopen(file_name, "r");
 
@@ -88,7 +88,7 @@ internal void mrd_get_code_snippet(const char *file_name, int line,
 	return;
 }
 
-internal void mrd_get_base_address(const char *path)
+mr_internal void mrd_get_base_address(const char *path)
 {
 	int pid = getpid();
 	char base_addr_string[BASE_ADDRESS_SIZE + 1];
@@ -116,7 +116,7 @@ internal void mrd_get_base_address(const char *path)
 	return;
 }
 
-internal void unused mrd_log_backtrace(void)
+mr_internal void unused mrd_log_backtrace(void)
 {
 	void *buffer[MAX_BACKTRACE_LENGTH];
 	int nptrs = backtrace(buffer, MAX_BACKTRACE_LENGTH);
@@ -195,7 +195,8 @@ internal void unused mrd_log_backtrace(void)
 }
 
 // returns 1 if true
-internal int mrd_is_free_active_allocation_slot(struct MrdAllocation allocation)
+mr_internal int
+mrd_is_free_active_allocation_slot(struct MrdAllocation allocation)
 {
 	if (allocation.active == FALSE) {
 		if (allocation.reallocated_to == NULL) {
@@ -209,7 +210,7 @@ internal int mrd_is_free_active_allocation_slot(struct MrdAllocation allocation)
 }
 
 // populates first available slot
-internal void
+mr_internal void
 mrd_add_allocation_to_active_allocations(struct MrdAllocation new_allocation)
 {
 	for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {
@@ -226,9 +227,9 @@ mrd_add_allocation_to_active_allocations(struct MrdAllocation new_allocation)
 	mrd_log_err(err);
 }
 
-internal void unused mrd_log_command(enum MRD_Command command, size_t size,
-				     struct MrdAllocation *realloc_free_src,
-				     const char *file_name, int line)
+mr_internal void unused mrd_log_command(enum MRD_Command command, size_t size,
+					struct MrdAllocation *realloc_free_src,
+					const char *file_name, int line)
 {
 	mrl_log(&logger, MRL_SEVERITY_INFO, DEBUG_LOG_HEAD);
 	if (command == MRD_COMMAND_REALLOC) {

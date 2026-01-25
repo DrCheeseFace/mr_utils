@@ -13,10 +13,11 @@ typedef struct {
 	Bool pass;
 } MrtCase;
 
-internal Err mrt_group_log(struct MrtGroup *t_group, struct MrlLogger *logger);
-internal void mrt_group_destroy(struct MrtGroup *t_group);
+mr_internal Err mrt_group_log(struct MrtGroup *t_group,
+			      struct MrlLogger *logger);
+mr_internal void mrt_group_destroy(struct MrtGroup *t_group);
 
-internal void mtr_case_log(struct MrlLogger *mrl_ctx, MrtCase test_case)
+mr_internal void mtr_case_log(struct MrlLogger *mrl_ctx, MrtCase test_case)
 {
 	mrl_log(mrl_ctx, MRL_SEVERITY_DEFAULT, test_case.description.value);
 	if (test_case.pass) {
@@ -27,8 +28,8 @@ internal void mtr_case_log(struct MrlLogger *mrl_ctx, MrtCase test_case)
 	mrl_reset_severity(mrl_ctx);
 }
 
-internal void mrt_group_init(struct MrtGroup *t_group, const char *description,
-			     MrtTestFunc func)
+mr_internal void mrt_group_init(struct MrtGroup *t_group,
+				const char *description, MrtTestFunc func)
 {
 	memset(t_group, 0, sizeof(*t_group));
 
@@ -103,7 +104,7 @@ int mrt_ctx_run(struct MrtContext *ctx)
 	return err_count;
 }
 
-internal void mrt_group_destroy(struct MrtGroup *t_group)
+mr_internal void mrt_group_destroy(struct MrtGroup *t_group)
 {
 	for (size_t i = 0; i < t_group->cases.len; i++) {
 		MrtCase *c = mrv_get_idx(&t_group->cases, i);
@@ -133,7 +134,8 @@ void mrt_group_append_case(struct MrtGroup *t_group, const char *description,
 		   APPEND_SCALING_ONE_POINT_FIVE);
 }
 
-internal Err mrt_group_log(struct MrtGroup *t_group, struct MrlLogger *logger)
+mr_internal Err mrt_group_log(struct MrtGroup *t_group,
+			      struct MrlLogger *logger)
 {
 	mrl_logln(logger, MRL_SEVERITY_DEFAULT, "");
 

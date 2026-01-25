@@ -8,9 +8,9 @@
 /*
  * more descriptive use of the keyword `static`
  */
-#define internal static
-#define global_variable static
-#define local_persist static
+#define mr_internal static
+#define mr_global static
+#define mr_local_persist static
 
 typedef unsigned int uint;
 
