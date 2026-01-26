@@ -22,7 +22,8 @@
  * \ mrv_realloc_to_fit    - sets capacity to length and reallocates to fit
  * \ mrv_pop               - removes last element
  * \ mrv_remove            - removes array[index]'th element
- * \ mrv_get_idx           - get pointer to idx
+ * \ mrv_get_idx           - get pointer from idx
+ * \ mrv_get_pos           - get idx from pointer
  * \ mrv_get_last          - get pointer to last item
  * \ mrv_get_item          - get pointer to first memcmp identical items
  * \ mrv_get_item_where    - get pointer to item that satisfies user defined method
@@ -69,6 +70,8 @@ Err mrv_pop(MrvVector *vec);
 Err mrv_remove(MrvVector *vec, size_t idx);
 
 void *mrv_get_idx(MrvVector *vec, size_t n);
+
+size_t mrv_get_pos(MrvVector *vec, void *item);
 
 void *mrv_get_last(MrvVector *vec);
 

@@ -1,5 +1,6 @@
 #include <mr_utils.h>
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -164,6 +165,11 @@ void *mrv_get_idx(MrvVector *vec, size_t n)
 	}
 
 	return &vec->arr[n * vec->stride];
+}
+
+size_t mrv_get_pos(MrvVector *vec, void *item)
+{
+	return ((uintptr_t)item - (uintptr_t)vec->arr) / vec->stride;
 }
 
 void *mrv_get_last(MrvVector *vec)

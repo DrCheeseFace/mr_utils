@@ -527,6 +527,51 @@ void test_remove(MrtGroup *t_ctx)
 	mrv_destroy(int_array);
 }
 
+void test_get_pos(MrtGroup *t_ctx)
+{
+	MrvVector *int_array = mrv_create(10, sizeof(int));
+
+	for (int i = 0; i < 10; i++) {
+		mrv_append(int_array, &i, APPEND_SCALING_INCREMENT);
+	}
+
+	void *first_item = mrv_get_idx(int_array, 0);
+	size_t pos_first = mrv_get_pos(int_array, first_item);
+	MRT_ASSERT(t_ctx, pos_first == 0, "get_pos for first element");
+
+	void *middle_item = mrv_get_idx(int_array, 5);
+	size_t pos_middle = mrv_get_pos(int_array, middle_item);
+	MRT_ASSERT(t_ctx, pos_middle == 5, "get_pos for middle element");
+
+	void *last_item = mrv_get_idx(int_array, 9);
+	size_t pos_last = mrv_get_pos(int_array, last_item);
+	MRT_ASSERT(t_ctx, pos_last == 9, "get_pos for last element");
+
+	mrv_destroy(int_array);
+
+	typedef struct {
+		long a;
+		long b;
+	} LargeData;
+
+	MrvVector *large_array = mrv_create(5, sizeof(LargeData));
+	LargeData data = { 100, 200 };
+
+	for (int i = 0; i < 5; i++) {
+		mrv_append(large_array, &data, APPEND_SCALING_INCREMENT);
+	}
+
+	void *large_item = mrv_get_idx(large_array, 3);
+	size_t pos_large = mrv_get_pos(large_array, large_item);
+
+	MRT_ASSERT(t_ctx, large_array->stride == sizeof(LargeData),
+		   "large array stride check");
+	MRT_ASSERT(t_ctx, pos_large == 3,
+		   "get_pos for large data type index 3");
+
+	mrv_destroy(large_array);
+}
+
 Bool is_two(void *x)
 {
 	return *(int *)x == 2;
@@ -610,6 +655,7 @@ int main(void)
 	mrt_ctx_register_test_func(ctx, test_append, "test_append");
 	mrt_ctx_register_test_func(ctx, test_pop, "test_pop");
 	mrt_ctx_register_test_func(ctx, test_remove, "test_remove");
+	mrt_ctx_register_test_func(ctx, test_get_pos, "test_get_pos");
 	mrt_ctx_register_test_func(ctx, test_get_item_where,
 				   "test_get_item_where");
 	mrt_ctx_register_test_func(ctx, test_get_item, "test_get_item");
