@@ -10,7 +10,10 @@
 #undef free
 #endif
 
+#ifndef _WIN32
 #include "execinfo.h"
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -88,7 +91,7 @@ mr_internal void mrd_get_code_snippet(const char *file_name, int line,
 	return;
 }
 
-mr_internal void mrd_get_base_address(const char *path)
+mr_internal void unused mrd_get_base_address(const char *path)
 {
 	int pid = getpid();
 	char base_addr_string[BASE_ADDRESS_SIZE + 1];
@@ -118,6 +121,7 @@ mr_internal void mrd_get_base_address(const char *path)
 
 mr_internal void unused mrd_log_backtrace(void)
 {
+#ifndef _WIN32
 	void *buffer[MAX_BACKTRACE_LENGTH];
 	int nptrs = backtrace(buffer, MAX_BACKTRACE_LENGTH);
 
@@ -192,6 +196,7 @@ mr_internal void unused mrd_log_backtrace(void)
 	}
 
 	free(symbols);
+#endif
 }
 
 // returns 1 if true

@@ -139,7 +139,7 @@ Err mrs_pushstr(MrsString *dest, const char *append_me, uint n)
 		return ERR;
 	}
 
-	strlcpy(&dest->value[dest->len], append_me, n + 1);
+	snprintf(&dest->value[dest->len], n + 1, "%s", append_me);
 
 	dest->value = realloced;
 	dest->capacity = capacity;
