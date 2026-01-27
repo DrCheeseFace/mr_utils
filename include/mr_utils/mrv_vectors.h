@@ -21,7 +21,7 @@
  * \ mrv_append            - appends element
  * \ mrv_realloc_to_fit    - sets capacity to length and reallocates to fit
  * \ mrv_pop               - removes last element
- * \ mrv_remove            - removes array[index]'th element
+ * \ mrv_remove            - removes array[index]'th element. uses swap and pop method
  * \ mrv_get_idx           - get pointer from idx
  * \ mrv_get_pos           - get idx from pointer
  * \ mrv_get_last          - get pointer to last item

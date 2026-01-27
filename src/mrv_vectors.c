@@ -140,13 +140,10 @@ Err mrv_remove(MrvVector *vec, size_t idx)
 		return ERR;
 	}
 
-	size_t items_to_move = vec->len - 1 - idx;
+	void *last = mrv_get_last(vec);
 
-	if (items_to_move > 0) {
-		unsigned char *dest = (unsigned char *)item;
-		unsigned char *src = dest + vec->stride;
-
-		memmove(dest, src, items_to_move * vec->stride);
+	if (item != last) {
+		memcpy(item, last, vec->stride);
 	}
 
 	vec->len--;

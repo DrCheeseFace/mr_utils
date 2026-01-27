@@ -481,34 +481,31 @@ void test_remove(MrtGroup *t_ctx)
 	MRT_ASSERT(t_ctx, int_array->len == 5, "setup length correct");
 
 	Err res = mrv_remove(int_array, 2);
-
 	MRT_ASSERT(t_ctx, res == OK, "remove middle OK");
 	MRT_ASSERT(t_ctx, int_array->len == 4, "remove middle len update");
 
 	int *val = mrv_get_idx(int_array, 2);
-	MRT_ASSERT(t_ctx, *val == 3, "remove middle: index 2 should be 3");
-
-	val = mrv_get_idx(int_array, 3);
-	MRT_ASSERT(t_ctx, *val == 4, "remove middle: index 3 should be 4");
+	MRT_ASSERT(t_ctx, val && *val == 4,
+		   "unordered remove: last element moved to middle");
 
 	res = mrv_remove(int_array, 0);
-
 	MRT_ASSERT(t_ctx, res == OK, "remove head OK");
 	MRT_ASSERT(t_ctx, int_array->len == 3, "remove head len update");
 
 	val = mrv_get_idx(int_array, 0);
-	MRT_ASSERT(t_ctx, *val == 1, "remove head: index 0 should be 1");
+	MRT_ASSERT(t_ctx, val && *val == 3,
+		   "unordered remove: last element moved to head");
 
 	res = mrv_remove(int_array, 2);
-
 	MRT_ASSERT(t_ctx, res == OK, "remove tail OK");
 	MRT_ASSERT(t_ctx, int_array->len == 2, "remove tail len update");
 
-	val = mrv_get_idx(int_array, 1);
-	MRT_ASSERT(t_ctx, *val == 3, "remove tail: last value check");
-
 	val = mrv_get_idx(int_array, 2);
 	MRT_ASSERT(t_ctx, val == NULL, "remove tail: old index inaccessible");
+
+	val = mrv_get_idx(int_array, 0);
+	MRT_ASSERT(t_ctx, val && *val == 3,
+		   "integrity check: index 0 still holds 3");
 
 	res = mrv_remove(int_array, 100);
 	MRT_ASSERT(t_ctx, res == ERR, "remove invalid index returns ERR");
