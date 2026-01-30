@@ -79,10 +79,18 @@ Err mrv_append(MrvVector *vec, void *item, Scaling scaling_method)
 			new_capacity++;
 			break;
 		case APPEND_SCALING_ONE_POINT_FIVE:
-			new_capacity += (vec->capacity >> 1);
+			if (new_capacity == 0) {
+				new_capacity = 1;
+			} else {
+				new_capacity += (vec->capacity >> 1);
+			}
 			break;
 		case APPEND_SCALING_DOUBLE:
-			new_capacity <<= 1;
+			if (new_capacity == 0) {
+				new_capacity = 1;
+			} else {
+				new_capacity <<= 1;
+			}
 			break;
 		default:
 			break;
@@ -133,6 +141,7 @@ Err mrv_pop(MrvVector *vec)
 	return OK;
 }
 
+// TODO implement stable version
 Err mrv_remove(MrvVector *vec, size_t idx)
 {
 	void *item = mrv_get_idx(vec, idx);
