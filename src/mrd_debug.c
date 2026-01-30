@@ -116,6 +116,8 @@ mr_internal void unused mrd_get_base_address(const char *path)
 
 	base_address = base_addr_long;
 
+	pclose(fp);
+
 	return;
 }
 
@@ -457,7 +459,7 @@ void mrd_log_allocation(struct MrdAllocation *allocation)
 	mrl_logln(&logger, MRL_SEVERITY_DEFAULT, " bytes");
 }
 
-void mrd_log_dump_active_allocations_here(void)
+size_t mrd_log_dump_active_allocations_here(void)
 {
 	if (logger.out == NULL) {
 		mrd_init();
@@ -472,7 +474,7 @@ void mrd_log_dump_active_allocations_here(void)
 	for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {
 		if (active_allocations[i].active) {
 			total_active_allocations++;
-			total_active_bytes += sizeof(active_allocations[i]);
+			total_active_bytes += sizeof(active_allocations[i].ptr);
 			mrd_log_allocation(&active_allocations[i]);
 		}
 	}
@@ -484,6 +486,8 @@ void mrd_log_dump_active_allocations_here(void)
 
 	mrl_logln(&logger, MRL_SEVERITY_DEFAULT, "TOTAL ACTIVE BYTES: %zu\n",
 		  total_active_bytes);
+
+	return total_active_allocations;
 }
 
 void *mrd_inspect_allocation(size_t allocation_id)
