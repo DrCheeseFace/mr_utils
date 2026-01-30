@@ -76,4 +76,15 @@ typedef enum {
 #define NONNULL_ARGS(...)
 #endif
 
+#define ASSERT(cond)                                                           \
+	do {                                                                   \
+		if (!(cond)) {                                                 \
+			fprintf(stderr,                                        \
+				"ASSERT FAILED: %s\n"                          \
+				"\t%s:%d\n",                                   \
+				#cond, __FILE__, __LINE__);                    \
+			abort();                                               \
+		}                                                              \
+	} while (0)
+
 #endif // !MRM_MISC_H
