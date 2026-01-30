@@ -47,6 +47,17 @@ void mrs_free(MrsString *string)
 	string->capacity = CAFE_BABE;
 }
 
+Err mrs_copy(MrsString *dest, const MrsString *src)
+{
+	dest->value = malloc(src->capacity + 1);
+	if (!dest->value)
+		return ERR;
+	memcpy(dest->value, src->value, src->len + 1);
+	dest->len = src->len;
+	dest->capacity = src->capacity;
+	return OK;
+}
+
 void mrs_filter(MrsString *string, const char remove_me)
 {
 	char filtered[string->len];

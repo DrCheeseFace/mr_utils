@@ -14,6 +14,7 @@
  * \ mrs_create                      - allocates a MRS_String on the heap and initializes it
  * \ mrs_init                        - initialize MRS_String
  * \ mrs_free                        - free contents of MRS_String
+ * \ mrs_copy                        - returns deepcopy
  * \ mrs_setstr                      - set MRS_String to str
  * \ mrs_setstrn                     - set n characters of str to MRS_String
  * \ mrs_strcmp                      - memcmp on contents of MRS_String
@@ -48,6 +49,8 @@ MrsString *mrs_create(uint capacity);
 Err mrs_init(uint capacity, const char *value, uint value_len, MrsString *dest);
 
 void mrs_free(MrsString *string);
+
+Err mrs_copy(MrsString *dest, const MrsString *src);
 
 Err mrs_setstr(MrsString *string, const char *src, uint src_len);
 
