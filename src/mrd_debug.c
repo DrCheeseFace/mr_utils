@@ -459,7 +459,7 @@ void mrd_log_allocation(struct MrdAllocation *allocation)
 	mrl_logln(&logger, MRL_SEVERITY_DEFAULT, " bytes");
 }
 
-size_t mrd_log_dump_active_allocations_here(void)
+size_t mrd_log_dump_active_allocations(void)
 {
 	if (logger.out == NULL) {
 		mrd_init();

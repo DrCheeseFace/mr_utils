@@ -24,7 +24,7 @@
 #define _GNU_SOURCE
 
 // return number of active allocations
-size_t mrd_log_dump_active_allocations_here(void);
+size_t mrd_log_dump_active_allocations(void);
 
 void *mrd_inspect_allocation(size_t allocation_id);
 
