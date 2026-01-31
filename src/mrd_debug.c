@@ -203,17 +203,10 @@ mr_internal void unused mrd_log_backtrace(void)
 
 // returns 1 if true
 mr_internal int
-mrd_is_free_active_allocation_slot(struct MrdAllocation allocation)
+mrd_is_active_allocation_slot_free(struct MrdAllocation allocation)
 {
-	if (allocation.active == FALSE) {
-		if (allocation.reallocated_to == NULL) {
-			return 1;
-		}
-		if (allocation.reallocated_to->active == FALSE) {
-			return 1;
-		}
-	}
-	return 0;
+	return (allocation.active == FALSE &&
+		allocation.reallocated_to == NULL);
 }
 
 // populates first available slot
@@ -221,7 +214,7 @@ mr_internal void
 mrd_add_allocation_to_active_allocations(struct MrdAllocation new_allocation)
 {
 	for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {
-		if (mrd_is_free_active_allocation_slot(active_allocations[i])) {
+		if (mrd_is_active_allocation_slot_free(active_allocations[i])) {
 			active_allocations[i] = new_allocation;
 			current_allocation_id++;
 			return;
@@ -331,7 +324,8 @@ void *mrd_calloc(size_t nmemb, size_t size, unused const char *file_name,
 	}
 
 #ifndef MRD_DEBUG_ONLY_CALLED_AND_ERR
-	mrd_log_command(MRD_COMMAND_CALLOC, size, NULL, file_name, line);
+	mrd_log_command(MRD_COMMAND_CALLOC, size * nmemb, NULL, file_name,
+			line);
 #endif
 
 #ifdef MRD_DEBUG_BACKTRACE
@@ -367,7 +361,8 @@ void *mrd_realloc(void *ptr, size_t size, unused const char *file_name,
 
 	struct MrdAllocation *src_allocation = NULL;
 	for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {
-		if (ptr == active_allocations[i].ptr) {
+		if (ptr == active_allocations[i].ptr &&
+		    active_allocations[i].active) {
 			src_allocation = &active_allocations[i];
 			break;
 		}
@@ -384,8 +379,12 @@ void *mrd_realloc(void *ptr, size_t size, unused const char *file_name,
 
 	void *realloc_ptr = realloc(ptr, size);
 	if (realloc_ptr != NULL) {
-		src_allocation->active = FALSE;
-		src_allocation->reallocated_to = realloc_ptr;
+		if (src_allocation) {
+			src_allocation->active = FALSE;
+			if (realloc_ptr != ptr) {
+				src_allocation->reallocated_to = realloc_ptr;
+			}
+		}
 
 		mrd_add_allocation_to_active_allocations(
 			(struct MrdAllocation){ .ptr = realloc_ptr,
@@ -393,7 +392,6 @@ void *mrd_realloc(void *ptr, size_t size, unused const char *file_name,
 						.id = current_allocation_id,
 						.active = TRUE,
 						.reallocated_to = NULL });
-
 	} else {
 		mrd_log_err("FAILED TO REALLOCATE");
 	}
@@ -413,7 +411,8 @@ void mrd_free(void *ptr, unused const char *file_name, unused int line)
 
 	struct MrdAllocation *allocation = NULL;
 	for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {
-		if (ptr == active_allocations[i].ptr) {
+		if (ptr == active_allocations[i].ptr &&
+		    active_allocations[i].active) {
 			allocation = &active_allocations[i];
 			break;
 		}
@@ -437,11 +436,15 @@ void mrd_free(void *ptr, unused const char *file_name, unused int line)
 #endif
 
 	// if the pointer to free is ever realloced somewhere, we need to set this to NULL
-	for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {
-		if (allocation->ptr == active_allocations[i].reallocated_to) {
-			active_allocations[i].reallocated_to = NULL;
-			break;
+	if (allocation != NULL) {
+		for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {
+			if (allocation->ptr ==
+			    active_allocations[i].reallocated_to) {
+				active_allocations[i].reallocated_to = NULL;
+				break;
+			}
 		}
+		allocation->active = FALSE;
 	}
 
 	free(ptr);
@@ -474,7 +477,7 @@ size_t mrd_log_dump_active_allocations(void)
 	for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {
 		if (active_allocations[i].active) {
 			total_active_allocations++;
-			total_active_bytes += sizeof(active_allocations[i].ptr);
+			total_active_bytes += active_allocations[i].size;
 			mrd_log_allocation(&active_allocations[i]);
 		}
 	}
