@@ -41,8 +41,8 @@
  * \           MrlLogger *logger = mrl_create(stderr, TRUE, FALSE);
  * \           MrtCtx *ctx = mrt_ctx_create(logger);
  * \
- * \           mrt_ctx_register_test_func(ctx, test_strstr, "test_strstr");
- * \           mrt_ctx_register_test_func(ctx, test_filter, "test_filter");
+ * \           MRT_REGISTER_TEST_FUNC(ctx, test_strstr);
+ * \           MRT_REGISTER_TEST_FUNC(ctx, test_filter);
  * \
  * \           int group_err_count = mrt_ctx_run(ctx); // returns number of failed test groups
  * \
@@ -63,12 +63,17 @@ void mrt_ctx_destroy(MrtContext *ctx);
 
 int mrt_ctx_run(MrtContext *ctx);
 
+#define MRT_REGISTER_TEST_FUNC(t_ctx, test_func)                               \
+	mrt_ctx_register_test_func(t_ctx, test_func, #test_func)
 void mrt_ctx_register_test_func(MrtContext *ctx,
 				void (*test_func)(MrtGroup *t_group),
-				const char *description);
+				const char *test_func_name);
 
 #define MRT_ASSERT(t_ctx, predicate, desc)                                     \
-	mrt_group_append_case(t_ctx, desc, predicate)
-void mrt_group_append_case(MrtGroup *t_ctx, const char *description, Bool pass);
+	mrt_group_append_case(t_ctx, desc, predicate, #predicate, __FILE__,    \
+			      __LINE__)
+void mrt_group_append_case(MrtGroup *t_ctx, const char *description, Bool pass,
+			   const char *predicate, const char *file_name,
+			   int line_number);
 
 #endif // !MRT_TEST_H

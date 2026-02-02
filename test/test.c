@@ -633,29 +633,26 @@ int main(void)
 	MrtContext *ctx = mrt_ctx_create(logger);
 
 	// mrs_strings
-	mrt_ctx_register_test_func(ctx, test_strstr, "test_strstr");
-	mrt_ctx_register_test_func(ctx, test_filter, "test_filter");
-	mrt_ctx_register_test_func(ctx, test_strcat, "test_strcat");
-	mrt_ctx_register_test_func(ctx, test_pushstr, "test_pushstr");
-	mrt_ctx_register_test_func(ctx, test_get_char, "test_get_char");
-	mrt_ctx_register_test_func(ctx, test_setstr, "test_setstr");
-	mrt_ctx_register_test_func(ctx, test_setstrn, "test_setstrn");
-	mrt_ctx_register_test_func(ctx, test_get_idx, "test_get_idx");
-	mrt_ctx_register_test_func(ctx, test_strchr, "test_strchr");
-	mrt_ctx_register_test_func(ctx, test_strndup, "test_strndup");
-	mrt_ctx_register_test_func(ctx, test_shrink_to_fit,
-				   "test_shrink_to_fit");
-	mrt_ctx_register_test_func(ctx, test_trim_trailing_whitespace,
-				   "test_trim_trailing_whitespace");
+	MRT_REGISTER_TEST_FUNC(ctx, test_strstr);
+	MRT_REGISTER_TEST_FUNC(ctx, test_filter);
+	MRT_REGISTER_TEST_FUNC(ctx, test_strcat);
+	MRT_REGISTER_TEST_FUNC(ctx, test_pushstr);
+	MRT_REGISTER_TEST_FUNC(ctx, test_get_char);
+	MRT_REGISTER_TEST_FUNC(ctx, test_setstr);
+	MRT_REGISTER_TEST_FUNC(ctx, test_setstrn);
+	MRT_REGISTER_TEST_FUNC(ctx, test_get_idx);
+	MRT_REGISTER_TEST_FUNC(ctx, test_strchr);
+	MRT_REGISTER_TEST_FUNC(ctx, test_strndup);
+	MRT_REGISTER_TEST_FUNC(ctx, test_shrink_to_fit);
+	MRT_REGISTER_TEST_FUNC(ctx, test_trim_trailing_whitespace);
 
 	// mrv_vectors
-	mrt_ctx_register_test_func(ctx, test_append, "test_append");
-	mrt_ctx_register_test_func(ctx, test_pop, "test_pop");
-	mrt_ctx_register_test_func(ctx, test_remove, "test_remove");
-	mrt_ctx_register_test_func(ctx, test_get_pos, "test_get_pos");
-	mrt_ctx_register_test_func(ctx, test_get_item_where,
-				   "test_get_item_where");
-	mrt_ctx_register_test_func(ctx, test_get_item, "test_get_item");
+	MRT_REGISTER_TEST_FUNC(ctx, test_append);
+	MRT_REGISTER_TEST_FUNC(ctx, test_pop);
+	MRT_REGISTER_TEST_FUNC(ctx, test_remove);
+	MRT_REGISTER_TEST_FUNC(ctx, test_get_pos);
+	MRT_REGISTER_TEST_FUNC(ctx, test_get_item_where);
+	MRT_REGISTER_TEST_FUNC(ctx, test_get_item);
 
 	Err err = mrt_ctx_run(ctx);
 
