@@ -35,8 +35,8 @@ mr_internal void mrt_group_init(struct MrtGroup *t_group,
 {
 	memset(t_group, 0, sizeof(*t_group));
 
-	MrsString *s = mrs_create(strlen(description));
-	mrs_setstr(s, description, strlen(description));
+	MrsString s;
+	mrs_init(strlen(description), description, strlen(description), &s);
 	t_group->name = s;
 	t_group->func = func;
 
@@ -85,7 +85,7 @@ mr_internal void mrt_group_log_failure(MrlLogger *logger,
 				       struct MrtGroup *group)
 {
 	mrl_logln(logger, MRL_SEVERITY_DEFAULT, "\n---- %s ----",
-		  group->name->value);
+		  group->name.value);
 
 	for (size_t j = 0; j < group->cases.len; j++) {
 		MrtCase *c = mrv_get_idx(&group->cases, j);
@@ -99,7 +99,7 @@ mr_internal void mrt_group_log_failure(MrlLogger *logger,
 				  c->description.value);
 			mrl_log(logger, MRL_SEVERITY_DEFAULT, MRT_TAB);
 			mrl_logln(logger, MRL_SEVERITY_DEFAULT,
-				  "assertion: %s failed\n", c->predicate);
+				  "assertion: %s\n", c->predicate);
 		}
 	}
 }
@@ -150,8 +150,7 @@ mr_internal void mrt_group_destroy(struct MrtGroup *t_group)
 
 	mrv_free(&t_group->cases);
 
-	mrs_free(t_group->name);
-	free(t_group->name);
+	mrs_free(&t_group->name);
 
 	free(t_group);
 }
@@ -188,7 +187,7 @@ mr_internal Err mrt_group_log(struct MrtGroup *t_group,
 	mrl_logln(logger, MRL_SEVERITY_DEFAULT, "");
 
 	mrl_log(logger, MRL_SEVERITY_DEFAULT, "test group: ");
-	mrl_logln(logger, MRL_SEVERITY_INFO, t_group->name->value);
+	mrl_logln(logger, MRL_SEVERITY_INFO, t_group->name.value);
 
 	for (size_t i = 0; i < t_group->cases.len; i++) {
 		mrl_log(logger, MRL_SEVERITY_DEFAULT, MRT_TAB);

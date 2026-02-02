@@ -15,7 +15,7 @@ struct MrlLogger {
 };
 
 struct MrtGroup {
-	MrsString *name;
+	MrsString name;
 	MrvVector cases;
 	size_t pass_count;
 	MrtTestFunc func;
