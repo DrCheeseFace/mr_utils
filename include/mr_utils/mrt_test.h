@@ -63,7 +63,7 @@ typedef void MrtGroup;
 MrtContext *mrt_ctx_create(MrlLogger *logger);
 void mrt_ctx_destroy(MrtContext *ctx);
 
-int mrt_ctx_run(MrtContext *ctx);
+int mrt_ctx_run(MrtContext *ctx, Bool run_tests_parrallelized);
 
 #define MRT_TEST_GROUP(name) void name(MrtGroup *t_ctx)
 

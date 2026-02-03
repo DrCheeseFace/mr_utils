@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <threads.h>
 
 #define MRT_INIT_TEST_CASES_PER_GROUP 64
 #define MRT_INIT_TEST_GROUPS_PER_CONTEXT 64
@@ -28,6 +29,8 @@ mr_internal void mrt_group_log_failure(MrlLogger *logger,
 				       struct MrtGroup *group);
 
 mr_internal void mrt_case_log(struct MrlLogger *mrl_ctx, MrtCase test_case);
+
+mr_global mtx_t *logging_mutex = NULL;
 
 struct MrtContext *mrt_ctx_create(MrlLogger *logger)
 {
@@ -65,7 +68,60 @@ void mrt_ctx_register_test_func(struct MrtContext *ctx, MrtTestFunc t_func,
 	return;
 }
 
-int mrt_ctx_run(struct MrtContext *ctx)
+struct runMrtGroupThreadWrapperParams {
+	int t_group_idx;
+	struct MrtContext *ctx;
+};
+
+mr_internal int run_MrtGroup_thread_wrapper(void *param)
+{
+	struct runMrtGroupThreadWrapperParams *p = param;
+	struct MrtGroup *group =
+		mrv_get_idx(&p->ctx->test_groups, p->t_group_idx);
+
+	(*group->func)(group);
+
+	mtx_lock(logging_mutex);
+	Err err = mrt_group_log(group, p->ctx->logger);
+
+	mtx_unlock(logging_mutex);
+
+	return err;
+}
+
+mr_internal int mrt_ctx_run_parrallelized(struct MrtContext *ctx)
+{
+	size_t err_count = 0;
+
+	logging_mutex = malloc(sizeof(*logging_mutex));
+	mtx_init(logging_mutex, mtx_plain);
+
+	struct runMrtGroupThreadWrapperParams *params =
+		calloc(ctx->test_groups.len, sizeof(*params));
+	thrd_t *threads = calloc(ctx->test_groups.len, sizeof(thrd_t));
+	for (uint i = 0; i < ctx->test_groups.len; i++) {
+		params[i].t_group_idx = i;
+		params[i].ctx = ctx;
+
+		thrd_create(&threads[i], run_MrtGroup_thread_wrapper,
+			    &params[i]);
+	}
+
+	for (uint i = 0; i < ctx->test_groups.len; i++) {
+		int err;
+		thrd_join(threads[i], &err);
+		err_count += err;
+	}
+
+	free(threads);
+	free(params);
+	mtx_destroy(logging_mutex);
+	free(logging_mutex);
+
+	return err_count;
+}
+
+mr_internal int mrt_ctx_run_single_threaded(struct MrtContext *ctx)
 {
 	size_t err_count = 0;
 
@@ -75,6 +131,19 @@ int mrt_ctx_run(struct MrtContext *ctx)
 		(*t_group->func)(t_group);
 
 		err_count += mrt_group_log(t_group, ctx->logger);
+	}
+
+	return err_count;
+}
+
+int mrt_ctx_run(struct MrtContext *ctx, Bool run_tests_parrallelized)
+{
+	size_t err_count = 0;
+
+	if (run_tests_parrallelized) {
+		err_count = mrt_ctx_run_parrallelized(ctx);
+	} else {
+		err_count = mrt_ctx_run_single_threaded(ctx);
 	}
 
 	if (err_count) {

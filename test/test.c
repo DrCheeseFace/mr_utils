@@ -642,10 +642,18 @@ int main(void)
 	MRT_REGISTER_TEST_GROUP(ctx, test_get_item_where);
 	MRT_REGISTER_TEST_GROUP(ctx, test_get_item);
 
-	Err err = mrt_ctx_run(ctx);
+#ifdef DEBUG
+	Err err = mrt_ctx_run(ctx, FALSE);
+#else
+	Err err = mrt_ctx_run(ctx, TRUE);
+#endif
 
 	mrt_ctx_destroy(ctx);
 	mrl_destroy(logger);
+
+#ifdef DEBUG
+	ASSERT(mrd_log_dump_active_allocations() == 0);
+#endif
 
 	return err;
 }
