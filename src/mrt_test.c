@@ -4,7 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MRT_INIT_TEST_CASES_PER_CONTEXT 64
+#define MRT_INIT_TEST_CASES_PER_GROUP 64
+#define MRT_INIT_TEST_GROUPS_PER_CONTEXT 64
 #define MRT_TAB "    "
 
 typedef struct {
@@ -40,7 +41,7 @@ mr_internal void mrt_group_init(struct MrtGroup *t_group,
 	t_group->name = s;
 	t_group->func = func;
 
-	mrv_init(&t_group->cases, MRT_INIT_TEST_CASES_PER_CONTEXT,
+	mrv_init(&t_group->cases, MRT_INIT_TEST_CASES_PER_GROUP,
 		 sizeof(MrtCase));
 }
 
@@ -49,7 +50,8 @@ struct MrtContext *mrt_ctx_create(MrlLogger *logger)
 	struct MrtContext *t_ctx = malloc(sizeof(*t_ctx));
 	memset(t_ctx, 0, sizeof(*t_ctx));
 
-	mrv_init(&t_ctx->test_groups, 64, sizeof(struct MrtGroup *));
+	mrv_init(&t_ctx->test_groups, MRT_INIT_TEST_GROUPS_PER_CONTEXT,
+		 sizeof(struct MrtGroup));
 
 	t_ctx->logger = logger;
 
@@ -59,8 +61,7 @@ struct MrtContext *mrt_ctx_create(MrlLogger *logger)
 void mrt_ctx_destroy(struct MrtContext *ctx)
 {
 	for (uint i = 0; i < ctx->test_groups.len; i++) {
-		struct MrtGroup *t_group =
-			*(struct MrtGroup **)mrv_get_idx(&ctx->test_groups, i);
+		struct MrtGroup *t_group = mrv_get_idx(&ctx->test_groups, i);
 		mrt_group_destroy(t_group);
 	}
 
@@ -72,9 +73,8 @@ void mrt_ctx_destroy(struct MrtContext *ctx)
 void mrt_ctx_register_test_func(struct MrtContext *ctx, MrtTestFunc t_func,
 				const char *t_func_name)
 {
-	struct MrtGroup *t_group = malloc(sizeof(struct MrtGroup));
-
-	mrt_group_init(t_group, t_func_name, t_func);
+	struct MrtGroup t_group;
+	mrt_group_init(&t_group, t_func_name, t_func);
 
 	mrv_append(&ctx->test_groups, &t_group, APPEND_SCALING_ONE_POINT_FIVE);
 
@@ -109,8 +109,7 @@ int mrt_ctx_run(struct MrtContext *ctx)
 	size_t err_count = 0;
 
 	for (uint i = 0; i < ctx->test_groups.len; i++) {
-		struct MrtGroup *t_group =
-			*(struct MrtGroup **)mrv_get_idx(&ctx->test_groups, i);
+		struct MrtGroup *t_group = mrv_get_idx(&ctx->test_groups, i);
 
 		(*t_group->func)(t_group);
 
@@ -121,8 +120,7 @@ int mrt_ctx_run(struct MrtContext *ctx)
 		mrl_logln(ctx->logger, MRL_SEVERITY_DEFAULT, "\nfailures:");
 		for (size_t i = 0; i < ctx->test_groups.len; i++) {
 			struct MrtGroup *group =
-				*(struct MrtGroup **)mrv_get_idx(
-					&ctx->test_groups, i);
+				mrv_get_idx(&ctx->test_groups, i);
 
 			if (group->pass_count != group->cases.len) {
 				mrt_group_log_failure(ctx->logger, group);
@@ -149,10 +147,7 @@ mr_internal void mrt_group_destroy(struct MrtGroup *t_group)
 	}
 
 	mrv_free(&t_group->cases);
-
 	mrs_free(&t_group->name);
-
-	free(t_group);
 }
 
 void mrt_group_append_case(struct MrtGroup *t_group, const char *description,
