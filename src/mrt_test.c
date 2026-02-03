@@ -16,34 +16,18 @@ typedef struct {
 	int line_number;
 } MrtCase;
 
-mr_internal Err mrt_group_log(struct MrtGroup *t_group,
-			      struct MrlLogger *logger);
+mr_internal void mrt_group_init(struct MrtGroup *t_group,
+				const char *description, MrtTestFunc func);
+
 mr_internal void mrt_group_destroy(struct MrtGroup *t_group);
 
-mr_internal void mrt_case_log(struct MrlLogger *mrl_ctx, MrtCase test_case)
-{
-	mrl_log(mrl_ctx, MRL_SEVERITY_DEFAULT, test_case.description.value);
-	if (test_case.pass) {
-		mrl_logln(mrl_ctx, MRL_SEVERITY_OK, " ... ok");
-	} else {
-		mrl_logln(mrl_ctx, MRL_SEVERITY_ERROR, " ... FAILED");
-	}
-	mrl_reset_severity(mrl_ctx);
-}
+mr_internal Err mrt_group_log(struct MrtGroup *t_group,
+			      struct MrlLogger *logger);
 
-mr_internal void mrt_group_init(struct MrtGroup *t_group,
-				const char *description, MrtTestFunc func)
-{
-	memset(t_group, 0, sizeof(*t_group));
+mr_internal void mrt_group_log_failure(MrlLogger *logger,
+				       struct MrtGroup *group);
 
-	MrsString s;
-	mrs_init(strlen(description), description, strlen(description), &s);
-	t_group->name = s;
-	t_group->func = func;
-
-	mrv_init(&t_group->cases, MRT_INIT_TEST_CASES_PER_GROUP,
-		 sizeof(MrtCase));
-}
+mr_internal void mrt_case_log(struct MrlLogger *mrl_ctx, MrtCase test_case);
 
 struct MrtContext *mrt_ctx_create(MrlLogger *logger)
 {
@@ -81,29 +65,6 @@ void mrt_ctx_register_test_func(struct MrtContext *ctx, MrtTestFunc t_func,
 	return;
 }
 
-mr_internal void mrt_group_log_failure(MrlLogger *logger,
-				       struct MrtGroup *group)
-{
-	mrl_logln(logger, MRL_SEVERITY_DEFAULT, "\n---- %s ----",
-		  group->name.value);
-
-	for (size_t j = 0; j < group->cases.len; j++) {
-		MrtCase *c = mrv_get_idx(&group->cases, j);
-
-		if (!c->pass) {
-			mrl_log(logger, MRL_SEVERITY_DEFAULT, MRT_TAB);
-			mrl_logln(logger, MRL_SEVERITY_DEFAULT, "in: %s:%d",
-				  c->file_name.value, c->line_number);
-			mrl_log(logger, MRL_SEVERITY_DEFAULT, MRT_TAB);
-			mrl_logln(logger, MRL_SEVERITY_DEFAULT, "desc: %s",
-				  c->description.value);
-			mrl_log(logger, MRL_SEVERITY_DEFAULT, MRT_TAB);
-			mrl_logln(logger, MRL_SEVERITY_DEFAULT,
-				  "assertion: %s\n", c->predicate);
-		}
-	}
-}
-
 int mrt_ctx_run(struct MrtContext *ctx)
 {
 	size_t err_count = 0;
@@ -135,6 +96,20 @@ int mrt_ctx_run(struct MrtContext *ctx)
 		  ctx->test_groups.len - err_count, err_count);
 
 	return err_count;
+}
+
+mr_internal void mrt_group_init(struct MrtGroup *t_group,
+				const char *description, MrtTestFunc func)
+{
+	memset(t_group, 0, sizeof(*t_group));
+
+	MrsString s;
+	mrs_init(strlen(description), description, strlen(description), &s);
+	t_group->name = s;
+	t_group->func = func;
+
+	mrv_init(&t_group->cases, MRT_INIT_TEST_CASES_PER_GROUP,
+		 sizeof(MrtCase));
 }
 
 mr_internal void mrt_group_destroy(struct MrtGroup *t_group)
@@ -205,4 +180,38 @@ mr_internal Err mrt_group_log(struct MrtGroup *t_group,
 		mrl_logln(logger, MRL_SEVERITY_OK, "PASSED");
 		return OK;
 	}
+}
+
+mr_internal void mrt_group_log_failure(MrlLogger *logger,
+				       struct MrtGroup *group)
+{
+	mrl_logln(logger, MRL_SEVERITY_DEFAULT, "\n---- %s ----",
+		  group->name.value);
+
+	for (size_t j = 0; j < group->cases.len; j++) {
+		MrtCase *c = mrv_get_idx(&group->cases, j);
+
+		if (!c->pass) {
+			mrl_log(logger, MRL_SEVERITY_DEFAULT, MRT_TAB);
+			mrl_logln(logger, MRL_SEVERITY_DEFAULT, "in: %s:%d",
+				  c->file_name.value, c->line_number);
+			mrl_log(logger, MRL_SEVERITY_DEFAULT, MRT_TAB);
+			mrl_logln(logger, MRL_SEVERITY_DEFAULT, "desc: %s",
+				  c->description.value);
+			mrl_log(logger, MRL_SEVERITY_DEFAULT, MRT_TAB);
+			mrl_logln(logger, MRL_SEVERITY_DEFAULT,
+				  "assertion: %s\n", c->predicate);
+		}
+	}
+}
+
+mr_internal void mrt_case_log(struct MrlLogger *mrl_ctx, MrtCase test_case)
+{
+	mrl_log(mrl_ctx, MRL_SEVERITY_DEFAULT, test_case.description.value);
+	if (test_case.pass) {
+		mrl_logln(mrl_ctx, MRL_SEVERITY_OK, " ... ok");
+	} else {
+		mrl_logln(mrl_ctx, MRL_SEVERITY_ERROR, " ... FAILED");
+	}
+	mrl_reset_severity(mrl_ctx);
 }
