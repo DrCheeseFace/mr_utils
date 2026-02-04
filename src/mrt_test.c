@@ -1,9 +1,11 @@
 #include "internals.h"
 #include <mr_utils.h>
 
+#include <stdatomic.h>
 #include <stdlib.h>
 #include <string.h>
 #include <threads.h>
+#include <unistd.h>
 
 #define MRT_INIT_TEST_CASES_PER_GROUP 64
 #define MRT_INIT_TEST_GROUPS_PER_CONTEXT 64
@@ -68,53 +70,79 @@ void mrt_ctx_register_test_func(struct MrtContext *ctx, MrtTestFunc t_func,
 	return;
 }
 
-struct runMrtGroupThreadWrapperParams {
-	int t_group_idx;
+struct WorkerParams {
 	struct MrtContext *ctx;
+	atomic_size_t *next_group_idx;
+	size_t total_groups;
 };
 
-mr_internal int run_MrtGroup_thread_wrapper(void *param)
+mr_internal int run_testgroup_with_locking_logging(struct MrtContext *ctx,
+						   int t_group_idx)
 {
-	struct runMrtGroupThreadWrapperParams *p = param;
-	struct MrtGroup *group =
-		mrv_get_idx(&p->ctx->test_groups, p->t_group_idx);
+	struct MrtGroup *group = mrv_get_idx(&ctx->test_groups, t_group_idx);
 
 	(*group->func)(group);
 
 	mtx_lock(logging_mutex);
-	Err err = mrt_group_log(group, p->ctx->logger);
-
+	Err err = mrt_group_log(group, ctx->logger);
 	mtx_unlock(logging_mutex);
 
 	return err;
 }
 
+mr_internal int worker_thread_func(void *worker_contex)
+{
+	struct WorkerParams *w_ctx = worker_contex;
+	int total_worker_err = 0;
+
+	for (;;) {
+		size_t group_idx_to_run =
+			atomic_fetch_add(w_ctx->next_group_idx, 1);
+
+		if (group_idx_to_run >= w_ctx->total_groups)
+			break;
+
+		total_worker_err += run_testgroup_with_locking_logging(
+			w_ctx->ctx, group_idx_to_run);
+	}
+
+	return total_worker_err;
+}
+
 mr_internal int mrt_ctx_run_parrallelized(struct MrtContext *ctx)
 {
-	size_t err_count = 0;
+	int core_count = sysconf(_SC_NPROCESSORS_ONLN);
+	if (core_count < 1) {
+		core_count = 1;
+	}
+
+	size_t thread_count = core_count;
+	if (thread_count > ctx->test_groups.len) {
+		thread_count = ctx->test_groups.len;
+	}
+
+	atomic_size_t next_group_idx = ATOMIC_VAR_INIT(0);
+	struct WorkerParams w_ctx;
+	w_ctx.ctx = ctx;
+	w_ctx.next_group_idx = &next_group_idx;
+	w_ctx.total_groups = ctx->test_groups.len;
 
 	logging_mutex = malloc(sizeof(*logging_mutex));
 	mtx_init(logging_mutex, mtx_plain);
+	thrd_t *threads = calloc(thread_count, sizeof(thrd_t));
 
-	struct runMrtGroupThreadWrapperParams *params =
-		calloc(ctx->test_groups.len, sizeof(*params));
-	thrd_t *threads = calloc(ctx->test_groups.len, sizeof(thrd_t));
-	for (uint i = 0; i < ctx->test_groups.len; i++) {
-		params[i].t_group_idx = i;
-		params[i].ctx = ctx;
-
-		thrd_create(&threads[i], run_MrtGroup_thread_wrapper,
-			    &params[i]);
+	for (uint i = 0; i < thread_count; i++) {
+		thrd_create(&threads[i], worker_thread_func, &w_ctx);
 	}
 
-	for (uint i = 0; i < ctx->test_groups.len; i++) {
+	size_t err_count = 0;
+	for (uint i = 0; i < thread_count; i++) {
 		int err;
 		thrd_join(threads[i], &err);
 		err_count += err;
 	}
 
 	free(threads);
-	free(params);
 	mtx_destroy(logging_mutex);
 	free(logging_mutex);
 
