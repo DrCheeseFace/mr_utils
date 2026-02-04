@@ -32,8 +32,6 @@ mr_internal void mrt_group_log_failure(MrlLogger *logger,
 
 mr_internal void mrt_case_log(struct MrlLogger *mrl_ctx, MrtCase test_case);
 
-mr_global mtx_t *logging_mutex = NULL;
-
 struct MrtContext *mrt_ctx_create(MrlLogger *logger)
 {
 	struct MrtContext *t_ctx = malloc(sizeof(*t_ctx));
@@ -70,12 +68,7 @@ void mrt_ctx_register_test_func(struct MrtContext *ctx, MrtTestFunc t_func,
 	return;
 }
 
-struct WorkerParams {
-	struct MrtContext *ctx;
-	atomic_size_t *next_group_idx;
-	size_t total_groups;
-};
-
+mr_global mtx_t *logging_mutex = NULL;
 mr_internal int run_testgroup_with_locking_logging(struct MrtContext *ctx,
 						   int t_group_idx)
 {
@@ -89,6 +82,12 @@ mr_internal int run_testgroup_with_locking_logging(struct MrtContext *ctx,
 
 	return err;
 }
+
+struct WorkerParams {
+	struct MrtContext *ctx;
+	atomic_size_t *next_group_idx;
+	size_t total_groups;
+};
 
 mr_internal int worker_thread_func(void *worker_contex)
 {
