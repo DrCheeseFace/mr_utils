@@ -1,7 +1,6 @@
 #include "internals.h"
 #include <mr_utils.h>
 
-#include <stdatomic.h>
 #include <stdlib.h>
 #include <string.h>
 #include <threads.h>
@@ -83,12 +82,20 @@ mr_internal int run_testgroup_with_locking_logging(struct MrtContext *ctx,
 	return err;
 }
 
+mr_global mtx_t *atomic_add_group_idx_mutex = NULL;
+mr_internal size_t atomic_fetch_add_group_idx(size_t *x, size_t increment)
+{
+	mtx_lock(atomic_add_group_idx_mutex);
+	*x += increment;
+	mtx_unlock(atomic_add_group_idx_mutex);
+	return *x - increment;
+}
+
 struct WorkerParams {
 	struct MrtContext *ctx;
-	atomic_size_t *next_group_idx;
+	size_t *next_group_idx; // is atomic. BEWARE
 	size_t total_groups;
 };
-
 mr_internal int worker_thread_func(void *worker_contex)
 {
 	struct WorkerParams *w_ctx = worker_contex;
@@ -96,7 +103,7 @@ mr_internal int worker_thread_func(void *worker_contex)
 
 	for (;;) {
 		size_t group_idx_to_run =
-			atomic_fetch_add(w_ctx->next_group_idx, 1);
+			atomic_fetch_add_group_idx(w_ctx->next_group_idx, 1);
 
 		if (group_idx_to_run >= w_ctx->total_groups)
 			break;
@@ -120,7 +127,7 @@ mr_internal int mrt_ctx_run_parrallelized(struct MrtContext *ctx)
 		thread_count = ctx->test_groups.len;
 	}
 
-	atomic_size_t next_group_idx = ATOMIC_VAR_INIT(0);
+	size_t next_group_idx = 0;
 	struct WorkerParams w_ctx;
 	w_ctx.ctx = ctx;
 	w_ctx.next_group_idx = &next_group_idx;
@@ -128,6 +135,11 @@ mr_internal int mrt_ctx_run_parrallelized(struct MrtContext *ctx)
 
 	logging_mutex = malloc(sizeof(*logging_mutex));
 	mtx_init(logging_mutex, mtx_plain);
+
+	atomic_add_group_idx_mutex =
+		malloc(sizeof(*atomic_add_group_idx_mutex));
+	mtx_init(atomic_add_group_idx_mutex, mtx_plain);
+
 	thrd_t *threads = calloc(thread_count, sizeof(thrd_t));
 
 	for (uint i = 0; i < thread_count; i++) {
@@ -142,6 +154,10 @@ mr_internal int mrt_ctx_run_parrallelized(struct MrtContext *ctx)
 	}
 
 	free(threads);
+
+	mtx_destroy(atomic_add_group_idx_mutex);
+	free(atomic_add_group_idx_mutex);
+
 	mtx_destroy(logging_mutex);
 	free(logging_mutex);
 
