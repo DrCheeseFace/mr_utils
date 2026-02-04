@@ -43,7 +43,7 @@ OBJ_TOOLS      = $(SRC_TOOLS:%.c=$(OBJ_DIR)/%.o)
 ALL_TEST_OBJS  = $(OBJ_COMMON) $(OBJ_TEST)
 ALL_SPACERS_OBJS = $(OBJ_COMMON) $(OBJ_TOOLS)
 
-.PHONY: all test run clean format format-check bear debug build-debug
+.PHONY: all test run clean format format-check bear debug build-debug spacers
 
 all: $(TARGET_TEST)
 
@@ -73,6 +73,8 @@ clean:
 
 bear: clean
 	bear -- make build-debug
+
+spacers: $(TARGET_SPACERS)
 
 format: $(TARGET_SPACERS)
 	find . -name "*.c" -o -name "*.h" | xargs clang-format -i --verbose
