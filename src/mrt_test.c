@@ -82,19 +82,18 @@ mr_internal int run_testgroup_with_locking_logging(struct MrtContext *ctx,
 	return err;
 }
 
-mr_global mtx_t *atomic_add_group_idx_mutex = NULL;
+mr_global mtx_t *atomic_group_idx_mutex = NULL;
 mr_internal size_t atomic_fetch_add_group_idx(size_t *x, size_t increment)
 {
-	mtx_lock(atomic_add_group_idx_mutex);
+	mtx_lock(atomic_group_idx_mutex);
 	*x += increment;
-	mtx_unlock(atomic_add_group_idx_mutex);
+	mtx_unlock(atomic_group_idx_mutex);
 	return *x - increment;
 }
 
 struct WorkerParams {
 	struct MrtContext *ctx;
 	size_t *next_group_idx; // is atomic. BEWARE
-	size_t total_groups;
 };
 mr_internal int worker_thread_func(void *worker_contex)
 {
@@ -105,7 +104,7 @@ mr_internal int worker_thread_func(void *worker_contex)
 		size_t group_idx_to_run =
 			atomic_fetch_add_group_idx(w_ctx->next_group_idx, 1);
 
-		if (group_idx_to_run >= w_ctx->total_groups)
+		if (group_idx_to_run >= w_ctx->ctx->test_groups.len)
 			break;
 
 		total_worker_err += run_testgroup_with_locking_logging(
@@ -131,14 +130,12 @@ mr_internal int mrt_ctx_run_parrallelized(struct MrtContext *ctx)
 	struct WorkerParams w_ctx;
 	w_ctx.ctx = ctx;
 	w_ctx.next_group_idx = &next_group_idx;
-	w_ctx.total_groups = ctx->test_groups.len;
 
 	logging_mutex = malloc(sizeof(*logging_mutex));
 	mtx_init(logging_mutex, mtx_plain);
 
-	atomic_add_group_idx_mutex =
-		malloc(sizeof(*atomic_add_group_idx_mutex));
-	mtx_init(atomic_add_group_idx_mutex, mtx_plain);
+	atomic_group_idx_mutex = malloc(sizeof(*atomic_group_idx_mutex));
+	mtx_init(atomic_group_idx_mutex, mtx_plain);
 
 	thrd_t *threads = calloc(thread_count, sizeof(thrd_t));
 
@@ -155,8 +152,8 @@ mr_internal int mrt_ctx_run_parrallelized(struct MrtContext *ctx)
 
 	free(threads);
 
-	mtx_destroy(atomic_add_group_idx_mutex);
-	free(atomic_add_group_idx_mutex);
+	mtx_destroy(atomic_group_idx_mutex);
+	free(atomic_group_idx_mutex);
 
 	mtx_destroy(logging_mutex);
 	free(logging_mutex);
