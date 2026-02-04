@@ -105,6 +105,7 @@ format-check: $(TARGET_SPACERS)
 - [x] whitespace remover
 - [x] debug maintain only active allocations. eg: freed and not realloced to something not freed
 - [x] add left rigth comparison for failed tests
+- [ ] mrd_debug mutexify so that i can programs with multithreading
 - [ ] add ability to define locked regions for logger library
 - [ ] malloc calloc realloc free wrappers for debugging memory leaks eg: this PTR (id) with this DATA that was allocated HERE, was not freed
 - [ ] optimize mrd_debug. map offsets to log messages so i dont have to calculate multiple times
