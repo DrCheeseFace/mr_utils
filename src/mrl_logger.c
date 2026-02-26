@@ -44,10 +44,6 @@ MrlLogger *mrl_create(FILE *out, Bool color, Bool log_header)
 
 void mrl_destroy(MrlLogger *ctx)
 {
-	struct MrlLogger *mrl_ctx = (struct MrlLogger *)ctx;
-	if (mrl_ctx->out != NULL) {
-		fclose(((struct MrlLogger *)ctx)->out);
-	}
 	free(ctx);
 }
 
