@@ -4,7 +4,7 @@
 #include <mr_utils.h>
 #include <mr_utils/mrt_test.h>
 
-MRT_TEST_GROUP(test_strstr)
+MRT_TEST_GROUP(test_string_strstr)
 {
 	const char *haystack = "11151111111111111231";
 	const char *needle = "31";
@@ -45,7 +45,7 @@ MRT_TEST_GROUP(test_strstr)
 	return;
 }
 
-MRT_TEST_GROUP(test_filter)
+MRT_TEST_GROUP(test_string_filter)
 {
 	MrsString actual;
 	mrs_init(20, "12121", strlen("12121"), &actual);
@@ -71,7 +71,7 @@ MRT_TEST_GROUP(test_filter)
 	mrs_free(&expected);
 }
 
-MRT_TEST_GROUP(test_strcat)
+MRT_TEST_GROUP(test_string_strcat)
 {
 	MrsString actual;
 	mrs_init(10, "aaabbb", strlen("aaabbb"), &actual);
@@ -133,7 +133,7 @@ MRT_TEST_GROUP(test_strcat)
 	mrs_free(&append);
 }
 
-MRT_TEST_GROUP(test_pushstr)
+MRT_TEST_GROUP(test_string_pushstr)
 {
 	MrsString actual;
 	mrs_init(10, "aaabbb", strlen("aaabbb"), &actual);
@@ -161,7 +161,7 @@ MRT_TEST_GROUP(test_pushstr)
 	mrs_free(&expected);
 }
 
-MRT_TEST_GROUP(test_get_char)
+MRT_TEST_GROUP(test_string_get_char)
 {
 	MrsString src;
 	mrs_init(10, "0123456789", strlen("0123456789"), &src);
@@ -189,7 +189,7 @@ MRT_TEST_GROUP(test_get_char)
 	mrs_free(&src);
 }
 
-MRT_TEST_GROUP(test_setstr)
+MRT_TEST_GROUP(test_string_setstr)
 {
 	const char *from = "from";
 	const char *to = "to";
@@ -212,7 +212,7 @@ MRT_TEST_GROUP(test_setstr)
 	mrs_free(&expected);
 }
 
-MRT_TEST_GROUP(test_setstrn)
+MRT_TEST_GROUP(test_string_setstrn)
 {
 	const char *from = "from";
 	const char *to = "to";
@@ -236,7 +236,7 @@ MRT_TEST_GROUP(test_setstrn)
 	mrs_free(&expected);
 }
 
-MRT_TEST_GROUP(test_get_idx)
+MRT_TEST_GROUP(test_string_get_idx)
 {
 	const char *from = "from";
 	const char *random = "random";
@@ -262,7 +262,7 @@ MRT_TEST_GROUP(test_get_idx)
 	mrs_free(&random_example);
 }
 
-MRT_TEST_GROUP(test_strchr)
+MRT_TEST_GROUP(test_string_strchr)
 {
 	const char *xample_str = "xample_str";
 	MrsString xample;
@@ -283,7 +283,7 @@ MRT_TEST_GROUP(test_strchr)
 	mrs_free(&xample);
 }
 
-MRT_TEST_GROUP(test_strndup)
+MRT_TEST_GROUP(test_string_strndup)
 {
 	const char *xample_str = "xample_str";
 	MrsString xample;
@@ -315,7 +315,7 @@ MRT_TEST_GROUP(test_strndup)
 	mrs_free(&xample);
 }
 
-MRT_TEST_GROUP(test_shrink_to_fit)
+MRT_TEST_GROUP(test_string_shrink_to_fit)
 {
 	const char *example_str = "example_str";
 	MrsString example;
@@ -331,7 +331,7 @@ MRT_TEST_GROUP(test_shrink_to_fit)
 	mrs_free(&example);
 }
 
-MRT_TEST_GROUP(test_trim_trailing_whitespace)
+MRT_TEST_GROUP(test_string_trim_trailing_whitespace)
 {
 	MrsString test;
 	mrs_init(20, "1234567890", strlen("1234567890"), &test);
@@ -371,7 +371,7 @@ MRT_TEST_GROUP(test_trim_trailing_whitespace)
 	mrs_free(&test);
 }
 
-MRT_TEST_GROUP(test_append)
+MRT_TEST_GROUP(test_vector_append)
 {
 	MrvVector *int_array = mrv_create(10, sizeof(int));
 	int append_val = CAFE_BABE;
@@ -434,7 +434,7 @@ MRT_TEST_GROUP(test_append)
 	mrv_destroy(int_array);
 }
 
-MRT_TEST_GROUP(test_pop)
+MRT_TEST_GROUP(test_vector_pop)
 {
 	MrvVector *int_array = mrv_create(10, sizeof(int));
 	int append_val = CAFE_BABE;
@@ -461,7 +461,7 @@ MRT_TEST_GROUP(test_pop)
 	mrv_destroy(int_array);
 }
 
-MRT_TEST_GROUP(test_remove)
+MRT_TEST_GROUP(test_vector_remove)
 {
 	MrvVector *int_array = mrv_create(10, sizeof(int));
 
@@ -513,7 +513,7 @@ MRT_TEST_GROUP(test_remove)
 	mrv_destroy(int_array);
 }
 
-MRT_TEST_GROUP(test_get_pos)
+MRT_TEST_GROUP(test_vector_get_pos)
 {
 	MrvVector *int_array = mrv_create(10, sizeof(int));
 
@@ -568,7 +568,7 @@ Bool always_false(void *_)
 	return FALSE;
 }
 
-MRT_TEST_GROUP(test_get_item_where)
+MRT_TEST_GROUP(test_string_get_item_where)
 {
 	MrvVector *int_array = mrv_create(10, sizeof(int));
 	int append_val = 1;
@@ -589,7 +589,7 @@ MRT_TEST_GROUP(test_get_item_where)
 	mrv_destroy(int_array);
 }
 
-MRT_TEST_GROUP(test_get_item)
+MRT_TEST_GROUP(test_vector_get_item)
 {
 	MrvVector *int_array = mrv_create(10, sizeof(int));
 	int append_val = 1;
@@ -621,26 +621,26 @@ int main(void)
 	MrtContext *ctx = mrt_ctx_create(logger);
 
 	// mrs_strings
-	MRT_REGISTER_TEST_GROUP(ctx, test_strstr);
-	MRT_REGISTER_TEST_GROUP(ctx, test_filter);
-	MRT_REGISTER_TEST_GROUP(ctx, test_strcat);
-	MRT_REGISTER_TEST_GROUP(ctx, test_pushstr);
-	MRT_REGISTER_TEST_GROUP(ctx, test_get_char);
-	MRT_REGISTER_TEST_GROUP(ctx, test_setstr);
-	MRT_REGISTER_TEST_GROUP(ctx, test_setstrn);
-	MRT_REGISTER_TEST_GROUP(ctx, test_get_idx);
-	MRT_REGISTER_TEST_GROUP(ctx, test_strchr);
-	MRT_REGISTER_TEST_GROUP(ctx, test_strndup);
-	MRT_REGISTER_TEST_GROUP(ctx, test_shrink_to_fit);
-	MRT_REGISTER_TEST_GROUP(ctx, test_trim_trailing_whitespace);
+	MRT_REGISTER_TEST_GROUP(ctx, test_string_strstr);
+	MRT_REGISTER_TEST_GROUP(ctx, test_string_filter);
+	MRT_REGISTER_TEST_GROUP(ctx, test_string_strcat);
+	MRT_REGISTER_TEST_GROUP(ctx, test_string_pushstr);
+	MRT_REGISTER_TEST_GROUP(ctx, test_string_get_char);
+	MRT_REGISTER_TEST_GROUP(ctx, test_string_setstr);
+	MRT_REGISTER_TEST_GROUP(ctx, test_string_setstrn);
+	MRT_REGISTER_TEST_GROUP(ctx, test_string_get_idx);
+	MRT_REGISTER_TEST_GROUP(ctx, test_string_strchr);
+	MRT_REGISTER_TEST_GROUP(ctx, test_string_strndup);
+	MRT_REGISTER_TEST_GROUP(ctx, test_string_shrink_to_fit);
+	MRT_REGISTER_TEST_GROUP(ctx, test_string_trim_trailing_whitespace);
 
 	// mrv_vectors
-	MRT_REGISTER_TEST_GROUP(ctx, test_append);
-	MRT_REGISTER_TEST_GROUP(ctx, test_pop);
-	MRT_REGISTER_TEST_GROUP(ctx, test_remove);
-	MRT_REGISTER_TEST_GROUP(ctx, test_get_pos);
-	MRT_REGISTER_TEST_GROUP(ctx, test_get_item_where);
-	MRT_REGISTER_TEST_GROUP(ctx, test_get_item);
+	MRT_REGISTER_TEST_GROUP(ctx, test_vector_append);
+	MRT_REGISTER_TEST_GROUP(ctx, test_vector_pop);
+	MRT_REGISTER_TEST_GROUP(ctx, test_vector_remove);
+	MRT_REGISTER_TEST_GROUP(ctx, test_vector_get_pos);
+	MRT_REGISTER_TEST_GROUP(ctx, test_string_get_item_where);
+	MRT_REGISTER_TEST_GROUP(ctx, test_vector_get_item);
 
 #ifdef DEBUG
 	Err err = mrt_ctx_run(ctx, FALSE);

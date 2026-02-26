@@ -65,7 +65,7 @@ void mrt_ctx_destroy(MrtContext *ctx);
 
 int mrt_ctx_run(MrtContext *ctx, Bool run_tests_parrallelized);
 
-#define MRT_TEST_GROUP(name) void name(MrtGroup *t_ctx)
+#define MRT_TEST_GROUP(name) void name(unused MrtGroup *t_ctx)
 
 #define MRT_REGISTER_TEST_GROUP(t_ctx, test_func)                              \
 	mrt_ctx_register_test_func(t_ctx, test_func, #test_func)
