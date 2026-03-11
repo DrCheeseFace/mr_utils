@@ -1,6 +1,7 @@
 #include "internals.h"
 #include <mr_utils.h>
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <threads.h>
@@ -180,11 +181,16 @@ int mrt_ctx_run(struct MrtContext *ctx, Bool run_tests_parrallelized)
 {
 	size_t err_count = 0;
 
+	struct timespec start, end;
+	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 	if (run_tests_parrallelized) {
 		err_count = mrt_ctx_run_parrallelized(ctx);
 	} else {
 		err_count = mrt_ctx_run_single_threaded(ctx);
 	}
+	clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+	double delta_ms = (double)(end.tv_sec - start.tv_sec) * 1000.0 +
+			  (double)(end.tv_nsec - start.tv_nsec) / 1000000.0;
 
 	if (err_count) {
 		mrl_logln(ctx->logger, MRL_SEVERITY_DEFAULT, "\nfailures:");
@@ -199,10 +205,19 @@ int mrt_ctx_run(struct MrtContext *ctx, Bool run_tests_parrallelized)
 	}
 
 	mrl_logln(ctx->logger, MRL_SEVERITY_DEFAULT, "");
-	mrl_logln(ctx->logger, MRL_SEVERITY_DEFAULT,
-		  "test results: %s. %d passed; %d failed",
-		  err_count == 0 ? "PASSED" : "FAILED",
+
+	mrl_log(ctx->logger, MRL_SEVERITY_DEFAULT,
+		"test results: ", ctx->test_groups.len - err_count, err_count);
+	if (err_count == 0) {
+		mrl_log(ctx->logger, MRL_SEVERITY_OK, "PASSED. ");
+	} else {
+		mrl_log(ctx->logger, MRL_SEVERITY_ERROR, "FAILED. ");
+	}
+	mrl_logln(ctx->logger, MRL_SEVERITY_DEFAULT, "%d passed; %d failed",
 		  ctx->test_groups.len - err_count, err_count);
+
+	mrl_logln(ctx->logger, MRL_SEVERITY_DEFAULT, "ran %d tests in %.3f ms",
+		  ctx->test_groups.len, delta_ms);
 
 	return err_count;
 }
@@ -265,7 +280,6 @@ mr_internal Err mrt_group_log(struct MrtGroup *t_group,
 {
 	mrl_logln(logger, MRL_SEVERITY_DEFAULT, "");
 
-	mrl_log(logger, MRL_SEVERITY_DEFAULT, "test group: ");
 	mrl_logln(logger, MRL_SEVERITY_INFO, t_group->name.value);
 
 	for (size_t i = 0; i < t_group->cases.len; i++) {
