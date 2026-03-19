@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <mr_utils.h>
 
 #include <stddef.h>
@@ -277,13 +278,7 @@ Err mrs_pop_char(MrsString *src)
 
 void mrs_trim_trailing_whitespace(MrsString *src)
 {
-	while (TRUE) {
-		if (src->len == 0) {
-			return;
-		}
-		if (mrs_is_whitespace(src, src->len - 1) != OK) {
-			return;
-		}
+	while (src->len > 0 && isspace(src->value[src->len - 1])) {
 		mrs_pop_char(src);
 	}
 }
