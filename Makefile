@@ -1,5 +1,6 @@
 CC          = gcc
 CSTANDARD   = c99
+AR          = ar
 
 INCLUDES    = -Iinclude
 LDLIBS      = -lm
@@ -23,14 +24,15 @@ endif
 BUILD_DIR := build
 OBJ_DIR   := $(BUILD_DIR)/$(BUILD_TYPE)
 
+TARGET_LIB     = $(OBJ_DIR)/libmr_utils.a
 TARGET_TEST    = $(OBJ_DIR)/test.out
 TARGET_SPACERS = $(OBJ_DIR)/spacers
 
 SRC_COMMON     = src/mrd_debug.c \
-	         src/mrl_logger.c \
-	         src/mrs_strings.c \
-	         src/mrt_test.c \
-	         src/mrv_vectors.c \
+                 src/mrl_logger.c \
+                 src/mrs_strings.c \
+                 src/mrt_test.c \
+                 src/mrv_vectors.c \
 
 SRC_TEST       = test/test.c
 
@@ -43,15 +45,21 @@ OBJ_TOOLS      = $(SRC_TOOLS:%.c=$(OBJ_DIR)/%.o)
 ALL_TEST_OBJS  = $(OBJ_COMMON) $(OBJ_TEST)
 ALL_SPACERS_OBJS = $(OBJ_COMMON) $(OBJ_TOOLS)
 
-.PHONY: all test run clean format format-check bear debug build-debug spacers
+.PHONY: all test run clean format format-check bear debug build-debug spacers static-lib
 
-all: $(TARGET_TEST)
+all: static-lib $(TARGET_TEST) spacers
+
+static-lib: $(TARGET_LIB)
+
+$(TARGET_LIB): $(OBJ_COMMON)
+	@mkdir -p $(dir $@)
+	$(AR) rcs $@ $^
 
 $(TARGET_TEST): $(ALL_TEST_OBJS)
 	$(CC) $(ALL_TEST_OBJS) -o $@ $(LDLIBS)
 
 $(TARGET_SPACERS): $(ALL_SPACERS_OBJS)
-	$(CC) $(ALL_SPACERS_OBJS) -o $@
+	$(CC) $(ALL_SPACERS_OBJS) -o $@ $(LDLIBS)
 
 $(OBJ_DIR)/%.o: %.c
 	@mkdir -p $(dir $@)
@@ -62,7 +70,7 @@ test: $(TARGET_TEST)
 
 run: test
 
-build-debug: $(TARGET_TEST)
+build-debug: static-lib $(TARGET_TEST) spacers
 
 debug: build-debug
 	./$(TARGET_TEST)
