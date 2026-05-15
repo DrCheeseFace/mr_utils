@@ -11,7 +11,7 @@
 #endif
 
 #ifndef _WIN32
-#include "execinfo.h"
+#include <execinfo.h>
 #endif
 
 #include <stdio.h>
@@ -26,7 +26,7 @@ struct MrdAllocation {
 	size_t size;
 };
 
-typedef enum MRD_Command {
+typedef enum {
 	MRD_COMMAND_MALLOC,
 	MRD_COMMAND_CALLOC,
 	MRD_COMMAND_REALLOC,
@@ -36,6 +36,15 @@ typedef enum MRD_Command {
 mr_global size_t current_allocation_id = 0;
 mr_global struct MrdAllocation active_allocations[MAX_ACTIVE_ALLOCATIONS];
 mr_global long base_address = CAFE_BABE;
+
+#define MAX_CACHED_OFFSETS 1024
+struct MrdOffsetCache {
+	long offset;
+	char func_name[MAX_FUNC_NAME_LEN + 1];
+	char file_line[128];
+};
+mr_global struct MrdOffsetCache offset_cache[MAX_CACHED_OFFSETS];
+mr_global size_t offset_cache_count = 0;
 
 struct MrlLogger logger = { .out = NULL,
 			    .log_header_enabled = FALSE,
@@ -159,42 +168,89 @@ mr_internal void unused mrd_log_backtrace(void)
 
 		long call_addr_long = strtol(call_addr, NULL, 16);
 		long addr_diff = call_addr_long - base_address;
-		char addr_diff_hex[32]; // eg: +0xCDCD
-		sprintf(addr_diff_hex, " +0x%lX", addr_diff);
 
-		// build addr2line command
-		char addr2line_command[128] = "";
-		strcat(addr2line_command, "addr2line -f -i -e ");
-		strcat(addr2line_command, path);
-		strcat(addr2line_command, " ");
-		strcat(addr2line_command, addr_diff_hex);
-
-		// exec addr2line command
-		FILE *fp = popen(addr2line_command, "r");
-		char addr2line_output_buffer[128] = "";
-		char addr2line_output_full_out[128] = "";
-		while (fgets(addr2line_output_buffer,
-			     sizeof(addr2line_output_buffer), fp) != NULL) {
-			strcat(addr2line_output_full_out,
-			       addr2line_output_buffer);
+		int cached_index = -1;
+		for (size_t k = 0; k < offset_cache_count; k++) {
+			if (offset_cache[k].offset == addr_diff) {
+				cached_index = (int)k;
+				break;
+			}
 		}
 
 		char func_name[MAX_FUNC_NAME_LEN + 1] = "";
-		func_name[MAX_FUNC_NAME_LEN] = '\0';
+		char file_line[128] = "";
 
-		char *newline_pos = strchr(addr2line_output_full_out, '\n');
-		*newline_pos = '\0';
-		strtok(addr2line_output_full_out, "\n");
-		size_t func_name_len = newline_pos - addr2line_output_full_out;
-		strncpy(func_name, addr2line_output_full_out, func_name_len);
-		strtok(newline_pos + 1, "\n");
+		if (cached_index != -1) { // cached
+			strncpy(func_name, offset_cache[cached_index].func_name,
+				MAX_FUNC_NAME_LEN);
+			strncpy(file_line, offset_cache[cached_index].file_line,
+				127);
+		} else { // not cached
+			char addr_diff_hex[32]; // eg: +0xCDCD
+			sprintf(addr_diff_hex, " +0x%lX", addr_diff);
+
+			// build addr2line command
+			char addr2line_command[128] = "";
+			strcat(addr2line_command, "addr2line -f -i -e ");
+			strcat(addr2line_command, path);
+			strcat(addr2line_command, " ");
+			strcat(addr2line_command, addr_diff_hex);
+
+			// exec addr2line command
+			FILE *fp = popen(addr2line_command, "r");
+			char addr2line_output_buffer[128] = "";
+			char addr2line_output_full_out[128] = "";
+			while (fgets(addr2line_output_buffer,
+				     sizeof(addr2line_output_buffer),
+				     fp) != NULL) {
+				strcat(addr2line_output_full_out,
+				       addr2line_output_buffer);
+			}
+			pclose(fp);
+
+			char *newline_pos =
+				strchr(addr2line_output_full_out, '\n');
+			if (newline_pos != NULL) {
+				*newline_pos = '\0';
+				strtok(addr2line_output_full_out, "\n");
+				size_t func_name_len =
+					newline_pos - addr2line_output_full_out;
+				if (func_name_len > MAX_FUNC_NAME_LEN) {
+					func_name_len = MAX_FUNC_NAME_LEN;
+				}
+				strncpy(func_name, addr2line_output_full_out,
+					func_name_len);
+				func_name[func_name_len] = '\0';
+
+				char *parsed_file_line = newline_pos + 1;
+				char *second_newline =
+					strchr(parsed_file_line, '\n');
+				if (second_newline)
+					*second_newline = '\0';
+				strncpy(file_line, parsed_file_line, 127);
+				file_line[127] = '\0';
+			}
+
+			// save to cache
+			if (offset_cache_count < MAX_CACHED_OFFSETS) {
+				offset_cache[offset_cache_count].offset =
+					addr_diff;
+				strncpy(offset_cache[offset_cache_count]
+						.func_name,
+					func_name, MAX_FUNC_NAME_LEN);
+				strncpy(offset_cache[offset_cache_count]
+						.file_line,
+					file_line, 127);
+				offset_cache_count++;
+			}
+		}
 
 		for (size_t j = 0; j < indent_level; j++) {
 			mrl_log(&logger, MRL_SEVERITY_DEFAULT, "  ");
 		}
 		indent_level++;
 		mrl_logln(&logger, MRL_SEVERITY_DEFAULT, "↪ %s => %s()",
-			  newline_pos + 1, func_name);
+			  file_line, func_name);
 	}
 
 	free(symbols);
@@ -227,7 +283,7 @@ mrd_add_allocation_to_active_allocations(struct MrdAllocation new_allocation)
 	mrd_log_err(err);
 }
 
-mr_internal void unused mrd_log_command(enum MRD_Command command, size_t size,
+mr_internal void unused mrd_log_command(MrdCommand command, size_t size,
 					struct MrdAllocation *realloc_free_src,
 					const char *file_name, int line)
 {
