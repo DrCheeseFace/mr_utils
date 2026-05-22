@@ -17,10 +17,12 @@
  * \ mrv_destroy           - frees contents of MRV_Vector and itself
  * \ mrv_free              - frees contents of MRV_Vector
  * \ mrv_init              - set arr to CAFE_BABE and length/capacity to 0
+ * \ mrv_dupe              - duplicates MrvVector. allocates to capacity
  * \ mrv_clear             - set arr to CAFE_BABE and length/capacity to 0
  * \ mrv_append            - appends element
  * \ mrv_realloc_to_fit    - sets capacity to length and reallocates to fit
  * \ mrv_pop               - removes last element
+ * \ mrv_pop_front         - removed first element
  * \ mrv_remove            - removes array[index]'th element. uses swap and pop method
  * \ mrv_get_idx           - get pointer from idx
  * \ mrv_get_pos           - get idx from pointer
@@ -53,6 +55,8 @@ void mrv_free(MrvVector *vec);
 
 void mrv_init(MrvVector *vec, size_t capacity, size_t stride);
 
+void mrv_dupe(MrvVector *vec, MrvVector *dest);
+
 Err mrv_clear(MrvVector *vec);
 
 // resizes vec->arr if needed
@@ -66,6 +70,8 @@ Err mrv_append(MrvVector *vec, void *item, Scaling scaling_method);
 Err mrv_realloc_to_fit(MrvVector *vec);
 
 Err mrv_pop(MrvVector *vec);
+
+Err mrv_pop_front(MrvVector *vec);
 
 Err mrv_remove(MrvVector *vec, size_t idx);
 

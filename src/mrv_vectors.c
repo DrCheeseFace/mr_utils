@@ -47,6 +47,15 @@ void mrv_init(MrvVector *vec, size_t capacity, size_t stride)
 	return;
 }
 
+void mrv_dupe(MrvVector *vec, MrvVector *dest)
+{
+	dest->stride = vec->stride;
+	dest->len = vec->len;
+	dest->capacity = vec->capacity;
+	dest->arr = malloc(vec->capacity * vec->stride);
+	memcpy(dest->arr, vec->arr, vec->len * vec->stride);
+}
+
 Err mrv_clear(MrvVector *vec)
 {
 	if (vec == NULL) {
@@ -135,6 +144,19 @@ Err mrv_pop(MrvVector *vec)
 	if (vec->len == 0) {
 		return ERR;
 	}
+
+	vec->len--;
+
+	return OK;
+}
+
+Err mrv_pop_front(MrvVector *vec)
+{
+	if (vec == NULL || vec->len == 0) {
+		return ERR;
+	}
+
+	memmove(vec->arr, vec->arr + vec->stride, (vec->len - 1) * vec->stride);
 
 	vec->len--;
 

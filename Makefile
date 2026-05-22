@@ -13,14 +13,17 @@ WARNINGS += -Wbad-function-cast -Wcast-qual -Wundef
 WARNINGS += -Wshadow -Wfloat-equal -Wformat=2
 WARNINGS += -Wredundant-decls -Wnested-externs
 
+BUILD_TYPE ?= release
+
 ifneq (,$(filter debug build-debug,$(MAKECMDGOALS)))
     BUILD_TYPE := debug
-    CFLAGS     := -O0 -g -fno-omit-frame-pointer -rdynamic -DDEBUG -DMRD_DEBUG_BACKTRACE $(WARNINGS) $(INCLUDES)
-else
-    BUILD_TYPE := release
-    CFLAGS     := -O2 $(WARNINGS) $(INCLUDES)
 endif
 
+ifeq ($(BUILD_TYPE),debug)
+    CFLAGS     := -O0 -g -fno-omit-frame-pointer -rdynamic -DDEBUG -DMRD_DEBUG_BACKTRACE $(WARNINGS) $(INCLUDES)
+else
+    CFLAGS     := -O2 $(WARNINGS) $(INCLUDES)
+endif
 
 BUILD_DIR := build
 OBJ_DIR   := $(BUILD_DIR)/$(BUILD_TYPE)
