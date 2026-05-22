@@ -111,7 +111,7 @@ format-check: $(TARGET_SPACERS)
 - [ ] optimize mrd_debug. map offsets to log messages so i dont have to calculate multiple times
 - [ ] useful runtime error message. something with coredump file abort()
 - [ ] mrv_append, have flags for how to realloc if needed. double, log, increment etc
-- [ ] replace <threads.h> with <pthread.h> in mrl_logger 
+- [ ] replace <threads.h> with <pthread.h> in mrl_logger
 
 
 

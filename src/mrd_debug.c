@@ -12,6 +12,7 @@
 
 #ifndef _WIN32
 #include <execinfo.h>
+#include <signal.h>
 #endif
 
 #include <pthread.h>
@@ -36,7 +37,6 @@ typedef enum {
 
 mr_global size_t current_allocation_id = 0;
 mr_global struct MrdAllocation active_allocations[MAX_ACTIVE_ALLOCATIONS];
-mr_global long base_address = CAFE_BABE;
 
 #define MAX_CACHED_OFFSETS 1024
 struct MrdOffsetCache {
@@ -56,6 +56,81 @@ static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 mr_internal void mrd_init(void)
 {
 	logger.out = stdout;
+}
+
+void mrd_log_allocation(struct MrdAllocation *allocation)
+{
+	mrl_log(&logger, MRL_SEVERITY_DEFAULT, "allocation (%zu) of",
+		allocation->id);
+
+	mrl_log(&logger, MRL_SEVERITY_OK, " [%zu]", allocation->size);
+
+	mrl_logln(&logger, MRL_SEVERITY_DEFAULT, " bytes");
+}
+
+size_t mrd_log_dump_active_allocations(void)
+{
+	pthread_mutex_lock(&mutex);
+	if (logger.out == NULL) {
+		mrd_init();
+	}
+
+	size_t total_active_allocations = 0;
+	size_t total_active_bytes = 0;
+
+	mrl_logln(&logger, MRL_SEVERITY_ALT_INFO,
+		  "=======ACTIVE=ALLOCATIONS=======");
+
+	for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {
+		if (active_allocations[i].active) {
+			total_active_allocations++;
+			total_active_bytes += active_allocations[i].size;
+			mrd_log_allocation(&active_allocations[i]);
+		}
+	}
+	mrl_logln(&logger, MRL_SEVERITY_ALT_INFO,
+		  "================================\n");
+
+	mrl_logln(&logger, MRL_SEVERITY_DEFAULT,
+		  "TOTAL ACTIVE ALLOCATIONS: %zu", total_active_allocations);
+
+	mrl_logln(&logger, MRL_SEVERITY_DEFAULT, "TOTAL ACTIVE BYTES: %zu\n",
+		  total_active_bytes);
+
+	pthread_mutex_unlock(&mutex);
+	return total_active_allocations;
+}
+
+void *mrd_inspect_allocation(size_t allocation_id)
+{
+	pthread_mutex_lock(&mutex);
+	if (logger.out == NULL) {
+		mrd_init();
+	}
+
+	mrl_logln(&logger, MRL_SEVERITY_WARNING,
+		  "-----INSPECTING-ALLOCATION-(%zu)------", allocation_id);
+
+	for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {
+		if (allocation_id == active_allocations[i].id) {
+			mrd_log_allocation(&active_allocations[i]);
+			mrl_logln(&logger, MRL_SEVERITY_WARNING,
+				  "--------------------------------------\n");
+
+			void *found_ptr = active_allocations[i].ptr;
+			pthread_mutex_unlock(&mutex);
+			return found_ptr;
+		}
+	}
+
+	mrl_logln(&logger, MRL_SEVERITY_ERROR, "ALLOCATION (%zu) NOT FOUND",
+		  allocation_id);
+
+	mrl_logln(&logger, MRL_SEVERITY_WARNING,
+		  "--------------------------------------\n");
+
+	pthread_mutex_unlock(&mutex);
+	return NULL;
 }
 
 // cant call MRS_init due to it calling malloc
@@ -103,36 +178,6 @@ mr_internal void mrd_get_code_snippet(const char *file_name, int line,
 	return;
 }
 
-mr_internal void unused mrd_get_base_address(const char *path)
-{
-	int pid = getpid();
-	char base_addr_string[BASE_ADDRESS_SIZE + 1];
-	char command[256];
-	sprintf(command,
-		"cat /proc/%d/maps | grep %s | head -n 1 | awk '{print $1}' | cut -d'-' -f1",
-		pid, path); // lol
-
-	FILE *fp = popen(command, "r");
-	char output_buffer[BASE_ADDRESS_SIZE] = "";
-	// has newline and \0 hence the +2
-	char output_full_out[BASE_ADDRESS_SIZE + 2] = "";
-	while (fgets(output_buffer, sizeof(output_buffer), fp) != NULL) {
-		strcat(output_full_out, output_buffer);
-	}
-
-	for (size_t i = 0; i < BASE_ADDRESS_SIZE; i++) {
-		base_addr_string[i] = output_full_out[i];
-	}
-
-	long base_addr_long = strtol(base_addr_string, NULL, 16);
-
-	base_address = base_addr_long;
-
-	pclose(fp);
-
-	return;
-}
-
 mr_internal void unused mrd_log_backtrace(void)
 {
 #ifndef _WIN32
@@ -150,10 +195,6 @@ mr_internal void unused mrd_log_backtrace(void)
 	strncpy(path, symbols[1], end_of_path - symbols[1]);
 	path[end_of_path - symbols[1]] = '\0';
 
-	if (base_address == CAFE_BABE) {
-		mrd_get_base_address(path);
-	}
-
 	int max_backtrace_depth_printout = MAX_BACKTRACE_DEPTH_PRINTOUT;
 	if (nptrs < max_backtrace_depth_printout) {
 		max_backtrace_depth_printout = nptrs;
@@ -162,19 +203,22 @@ mr_internal void unused mrd_log_backtrace(void)
 	// 2 is used here to remove depth created in this file
 	size_t indent_level = 0;
 	for (size_t i = 2; i < (size_t)max_backtrace_depth_printout; i++) {
-		// calc diff between base and call addr
-		char call_addr[BASE_ADDRESS_SIZE + 1];
-		call_addr[BASE_ADDRESS_SIZE] = '\0';
-		char *open_bracket = strchr(symbols[i], '[');
-		open_bracket += 3;
-		strncpy(call_addr, open_bracket, BASE_ADDRESS_SIZE);
+		// extract offset eg: +0x8cbb
+		char *open_paren = strchr(symbols[i], '(');
+		char *close_paren = strchr(symbols[i], ')');
 
-		long call_addr_long = strtol(call_addr, NULL, 16);
-		long addr_diff = call_addr_long - base_address;
+		size_t offset_len = close_paren - (open_paren + 1);
+		char raw_offset[32];
+		strncpy(raw_offset, open_paren + 1, offset_len);
+		raw_offset[offset_len] = '\0';
+
+		char *hex_offset = raw_offset + 1; // remove leading '+'
+
+		long call_addr_long = strtol(hex_offset, NULL, 16);
 
 		int cached_index = -1;
 		for (size_t k = 0; k < offset_cache_count; k++) {
-			if (offset_cache[k].offset == addr_diff) {
+			if (offset_cache[k].offset == call_addr_long) {
 				cached_index = (int)k;
 				break;
 			}
@@ -189,15 +233,12 @@ mr_internal void unused mrd_log_backtrace(void)
 			strncpy(file_line, offset_cache[cached_index].file_line,
 				127);
 		} else { // not cached
-			char addr_diff_hex[32]; // eg: +0xCDCD
-			sprintf(addr_diff_hex, " +0x%lX", addr_diff);
-
 			// build addr2line command
 			char addr2line_command[128] = "";
 			strcat(addr2line_command, "addr2line -f -i -e ");
 			strcat(addr2line_command, path);
 			strcat(addr2line_command, " ");
-			strcat(addr2line_command, addr_diff_hex);
+			strcat(addr2line_command, hex_offset);
 
 			// exec addr2line command
 			FILE *fp = popen(addr2line_command, "r");
@@ -237,7 +278,7 @@ mr_internal void unused mrd_log_backtrace(void)
 			// save to cache
 			if (offset_cache_count < MAX_CACHED_OFFSETS) {
 				offset_cache[offset_cache_count].offset =
-					addr_diff;
+					call_addr_long;
 				strncpy(offset_cache[offset_cache_count]
 						.func_name,
 					func_name, MAX_FUNC_NAME_LEN);
@@ -518,79 +559,4 @@ void mrd_free(void *ptr, unused const char *file_name, unused int line)
 	allocation->active = FALSE;
 
 	pthread_mutex_unlock(&mutex);
-}
-
-void mrd_log_allocation(struct MrdAllocation *allocation)
-{
-	mrl_log(&logger, MRL_SEVERITY_DEFAULT, "allocation (%zu) of",
-		allocation->id);
-
-	mrl_log(&logger, MRL_SEVERITY_OK, " [%zu]", allocation->size);
-
-	mrl_logln(&logger, MRL_SEVERITY_DEFAULT, " bytes");
-}
-
-size_t mrd_log_dump_active_allocations(void)
-{
-	pthread_mutex_lock(&mutex);
-	if (logger.out == NULL) {
-		mrd_init();
-	}
-
-	size_t total_active_allocations = 0;
-	size_t total_active_bytes = 0;
-
-	mrl_logln(&logger, MRL_SEVERITY_ALT_INFO,
-		  "=======ACTIVE=ALLOCATIONS=======");
-
-	for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {
-		if (active_allocations[i].active) {
-			total_active_allocations++;
-			total_active_bytes += active_allocations[i].size;
-			mrd_log_allocation(&active_allocations[i]);
-		}
-	}
-	mrl_logln(&logger, MRL_SEVERITY_ALT_INFO,
-		  "================================\n");
-
-	mrl_logln(&logger, MRL_SEVERITY_DEFAULT,
-		  "TOTAL ACTIVE ALLOCATIONS: %zu", total_active_allocations);
-
-	mrl_logln(&logger, MRL_SEVERITY_DEFAULT, "TOTAL ACTIVE BYTES: %zu\n",
-		  total_active_bytes);
-
-	pthread_mutex_unlock(&mutex);
-	return total_active_allocations;
-}
-
-void *mrd_inspect_allocation(size_t allocation_id)
-{
-	pthread_mutex_lock(&mutex);
-	if (logger.out == NULL) {
-		mrd_init();
-	}
-
-	mrl_logln(&logger, MRL_SEVERITY_WARNING,
-		  "-----INSPECTING-ALLOCATION-(%zu)------", allocation_id);
-
-	for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {
-		if (allocation_id == active_allocations[i].id) {
-			mrd_log_allocation(&active_allocations[i]);
-			mrl_logln(&logger, MRL_SEVERITY_WARNING,
-				  "--------------------------------------\n");
-
-			void *found_ptr = active_allocations[i].ptr;
-			pthread_mutex_unlock(&mutex);
-			return found_ptr;
-		}
-	}
-
-	mrl_logln(&logger, MRL_SEVERITY_ERROR, "ALLOCATION (%zu) NOT FOUND",
-		  allocation_id);
-
-	mrl_logln(&logger, MRL_SEVERITY_WARNING,
-		  "--------------------------------------\n");
-
-	pthread_mutex_unlock(&mutex);
-	return NULL;
 }
