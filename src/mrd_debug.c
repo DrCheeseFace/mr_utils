@@ -14,6 +14,7 @@
 #include <execinfo.h>
 #endif
 
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -49,6 +50,8 @@ mr_global size_t offset_cache_count = 0;
 struct MrlLogger logger = { .out = NULL,
 			    .log_header_enabled = FALSE,
 			    .terminal_color_enabled = TRUE };
+
+static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 mr_internal void mrd_init(void)
 {
@@ -339,6 +342,7 @@ mr_internal void unused mrd_log_command(MrdCommand command, size_t size,
 
 void *mrd_malloc(size_t size, unused const char *file_name, unused int line)
 {
+	pthread_mutex_lock(&mutex);
 	if (logger.out == NULL) {
 		mrd_init();
 	}
@@ -369,12 +373,14 @@ void *mrd_malloc(size_t size, unused const char *file_name, unused int line)
 	mrl_logln(&logger, MRL_SEVERITY_DEFAULT, "");
 #endif
 
+	pthread_mutex_unlock(&mutex);
 	return ptr;
 }
 
 void *mrd_calloc(size_t nmemb, size_t size, unused const char *file_name,
 		 unused int line)
 {
+	pthread_mutex_lock(&mutex);
 	if (logger.out == NULL) {
 		mrd_init();
 	}
@@ -405,12 +411,15 @@ void *mrd_calloc(size_t nmemb, size_t size, unused const char *file_name,
 	mrl_logln(&logger, MRL_SEVERITY_DEFAULT, "");
 #endif
 
+	pthread_mutex_unlock(&mutex);
 	return ptr;
 }
 
 void *mrd_realloc(void *ptr, size_t size, unused const char *file_name,
 		  unused int line)
 {
+	pthread_mutex_lock(&mutex);
+
 	if (logger.out == NULL) {
 		mrd_init();
 	}
@@ -456,11 +465,13 @@ void *mrd_realloc(void *ptr, size_t size, unused const char *file_name,
 	mrl_logln(&logger, MRL_SEVERITY_DEFAULT, "");
 #endif
 
+	pthread_mutex_unlock(&mutex);
 	return realloc_ptr;
 }
 
 void mrd_free(void *ptr, unused const char *file_name, unused int line)
 {
+	pthread_mutex_lock(&mutex);
 	if (logger.out == NULL) {
 		mrd_init();
 	}
@@ -500,12 +511,13 @@ void mrd_free(void *ptr, unused const char *file_name, unused int line)
 				break;
 			}
 		}
-		allocation->active = FALSE;
 	}
 
 	free(ptr);
 
 	allocation->active = FALSE;
+
+	pthread_mutex_unlock(&mutex);
 }
 
 void mrd_log_allocation(struct MrdAllocation *allocation)
@@ -520,6 +532,7 @@ void mrd_log_allocation(struct MrdAllocation *allocation)
 
 size_t mrd_log_dump_active_allocations(void)
 {
+	pthread_mutex_lock(&mutex);
 	if (logger.out == NULL) {
 		mrd_init();
 	}
@@ -546,11 +559,13 @@ size_t mrd_log_dump_active_allocations(void)
 	mrl_logln(&logger, MRL_SEVERITY_DEFAULT, "TOTAL ACTIVE BYTES: %zu\n",
 		  total_active_bytes);
 
+	pthread_mutex_unlock(&mutex);
 	return total_active_allocations;
 }
 
 void *mrd_inspect_allocation(size_t allocation_id)
 {
+	pthread_mutex_lock(&mutex);
 	if (logger.out == NULL) {
 		mrd_init();
 	}
@@ -564,7 +579,9 @@ void *mrd_inspect_allocation(size_t allocation_id)
 			mrl_logln(&logger, MRL_SEVERITY_WARNING,
 				  "--------------------------------------\n");
 
-			return active_allocations[i].ptr;
+			void *found_ptr = active_allocations[i].ptr;
+			pthread_mutex_unlock(&mutex);
+			return found_ptr;
 		}
 	}
 
@@ -574,5 +591,6 @@ void *mrd_inspect_allocation(size_t allocation_id)
 	mrl_logln(&logger, MRL_SEVERITY_WARNING,
 		  "--------------------------------------\n");
 
+	pthread_mutex_unlock(&mutex);
 	return NULL;
 }
