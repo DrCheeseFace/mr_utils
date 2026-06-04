@@ -47,17 +47,17 @@ typedef enum {
 	// APPEND_SCALING_PAGE_ALIGNED // TODO IMPLEMENT
 } Scaling;
 
-MrvVector *mrv_create(size_t capacity, size_t stride);
+MrvVector *mrv_create(size_t capacity, size_t stride) WARN_UNUSED;
 
-void mrv_destroy(MrvVector *vec);
+void mrv_destroy(MrvVector *vec) NONNULL_ARGS(1);
 
-void mrv_free(MrvVector *vec);
+void mrv_free(MrvVector *vec) NONNULL_ARGS(1);
 
-void mrv_init(MrvVector *vec, size_t capacity, size_t stride);
+void *mrv_init(MrvVector *vec, size_t capacity, size_t stride) NONNULL_ARGS(1);
 
-void mrv_dupe(MrvVector *vec, MrvVector *dest);
+void *mrv_dupe(MrvVector *vec, MrvVector *dest) NONNULL_ARGS(1, 2);
 
-Err mrv_clear(MrvVector *vec);
+void mrv_clear(MrvVector *vec) NONNULL_ARGS(1);
 
 // resizes vec->arr if needed
 // Scaling methods:
@@ -65,26 +65,29 @@ Err mrv_clear(MrvVector *vec);
 // 	APPEND_SCALING_DOUBLE,
 // 	APPEND_SCALING_ONE_POINT_FIVE,
 // 	APPEND_SCALING_POWER_OF_TWO,
-Err mrv_append(MrvVector *vec, void *item, Scaling scaling_method);
+Err mrv_append(MrvVector *vec, void *item, Scaling scaling_method)
+	NONNULL_ARGS(1, 2);
 
-Err mrv_realloc_to_fit(MrvVector *vec);
+Err mrv_realloc_to_fit(MrvVector *vec) NONNULL_ARGS(1);
 
-Err mrv_pop(MrvVector *vec);
+void mrv_pop(MrvVector *vec) NONNULL_ARGS(1);
 
-Err mrv_pop_front(MrvVector *vec);
+void mrv_pop_front(MrvVector *vec) NONNULL_ARGS(1);
 
-Err mrv_remove(MrvVector *vec, size_t idx);
+void mrv_remove(MrvVector *vec, size_t idx) NONNULL_ARGS(1);
 
-void *mrv_get_idx(MrvVector *vec, size_t n);
+void *mrv_get_idx(MrvVector *vec, size_t n) NONNULL_ARGS(1);
 
-size_t mrv_get_pos(MrvVector *vec, void *item);
+size_t mrv_get_pos(MrvVector *vec, void *item) NONNULL_ARGS(1);
 
-void *mrv_get_last(MrvVector *vec);
+void *mrv_get_last(MrvVector *vec) NONNULL_ARGS(1);
 
-void *mrv_get_item(MrvVector *vec, void *item);
+void *mrv_get_item(MrvVector *vec, void *item) NONNULL_ARGS(1);
 
-void *mrv_get_item_where(MrvVector *vec, Bool (*is_item)(void *));
+void *mrv_get_item_where(MrvVector *vec, Bool (*is_item)(void *))
+	NONNULL_ARGS(1, 2);
 
-void mrv_qsort(MrvVector *vec, int (*compare)(const void *, const void *));
+void mrv_qsort(MrvVector *vec, int (*compare)(const void *, const void *))
+	NONNULL_ARGS(1, 2);
 
 #endif // !MRV_VECTORS_H

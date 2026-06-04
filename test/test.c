@@ -447,16 +447,10 @@ MRT_TEST_GROUP(test_vector_pop)
 	MRT_ASSERT(int_array->capacity == 10, "pop len > 0 capacity");
 
 	mrv_pop(int_array);
-	Err error = mrv_pop(int_array);
+	mrv_pop(int_array);
 
 	MRT_ASSERT(int_array->len == 0, "pop to len = 0 len");
 	MRT_ASSERT(int_array->capacity == 10, "pop to len = 0 capacity");
-	MRT_ASSERT(error == OK, "pop to len = 0 err");
-
-	error = mrv_pop(int_array);
-
-	MRT_ASSERT(int_array->len == 0, "pop at len = 0 len");
-	MRT_ASSERT(error == ERR, "pop at len = 0 err");
 
 	mrv_destroy(int_array);
 }
@@ -471,44 +465,29 @@ MRT_TEST_GROUP(test_vector_remove)
 
 	MRT_ASSERT(int_array->len == 5, "setup length correct");
 
-	Err res = mrv_remove(int_array, 2);
-	MRT_ASSERT(res == OK, "remove middle OK");
+	mrv_remove(int_array, 2);
 	MRT_ASSERT(int_array->len == 4, "remove middle len update");
 
 	int *val = mrv_get_idx(int_array, 2);
 	MRT_ASSERT(val && *val == 4,
 		   "unordered remove: last element moved to middle");
 
-	res = mrv_remove(int_array, 0);
-	MRT_ASSERT(res == OK, "remove head OK");
+	mrv_remove(int_array, 0);
 	MRT_ASSERT(int_array->len == 3, "remove head len update");
 
 	val = mrv_get_idx(int_array, 0);
 	MRT_ASSERT(val && *val == 3,
 		   "unordered remove: last element moved to head");
 
-	res = mrv_remove(int_array, 2);
-	MRT_ASSERT(res == OK, "remove tail OK");
+	mrv_remove(int_array, 2);
 	MRT_ASSERT(int_array->len == 2, "remove tail len update");
-
-	val = mrv_get_idx(int_array, 2);
-	MRT_ASSERT(val == NULL, "remove tail: old index inaccessible");
 
 	val = mrv_get_idx(int_array, 0);
 	MRT_ASSERT(val && *val == 3, "integrity check: index 0 still holds 3");
 
-	res = mrv_remove(int_array, 100);
-	MRT_ASSERT(res == ERR, "remove invalid index returns ERR");
-	MRT_ASSERT(int_array->len == 2, "remove invalid index len unchanged");
-
 	mrv_remove(int_array, 0);
-	res = mrv_remove(int_array, 0);
-
-	MRT_ASSERT(res == OK, "remove last item OK");
+	mrv_remove(int_array, 0);
 	MRT_ASSERT(int_array->len == 0, "remove until empty len is 0");
-
-	res = mrv_remove(int_array, 0);
-	MRT_ASSERT(res == ERR, "remove from empty returns ERR");
 
 	mrv_destroy(int_array);
 }

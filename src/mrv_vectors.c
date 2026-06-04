@@ -7,8 +7,14 @@
 MrvVector *mrv_create(size_t capacity, size_t stride)
 {
 	MrvVector *vec = malloc(sizeof(MrvVector));
+	if (vec == NULL)
+		return NULL;
 
 	vec->arr = malloc(capacity * stride);
+	if (vec->arr == NULL) {
+		free(vec);
+		return NULL;
+	}
 	memset(vec->arr, CAFE_BABE, capacity * stride);
 
 	vec->stride = stride;
@@ -26,7 +32,7 @@ void mrv_destroy(MrvVector *vec)
 
 void mrv_free(MrvVector *vec)
 {
-	if (vec != NULL && vec->arr != NULL) {
+	if (vec->arr != NULL) {
 		free(vec->arr);
 		vec->arr = NULL;
 	}
@@ -36,50 +42,45 @@ void mrv_free(MrvVector *vec)
 	vec->capacity = CAFE_BABE;
 }
 
-void mrv_init(MrvVector *vec, size_t capacity, size_t stride)
+void *mrv_init(MrvVector *vec, size_t capacity, size_t stride)
 {
 	vec->arr = malloc(capacity * stride);
+	if (vec->arr == NULL)
+		return NULL;
+
 	memset(vec->arr, CAFE_BABE, capacity * stride);
 	vec->stride = stride;
 	vec->len = 0;
 	vec->capacity = capacity;
 
-	return;
+	return vec;
 }
 
-void mrv_dupe(MrvVector *vec, MrvVector *dest)
+void *mrv_dupe(MrvVector *vec, MrvVector *dest)
 {
 	dest->stride = vec->stride;
 	dest->len = vec->len;
 	dest->capacity = vec->capacity;
+
 	dest->arr = malloc(vec->capacity * vec->stride);
+	if (dest->arr == NULL)
+		return NULL;
+
 	memcpy(dest->arr, vec->arr, vec->len * vec->stride);
+
+	return dest;
 }
 
-Err mrv_clear(MrvVector *vec)
+void mrv_clear(MrvVector *vec)
 {
-	if (vec == NULL) {
-		return ERR;
-	}
-
-	if (vec->arr == NULL) {
-		return ERR;
-	}
-
 	memset(vec->arr, CAFE_BABE, vec->len * vec->stride);
 
 	vec->len = 0;
 	vec->capacity = 0;
-
-	return OK;
 }
 
 Err mrv_append(MrvVector *vec, void *item, Scaling scaling_method)
 {
-	if (vec == NULL) {
-		return ERR;
-	}
-
 	size_t new_capacity = vec->capacity;
 
 	if (vec->capacity == vec->len) {
@@ -108,6 +109,7 @@ Err mrv_append(MrvVector *vec, void *item, Scaling scaling_method)
 		void *temp = realloc(vec->arr, new_capacity * vec->stride);
 		if (temp == NULL)
 			return ERR;
+
 		vec->arr = temp;
 		vec->capacity = new_capacity;
 	}
@@ -115,61 +117,39 @@ Err mrv_append(MrvVector *vec, void *item, Scaling scaling_method)
 	memcpy(&vec->arr[vec->len * vec->stride], item, vec->stride);
 
 	vec->len++;
-
 	return OK;
 }
 
 Err mrv_realloc_to_fit(MrvVector *vec)
 {
-	if (vec == NULL) {
-		return ERR;
-	}
-
 	if (vec->capacity == vec->len) {
 		return OK;
 	}
 
 	vec->capacity = vec->len;
-	vec->arr = realloc(vec->arr, vec->len * vec->stride);
+	void *temp = realloc(vec->arr, vec->len * vec->stride);
+	if (temp == NULL)
+		return ERR;
 
+	vec->arr = temp;
 	return OK;
 }
 
-Err mrv_pop(MrvVector *vec)
+void mrv_pop(MrvVector *vec)
 {
-	if (vec == NULL) {
-		return ERR;
-	}
-
-	if (vec->len == 0) {
-		return ERR;
-	}
-
 	vec->len--;
-
-	return OK;
 }
 
-Err mrv_pop_front(MrvVector *vec)
+void mrv_pop_front(MrvVector *vec)
 {
-	if (vec == NULL || vec->len == 0) {
-		return ERR;
-	}
-
 	memmove(vec->arr, vec->arr + vec->stride, (vec->len - 1) * vec->stride);
-
 	vec->len--;
-
-	return OK;
 }
 
 // TODO implement stable version
-Err mrv_remove(MrvVector *vec, size_t idx)
+void mrv_remove(MrvVector *vec, size_t idx)
 {
 	void *item = mrv_get_idx(vec, idx);
-	if (!item) {
-		return ERR;
-	}
 
 	void *last = mrv_get_last(vec);
 
@@ -178,20 +158,10 @@ Err mrv_remove(MrvVector *vec, size_t idx)
 	}
 
 	vec->len--;
-
-	return OK;
 }
 
 void *mrv_get_idx(MrvVector *vec, size_t n)
 {
-	if (vec == NULL) {
-		return NULL;
-	}
-
-	if (n >= vec->len) {
-		return NULL;
-	}
-
 	return &vec->arr[n * vec->stride];
 }
 
