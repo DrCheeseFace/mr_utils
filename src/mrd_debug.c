@@ -12,7 +12,6 @@
 
 #ifndef _WIN32
 #include <execinfo.h>
-#include <signal.h>
 #endif
 
 #include <pthread.h>
@@ -35,8 +34,8 @@ typedef enum {
 	MRD_COMMAND_FREE,
 } MrdCommand;
 
-mr_global size_t current_allocation_id = 0;
-mr_global struct MrdAllocation active_allocations[MAX_ACTIVE_ALLOCATIONS];
+global_variable size_t current_allocation_id = 0;
+global_variable struct MrdAllocation active_allocations[MAX_ACTIVE_ALLOCATIONS];
 
 #define MAX_CACHED_OFFSETS 1024
 struct MrdOffsetCache {
@@ -44,8 +43,8 @@ struct MrdOffsetCache {
 	char func_name[MAX_FUNC_NAME_LEN + 1];
 	char file_line[128];
 };
-mr_global struct MrdOffsetCache offset_cache[MAX_CACHED_OFFSETS];
-mr_global size_t offset_cache_count = 0;
+global_variable struct MrdOffsetCache offset_cache[MAX_CACHED_OFFSETS];
+global_variable size_t offset_cache_count = 0;
 
 struct MrlLogger logger = { .out = NULL,
 			    .log_header_enabled = FALSE,
@@ -53,7 +52,7 @@ struct MrlLogger logger = { .out = NULL,
 
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
-mr_internal void mrd_init(void)
+internal void mrd_init(void)
 {
 	logger.out = stdout;
 }
@@ -134,7 +133,7 @@ void *mrd_inspect_allocation(size_t allocation_id)
 }
 
 // cant call MRS_init due to it calling malloc
-mr_internal void mrd_init_code_snippet(MrsString *dest)
+internal void mrd_init_code_snippet(MrsString *dest)
 {
 	dest->value = malloc(sizeof(char) * (MAX_SNIPPET_LEN + 1));
 	dest->value[MAX_SNIPPET_LEN] = '\0';
@@ -142,14 +141,14 @@ mr_internal void mrd_init_code_snippet(MrsString *dest)
 	dest->len = 0;
 }
 
-mr_internal void mrd_log_err(const char *msg)
+internal void mrd_log_err(const char *msg)
 {
 	mrl_log(&logger, MRL_SEVERITY_INFO, DEBUG_LOG_HEAD);
 	mrl_logln(&logger, MRL_SEVERITY_ERROR, msg);
 }
 
-mr_internal void mrd_get_code_snippet(const char *file_name, int line,
-				      MrsString *dest)
+internal void mrd_get_code_snippet(const char *file_name, int line,
+				   MrsString *dest)
 {
 	FILE *file = fopen(file_name, "r");
 
@@ -178,7 +177,7 @@ mr_internal void mrd_get_code_snippet(const char *file_name, int line,
 	return;
 }
 
-mr_internal void unused mrd_log_backtrace(void)
+internal void unused mrd_log_backtrace(void)
 {
 #ifndef _WIN32
 	void *buffer[MAX_BACKTRACE_LENGTH];
@@ -302,15 +301,14 @@ mr_internal void unused mrd_log_backtrace(void)
 }
 
 // returns 1 if true
-mr_internal int
-mrd_is_active_allocation_slot_free(struct MrdAllocation allocation)
+internal int mrd_is_active_allocation_slot_free(struct MrdAllocation allocation)
 {
 	return (allocation.active == FALSE &&
 		allocation.reallocated_to == NULL);
 }
 
 // populates first available slot
-mr_internal void
+internal void
 mrd_add_allocation_to_active_allocations(struct MrdAllocation new_allocation)
 {
 	for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {
@@ -327,9 +325,9 @@ mrd_add_allocation_to_active_allocations(struct MrdAllocation new_allocation)
 	mrd_log_err(err);
 }
 
-mr_internal void unused mrd_log_command(MrdCommand command, size_t size,
-					struct MrdAllocation *realloc_free_src,
-					const char *file_name, int line)
+internal void unused mrd_log_command(MrdCommand command, size_t size,
+				     struct MrdAllocation *realloc_free_src,
+				     const char *file_name, int line)
 {
 	mrl_log(&logger, MRL_SEVERITY_INFO, DEBUG_LOG_HEAD);
 	if (command == MRD_COMMAND_REALLOC) {

@@ -19,18 +19,16 @@ typedef struct {
 	int line_number;
 } MrtCase;
 
-mr_internal void mrt_group_init(struct MrtGroup *t_group,
-				const char *description, MrtTestFunc func);
+internal void mrt_group_init(struct MrtGroup *t_group, const char *description,
+			     MrtTestFunc func);
 
-mr_internal void mrt_group_destroy(struct MrtGroup *t_group);
+internal void mrt_group_destroy(struct MrtGroup *t_group);
 
-mr_internal Err mrt_group_log(struct MrtGroup *t_group,
-			      struct MrlLogger *logger);
+internal Err mrt_group_log(struct MrtGroup *t_group, struct MrlLogger *logger);
 
-mr_internal void mrt_group_log_failure(MrlLogger *logger,
-				       struct MrtGroup *group);
+internal void mrt_group_log_failure(MrlLogger *logger, struct MrtGroup *group);
 
-mr_internal void mrt_case_log(struct MrlLogger *mrl_ctx, MrtCase test_case);
+internal void mrt_case_log(struct MrlLogger *mrl_ctx, MrtCase test_case);
 
 struct MrtContext *mrt_ctx_create(MrlLogger *logger)
 {
@@ -68,9 +66,9 @@ void mrt_ctx_register_test_func(struct MrtContext *ctx, MrtTestFunc t_func,
 	return;
 }
 
-mr_global mtx_t *logging_mutex = NULL;
-mr_internal int run_testgroup_with_locking_logging(struct MrtContext *ctx,
-						   int t_group_idx)
+global_variable mtx_t *logging_mutex = NULL;
+internal int run_testgroup_with_locking_logging(struct MrtContext *ctx,
+						int t_group_idx)
 {
 	struct MrtGroup *group = mrv_get_idx(&ctx->test_groups, t_group_idx);
 
@@ -83,12 +81,12 @@ mr_internal int run_testgroup_with_locking_logging(struct MrtContext *ctx,
 	return err;
 }
 
-mr_global struct WorkerParams {
+global_variable struct WorkerParams {
 	struct MrtContext *ctx;
 	size_t next_group_idx; // is atomic. BEWARE
 } w_ctx;
-mr_global mtx_t *atomic_next_group_idx_mutex = NULL;
-mr_internal size_t atomic_fetch_increment_group_idx(void)
+global_variable mtx_t *atomic_next_group_idx_mutex = NULL;
+internal size_t atomic_fetch_increment_group_idx(void)
 {
 	mtx_lock(atomic_next_group_idx_mutex);
 	w_ctx.next_group_idx++;
@@ -96,7 +94,7 @@ mr_internal size_t atomic_fetch_increment_group_idx(void)
 	return w_ctx.next_group_idx - 1;
 }
 
-mr_internal int worker_thread_func(unused void *empty)
+internal int worker_thread_func(unused void *empty)
 {
 	int total_worker_err = 0;
 
@@ -113,7 +111,7 @@ mr_internal int worker_thread_func(unused void *empty)
 	return total_worker_err;
 }
 
-mr_internal int mrt_ctx_run_parrallelized(struct MrtContext *ctx)
+internal int mrt_ctx_run_parrallelized(struct MrtContext *ctx)
 {
 	int core_count = sysconf(_SC_NPROCESSORS_ONLN);
 	if (core_count < 1) {
@@ -157,7 +155,7 @@ mr_internal int mrt_ctx_run_parrallelized(struct MrtContext *ctx)
 	return err_count;
 }
 
-mr_internal int mrt_ctx_run_single_threaded(struct MrtContext *ctx)
+internal int mrt_ctx_run_single_threaded(struct MrtContext *ctx)
 {
 	size_t err_count = 0;
 
@@ -217,8 +215,8 @@ int mrt_ctx_run(struct MrtContext *ctx, Bool run_tests_parrallelized)
 	return err_count;
 }
 
-mr_internal void mrt_group_init(struct MrtGroup *t_group,
-				const char *description, MrtTestFunc func)
+internal void mrt_group_init(struct MrtGroup *t_group, const char *description,
+			     MrtTestFunc func)
 {
 	memset(t_group, 0, sizeof(*t_group));
 
@@ -231,7 +229,7 @@ mr_internal void mrt_group_init(struct MrtGroup *t_group,
 		 sizeof(MrtCase));
 }
 
-mr_internal void mrt_group_destroy(struct MrtGroup *t_group)
+internal void mrt_group_destroy(struct MrtGroup *t_group)
 {
 	for (size_t i = 0; i < t_group->cases.len; i++) {
 		MrtCase *c = mrv_get_idx(&t_group->cases, i);
@@ -270,8 +268,7 @@ void mrt_group_append_case(struct MrtGroup *t_group, const char *description,
 		   APPEND_SCALING_ONE_POINT_FIVE);
 }
 
-mr_internal Err mrt_group_log(struct MrtGroup *t_group,
-			      struct MrlLogger *logger)
+internal Err mrt_group_log(struct MrtGroup *t_group, struct MrlLogger *logger)
 {
 	mrl_logln(logger, MRL_SEVERITY_DEFAULT, "");
 
@@ -300,8 +297,7 @@ mr_internal Err mrt_group_log(struct MrtGroup *t_group,
 	}
 }
 
-mr_internal void mrt_group_log_failure(MrlLogger *logger,
-				       struct MrtGroup *group)
+internal void mrt_group_log_failure(MrlLogger *logger, struct MrtGroup *group)
 {
 	mrl_logln(logger, MRL_SEVERITY_DEFAULT, "\n---- %s ----",
 		  group->name.value);
@@ -323,7 +319,7 @@ mr_internal void mrt_group_log_failure(MrlLogger *logger,
 	}
 }
 
-mr_internal void mrt_case_log(struct MrlLogger *mrl_ctx, MrtCase test_case)
+internal void mrt_case_log(struct MrlLogger *mrl_ctx, MrtCase test_case)
 {
 	mrl_log(mrl_ctx, MRL_SEVERITY_DEFAULT, test_case.description.value);
 	if (test_case.pass) {
