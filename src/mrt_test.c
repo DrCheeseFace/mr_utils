@@ -83,33 +83,31 @@ mr_internal int run_testgroup_with_locking_logging(struct MrtContext *ctx,
 	return err;
 }
 
-mr_global mtx_t *atomic_group_idx_mutex = NULL;
-mr_internal size_t atomic_fetch_add_group_idx(size_t *x, size_t increment)
+mr_global struct WorkerParams {
+	struct MrtContext *ctx;
+	size_t next_group_idx; // is atomic. BEWARE
+} w_ctx;
+mr_global mtx_t *atomic_next_group_idx_mutex = NULL;
+mr_internal size_t atomic_fetch_increment_group_idx(void)
 {
-	mtx_lock(atomic_group_idx_mutex);
-	*x += increment;
-	mtx_unlock(atomic_group_idx_mutex);
-	return *x - increment;
+	mtx_lock(atomic_next_group_idx_mutex);
+	w_ctx.next_group_idx++;
+	mtx_unlock(atomic_next_group_idx_mutex);
+	return w_ctx.next_group_idx - 1;
 }
 
-struct WorkerParams {
-	struct MrtContext *ctx;
-	size_t *next_group_idx; // is atomic. BEWARE
-};
-mr_internal int worker_thread_func(void *worker_contex)
+mr_internal int worker_thread_func(unused void *empty)
 {
-	struct WorkerParams *w_ctx = worker_contex;
 	int total_worker_err = 0;
 
 	for (;;) {
-		size_t group_idx_to_run =
-			atomic_fetch_add_group_idx(w_ctx->next_group_idx, 1);
+		size_t group_idx_to_run = atomic_fetch_increment_group_idx();
 
-		if (group_idx_to_run >= w_ctx->ctx->test_groups.len)
+		if (group_idx_to_run >= w_ctx.ctx->test_groups.len)
 			break;
 
 		total_worker_err += run_testgroup_with_locking_logging(
-			w_ctx->ctx, group_idx_to_run);
+			w_ctx.ctx, group_idx_to_run);
 	}
 
 	return total_worker_err;
@@ -127,21 +125,20 @@ mr_internal int mrt_ctx_run_parrallelized(struct MrtContext *ctx)
 		thread_count = ctx->test_groups.len;
 	}
 
-	size_t next_group_idx = 0;
-	struct WorkerParams w_ctx;
 	w_ctx.ctx = ctx;
-	w_ctx.next_group_idx = &next_group_idx;
+	w_ctx.next_group_idx = 0;
 
 	logging_mutex = malloc(sizeof(*logging_mutex));
 	mtx_init(logging_mutex, mtx_plain);
 
-	atomic_group_idx_mutex = malloc(sizeof(*atomic_group_idx_mutex));
-	mtx_init(atomic_group_idx_mutex, mtx_plain);
+	atomic_next_group_idx_mutex =
+		malloc(sizeof(*atomic_next_group_idx_mutex));
+	mtx_init(atomic_next_group_idx_mutex, mtx_plain);
 
-	thrd_t *threads = calloc(thread_count, sizeof(thrd_t));
+	thrd_t threads[thread_count];
 
 	for (uint i = 0; i < thread_count; i++) {
-		thrd_create(&threads[i], worker_thread_func, &w_ctx);
+		thrd_create(&threads[i], worker_thread_func, NULL);
 	}
 
 	size_t err_count = 0;
@@ -151,10 +148,8 @@ mr_internal int mrt_ctx_run_parrallelized(struct MrtContext *ctx)
 		err_count += err;
 	}
 
-	free(threads);
-
-	mtx_destroy(atomic_group_idx_mutex);
-	free(atomic_group_idx_mutex);
+	mtx_destroy(atomic_next_group_idx_mutex);
+	free(atomic_next_group_idx_mutex);
 
 	mtx_destroy(logging_mutex);
 	free(logging_mutex);
