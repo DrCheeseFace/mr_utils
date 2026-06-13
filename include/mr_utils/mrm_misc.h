@@ -27,10 +27,12 @@ typedef unsigned int uint;
  *
  * TRUE = 1
  */
+#ifndef Bool
 typedef enum {
 	MRM_BOOL_FALSE = 0,
 	MRM_BOOL_TRUE,
 } Bool;
+#endif
 
 #define TRUE MRM_BOOL_TRUE
 #define FALSE MRM_BOOL_FALSE
