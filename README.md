@@ -112,6 +112,7 @@ format-check: $(TARGET_SPACERS)
 - [ ] useful runtime error message. something with coredump file abort()
 - [ ] mrv_append, have flags for how to realloc if needed. double, log, increment etc
 - [ ] replace <threads.h> with <pthread.h> in mrl_logger
+- [ ] spacers add ignore flag
 
 
 
