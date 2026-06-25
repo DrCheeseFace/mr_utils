@@ -374,7 +374,7 @@ internal void unused mrd_log_command(MrdCommand command, size_t size,
 		mrl_log(&logger, MRL_SEVERITY_INFO, "mmap allocated ");
 		break;
 	case MRD_COMMAND_MUNMAP:
-		mrl_log(&logger, MRL_SEVERITY_WARNING, "munmap allocated ");
+		mrl_log(&logger, MRL_SEVERITY_WARNING, "munmap'd ");
 		break;
 	default:
 		break;
