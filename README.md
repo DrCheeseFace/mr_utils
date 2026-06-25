@@ -95,6 +95,36 @@ format-check: $(TARGET_SPACERS)
 - note: `-rdynamic` breaks `-fsanitize=address`
 - note: `static` functions wont be displayed as the symbol isnt exported :(
 
+#### mrd_debug example output
+```
+
+MRD_DEBUG LOG: allocation (0) of [40] bytes malloc allocated in src/x11/window.c:21 struct x11_Window *const x11_window = malloc(sizeof(*x11_window));
+
+MRD_DEBUG LOG: allocation (1) of [4096] bytes mmap allocated in src/posix/buffers.c:95 Buffer *const new_buffer = mmap(NULL, size, PROT_READ | PROT_WRITE,
+
+MRD_DEBUG LOG: allocation (1) of [4096] bytes munmap'd in src/posix/buffers.c:131 munmap(buffers[buffer_id], buffers[buffer_id]->size);
+
+MRD_DEBUG LOG: allocation (0) of [40] bytes free'd in src/x11/window.c:72 free(x11_window);
+
+MRD_DEBUG LOG: allocation (2) of [4] bytes malloc allocated in src/main.c:43 void *x = malloc(4);
+
+MRD_DEBUG LOG: allocation (2>3) of [4>10] bytes realloc allocated in src/main.c:44 x = realloc(x, 10);
+
+MRD_DEBUG LOG: allocation (4) of [4] bytes malloc allocated in src/main.c:45 x = malloc(4);
+
+MRD_DEBUG LOG: allocation (4) of [4] bytes free'd in src/main.c:46 free(x);
+
+=======ACTIVE=ALLOCATIONS=======
+allocation (3) of [10] bytes
+================================
+
+TOTAL ACTIVE ALLOCATIONS: 1
+TOTAL ACTIVE BYTES: 10
+
+ASSERT FAILED: mrd_log_dump_active_allocations() == 0
+        src/main.c:49
+
+```
 
 
 
@@ -105,10 +135,10 @@ format-check: $(TARGET_SPACERS)
 - [x] whitespace remover
 - [x] debug maintain only active allocations. eg: freed and not realloced to something not freed
 - [x] add left rigth comparison for failed tests
-- [ ] mrd_debug mutexify so that i can programs with multithreading
+- [x] mrd_debug mutexify so that i can programs with multithreading
 - [ ] add ability to define locked regions for logger library
 - [ ] malloc calloc realloc free wrappers for debugging memory leaks eg: this PTR (id) with this DATA that was allocated HERE, was not freed
-- [ ] optimize mrd_debug. map offsets to log messages so i dont have to calculate multiple times
+- [x] optimize mrd_debug. map offsets to log messages so i dont have to calculate multiple times
 - [ ] useful runtime error message. something with coredump file abort()
 - [ ] mrv_append, have flags for how to realloc if needed. double, log, increment etc
 - [ ] replace <threads.h> with <pthread.h> in mrl_logger
