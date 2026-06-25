@@ -1,3 +1,5 @@
+#define _GNU_SOURCE
+
 #include "internals.h"
 #include <mr_utils.h>
 
@@ -5,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <threads.h>
+#include <time.h>
 #include <unistd.h>
 
 #define MRT_INIT_TEST_CASES_PER_GROUP 64

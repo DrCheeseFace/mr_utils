@@ -3,7 +3,7 @@ CSTANDARD   = c99
 AR          = ar
 
 INCLUDES    = -Iinclude
-LDLIBS      = -lm
+LDLIBS      = -lm -lrt
 
 WARNINGS  = -Wall -Wextra -Werror -Wpedantic -pedantic-errors
 WARNINGS += -Wpointer-arith -Wcast-align -Wwrite-strings
