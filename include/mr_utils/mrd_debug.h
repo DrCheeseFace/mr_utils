@@ -13,6 +13,7 @@
 #define MRD_DEBUG_H
 
 #include <stddef.h>
+#include <sys/mman.h>
 
 #define MAX_ACTIVE_ALLOCATIONS 1024
 #define MAX_SNIPPET_LEN 128
@@ -33,11 +34,19 @@ void *mrd_calloc(size_t nmemb, size_t size, const char *file_name, int line);
 void *mrd_realloc(void *ptr, size_t size, const char *file_name, int line);
 void mrd_free(void *ptr, const char *file_name, int line);
 
+void *mrd_mmap(void *addr, size_t size, int prot, int flags, int fd,
+	       __off_t offset, const char *file_name, int line);
+void mrd_munmap(void *ptr, size_t size, const char *file_name, int line);
+
 #endif // !DEBUG
 
 #ifdef DEBUG
 
 #include <stdlib.h>
+
+#define mmap(addr, size, prot, flags, fd, offset)                              \
+	mrd_mmap(addr, size, prot, flags, fd, offset, __FILE__, __LINE__)
+#define munmap(ptr, size) mrd_munmap(ptr, size, __FILE__, __LINE__)
 
 #define malloc(size) mrd_malloc(size, __FILE__, __LINE__)
 #define calloc(nmemb, size) mrd_calloc(nmemb, size, __FILE__, __LINE__)

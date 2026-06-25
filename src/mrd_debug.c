@@ -8,6 +8,8 @@
 #undef calloc
 #undef realloc
 #undef free
+#undef mmap
+#undef munmap
 #endif
 
 #ifndef _WIN32
@@ -17,6 +19,7 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/mman.h>
 #include <unistd.h>
 
 struct MrdAllocation {
@@ -32,6 +35,8 @@ typedef enum {
 	MRD_COMMAND_CALLOC,
 	MRD_COMMAND_REALLOC,
 	MRD_COMMAND_FREE,
+	MRD_COMMAND_MMAP,
+	MRD_COMMAND_MUNMAP,
 } MrdCommand;
 
 global_variable size_t current_allocation_id = 0;
@@ -335,7 +340,8 @@ internal void unused mrd_log_command(MrdCommand command, size_t size,
 			"allocation (%zu>%zu) of ", realloc_free_src->id,
 			current_allocation_id);
 
-	} else if (command == MRD_COMMAND_FREE) {
+	} else if (command == MRD_COMMAND_FREE ||
+		   command == MRD_COMMAND_MUNMAP) {
 		mrl_log(&logger, MRL_SEVERITY_DEFAULT, "allocation (%zu) of ",
 			realloc_free_src->id);
 	} else {
@@ -363,6 +369,12 @@ internal void unused mrd_log_command(MrdCommand command, size_t size,
 		break;
 	case MRD_COMMAND_FREE:
 		mrl_log(&logger, MRL_SEVERITY_WARNING, "free'd ");
+		break;
+	case MRD_COMMAND_MMAP:
+		mrl_log(&logger, MRL_SEVERITY_INFO, "mmap allocated ");
+		break;
+	case MRD_COMMAND_MUNMAP:
+		mrl_log(&logger, MRL_SEVERITY_WARNING, "munmap allocated ");
 		break;
 	default:
 		break;
@@ -553,6 +565,84 @@ void mrd_free(void *ptr, unused const char *file_name, unused int line)
 	}
 
 	free(ptr);
+
+	allocation->active = FALSE;
+
+	pthread_mutex_unlock(&mutex);
+}
+
+void *mrd_mmap(void *addr, size_t size, int prot, int flags, int fd,
+	       __off_t offset, unused const char *file_name, unused int line)
+{
+	pthread_mutex_lock(&mutex);
+	if (logger.out == NULL) {
+		mrd_init();
+	}
+
+#ifndef MRD_DEBUG_ONLY_CALLED_AND_ERR
+	mrd_log_command(MRD_COMMAND_MMAP, size, NULL, file_name, line);
+#endif
+
+#ifdef MRD_DEBUG_BACKTRACE
+	mrd_log_backtrace();
+#endif
+
+	void *ptr = mmap(addr, size, prot, flags, fd, offset);
+	if (ptr == MAP_FAILED) {
+		mrd_log_err("FAILED TO MMAP ALLOCATE ");
+	} else {
+		memset(ptr, CAFE_BABE, size);
+		mrd_add_allocation_to_active_allocations(
+			(struct MrdAllocation){ .ptr = ptr,
+						.size = size,
+						.id = current_allocation_id,
+						.active = TRUE,
+						.reallocated_to = NULL });
+	}
+
+#ifndef MRD_DEBUG_ONLY_CALLED_AND_ERR
+	mrl_logln(&logger, MRL_SEVERITY_DEFAULT, "");
+#endif
+
+	pthread_mutex_unlock(&mutex);
+	return ptr;
+}
+
+void mrd_munmap(void *ptr, size_t size, unused const char *file_name,
+		unused int line)
+{
+	pthread_mutex_lock(&mutex);
+	if (logger.out == NULL) {
+		mrd_init();
+	}
+
+	struct MrdAllocation *allocation = NULL;
+	for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {
+		if (ptr == active_allocations[i].ptr &&
+		    active_allocations[i].active) {
+			allocation = &active_allocations[i];
+			break;
+		}
+	}
+
+	if (ptr == NULL) {
+		mrd_log_err("ATTEMPTED TO MUNMAP NULL");
+	} else {
+#ifndef MRD_DEBUG_ONLY_CALLED_AND_ERR
+		mrd_log_command(MRD_COMMAND_MUNMAP, allocation->size,
+				allocation, file_name, line);
+#endif
+	}
+
+#ifdef MRD_DEBUG_BACKTRACE
+	mrd_log_backtrace();
+#endif
+
+#ifndef MRD_DEBUG_ONLY_CALLED_AND_ERR
+	mrl_logln(&logger, MRL_SEVERITY_DEFAULT, "");
+#endif
+
+	munmap(ptr, size);
 
 	allocation->active = FALSE;
 
