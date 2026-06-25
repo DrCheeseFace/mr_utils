@@ -96,37 +96,12 @@ format-check: $(TARGET_SPACERS)
 - note: `static` functions wont be displayed as the symbol isnt exported :(
 
 #### mrd_debug example output
-```
 
-MRD_DEBUG LOG: allocation (0) of [40] bytes malloc allocated in src/x11/window.c:21 struct x11_Window *const x11_window = malloc(sizeof(*x11_window));
+##### default logging example -DMRD_DEBUG_DEFAULT
+![https://github.com/user-attachments/assets/e88ce981-dbb5-4126-bcd0-7d22b08de42a](https://github.com/user-attachments/assets/e88ce981-dbb5-4126-bcd0-7d22b08de42a)
 
-MRD_DEBUG LOG: allocation (1) of [4096] bytes mmap allocated in src/posix/buffers.c:95 Buffer *const new_buffer = mmap(NULL, size, PROT_READ | PROT_WRITE,
-
-MRD_DEBUG LOG: allocation (1) of [4096] bytes munmap'd in src/posix/buffers.c:131 munmap(buffers[buffer_id], buffers[buffer_id]->size);
-
-MRD_DEBUG LOG: allocation (0) of [40] bytes free'd in src/x11/window.c:72 free(x11_window);
-
-MRD_DEBUG LOG: allocation (2) of [4] bytes malloc allocated in src/main.c:43 void *x = malloc(4);
-
-MRD_DEBUG LOG: allocation (2>3) of [4>10] bytes realloc allocated in src/main.c:44 x = realloc(x, 10);
-
-MRD_DEBUG LOG: allocation (4) of [4] bytes malloc allocated in src/main.c:45 x = malloc(4);
-
-MRD_DEBUG LOG: allocation (4) of [4] bytes free'd in src/main.c:46 free(x);
-
-=======ACTIVE=ALLOCATIONS=======
-allocation (3) of [10] bytes
-================================
-
-TOTAL ACTIVE ALLOCATIONS: 1
-TOTAL ACTIVE BYTES: 10
-
-ASSERT FAILED: mrd_log_dump_active_allocations() == 0
-        src/main.c:49
-
-```
-
-
+##### backtrace logging example -DMRD_DEBUG_BACKTRACE
+![https://github.com/user-attachments/assets/160fbba1-3405-46b9-82e3-999102690b86](https://github.com/user-attachments/assets/160fbba1-3405-46b9-82e3-999102690b86)
 
 ### TODO
 - [x] REWRITE spacers.c IT BAD VERY BAD
