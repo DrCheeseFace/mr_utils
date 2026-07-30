@@ -57,7 +57,7 @@ struct MrlLogger logger = { .out = NULL,
 
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
-internal void mrd_init(void)
+internal_function void mrd_init(void)
 {
 	logger.out = stdout;
 }
@@ -138,7 +138,7 @@ void *mrd_inspect_allocation(size_t allocation_id)
 }
 
 // cant call MRS_init due to it calling malloc
-internal void mrd_init_code_snippet(MrsString *dest)
+internal_function void mrd_init_code_snippet(MrsString *dest)
 {
 	dest->value = malloc(sizeof(char) * (MAX_SNIPPET_LEN + 1));
 	dest->value[MAX_SNIPPET_LEN] = '\0';
@@ -146,14 +146,14 @@ internal void mrd_init_code_snippet(MrsString *dest)
 	dest->len = 0;
 }
 
-internal void mrd_log_err(const char *msg)
+internal_function void mrd_log_err(const char *msg)
 {
 	mrl_log(&logger, MRL_SEVERITY_INFO, DEBUG_LOG_HEAD);
 	mrl_logln(&logger, MRL_SEVERITY_ERROR, msg);
 }
 
-internal void mrd_get_code_snippet(const char *file_name, int line,
-				   MrsString *dest)
+internal_function void mrd_get_code_snippet(const char *file_name, int line,
+					    MrsString *dest)
 {
 	FILE *file = fopen(file_name, "r");
 
@@ -182,7 +182,7 @@ internal void mrd_get_code_snippet(const char *file_name, int line,
 	return;
 }
 
-internal void unused mrd_log_backtrace(void)
+internal_function void unused mrd_log_backtrace(void)
 {
 #ifndef _WIN32
 	void *buffer[MAX_BACKTRACE_LENGTH];
@@ -306,14 +306,15 @@ internal void unused mrd_log_backtrace(void)
 }
 
 // returns 1 if true
-internal int mrd_is_active_allocation_slot_free(struct MrdAllocation allocation)
+internal_function int
+mrd_is_active_allocation_slot_free(struct MrdAllocation allocation)
 {
 	return (allocation.active == FALSE &&
 		allocation.reallocated_to == NULL);
 }
 
 // populates first available slot
-internal void
+internal_function void
 mrd_add_allocation_to_active_allocations(struct MrdAllocation new_allocation)
 {
 	for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {
@@ -330,9 +331,9 @@ mrd_add_allocation_to_active_allocations(struct MrdAllocation new_allocation)
 	mrd_log_err(err);
 }
 
-internal void unused mrd_log_command(MrdCommand command, size_t size,
-				     struct MrdAllocation *realloc_free_src,
-				     const char *file_name, int line)
+internal_function void unused mrd_log_command(
+	MrdCommand command, size_t size, struct MrdAllocation *realloc_free_src,
+	const char *file_name, int line)
 {
 	mrl_log(&logger, MRL_SEVERITY_INFO, DEBUG_LOG_HEAD);
 	if (command == MRD_COMMAND_REALLOC) {
