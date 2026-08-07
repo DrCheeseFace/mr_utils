@@ -42,7 +42,7 @@
  * \   int main(void)
  * \   {
  * \           MrlLogger *logger = mrl_create(stderr, TRUE, FALSE);
- * \           MrtCtx *ctx = mrt_ctx_create(logger);
+ * \           MrtContext *ctx = mrt_ctx_create(logger);
  * \
  * \           MRT_REGISTER_TEST_GROUP(ctx, test_strstr);
  * \           MRT_REGISTER_TEST_GROUP(ctx, test_filter);
@@ -79,5 +79,8 @@ void mrt_ctx_register_test_func(MrtContext *ctx,
 void mrt_group_append_case(MrtGroup *t_ctx, const char *description, Bool pass,
 			   const char *predicate, const char *file_name,
 			   int line_number);
+#ifdef __cplusplus
+#define MRT_BOOL(expr) ((expr) ? TRUE : FALSE)
+#endif
 
 #endif // !MRT_TEST_H

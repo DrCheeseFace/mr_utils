@@ -22,7 +22,10 @@
 #define MAX_FUNC_NAME_LEN 64
 #define BASE_ADDRESS_SIZE 12
 #define DEBUG_LOG_HEAD "MRD_DEBUG LOG: "
+
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 
 // return number of active allocations
 size_t mrd_log_dump_active_allocations(void);
