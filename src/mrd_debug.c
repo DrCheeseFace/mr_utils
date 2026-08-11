@@ -37,6 +37,8 @@ typedef enum {
 	MRD_COMMAND_FREE,
 	MRD_COMMAND_MMAP,
 	MRD_COMMAND_MUNMAP,
+	MRD_COMMAND_CUSTOM_ALLOCATION,
+	MRD_COMMAND_CUSTOM_FREE,
 } MrdCommand;
 
 global_variable size_t current_allocation_id = 0;
@@ -342,7 +344,8 @@ internal_function void unused mrd_log_command(
 			current_allocation_id);
 
 	} else if (command == MRD_COMMAND_FREE ||
-		   command == MRD_COMMAND_MUNMAP) {
+		   command == MRD_COMMAND_MUNMAP ||
+		   command == MRD_COMMAND_CUSTOM_FREE) {
 		mrl_log(&logger, MRL_SEVERITY_DEFAULT, "allocation (%zu) of ",
 			realloc_free_src->id);
 	} else {
@@ -376,6 +379,12 @@ internal_function void unused mrd_log_command(
 		break;
 	case MRD_COMMAND_MUNMAP:
 		mrl_log(&logger, MRL_SEVERITY_WARNING, "munmap'd ");
+		break;
+	case MRD_COMMAND_CUSTOM_ALLOCATION:
+		mrl_log(&logger, MRL_SEVERITY_INFO, "custom allocated ");
+		break;
+	case MRD_COMMAND_CUSTOM_FREE:
+		mrl_log(&logger, MRL_SEVERITY_WARNING, "custom free'd ");
 		break;
 	default:
 		break;
@@ -650,4 +659,70 @@ int mrd_munmap(void *ptr, size_t size, unused const char *file_name,
 	pthread_mutex_unlock(&mutex);
 
 	return err;
+}
+
+void mrd_custom_allocation(void *ptr, size_t size, unused const char *file_name,
+			   unused int line)
+{
+	pthread_mutex_lock(&mutex);
+	if (logger.out == NULL) {
+		mrd_init();
+	}
+
+#ifndef MRD_DEBUG_ONLY_CALLED_AND_ERR
+	mrd_log_command(MRD_COMMAND_CUSTOM_ALLOCATION, size, NULL, file_name,
+			line);
+#endif
+
+#ifdef MRD_DEBUG_BACKTRACE
+	mrd_log_backtrace();
+#endif
+
+	memset(ptr, CAFE_BABE, size);
+	mrd_add_allocation_to_active_allocations(
+		(struct MrdAllocation){ .ptr = ptr,
+					.size = size,
+					.id = current_allocation_id,
+					.active = TRUE,
+					.reallocated_to = NULL });
+
+#ifndef MRD_DEBUG_ONLY_CALLED_AND_ERR
+	mrl_logln(&logger, MRL_SEVERITY_DEFAULT, "");
+#endif
+
+	pthread_mutex_unlock(&mutex);
+}
+
+void mrd_custom_free(void *ptr, unused const char *file_name, unused int line)
+{
+	pthread_mutex_lock(&mutex);
+	if (logger.out == NULL) {
+		mrd_init();
+	}
+
+	struct MrdAllocation *allocation = NULL;
+	for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {
+		if (ptr == active_allocations[i].ptr &&
+		    active_allocations[i].active) {
+			allocation = &active_allocations[i];
+			break;
+		}
+	}
+
+#ifndef MRD_DEBUG_ONLY_CALLED_AND_ERR
+	mrd_log_command(MRD_COMMAND_CUSTOM_FREE, allocation->size, allocation,
+			file_name, line);
+#endif
+
+#ifdef MRD_DEBUG_BACKTRACE
+	mrd_log_backtrace();
+#endif
+
+#ifndef MRD_DEBUG_ONLY_CALLED_AND_ERR
+	mrl_logln(&logger, MRL_SEVERITY_DEFAULT, "");
+#endif
+
+	allocation->active = FALSE;
+
+	pthread_mutex_unlock(&mutex);
 }

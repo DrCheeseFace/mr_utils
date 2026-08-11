@@ -41,6 +41,10 @@ void *mrd_mmap(void *addr, size_t size, int prot, int flags, int fd,
 	       __off_t offset, const char *file_name, int line);
 int mrd_munmap(void *ptr, size_t size, const char *file_name, int line);
 
+void mrd_custom_allocation(void *ptr, size_t size, const char *file_name,
+			   int line);
+void mrd_custom_free(void *ptr, const char *file_name, int line);
+
 #endif // !MRD_DEBUG_H
 
 #ifdef DEBUG
@@ -55,5 +59,9 @@ int mrd_munmap(void *ptr, size_t size, const char *file_name, int line);
 #define calloc(nmemb, size) mrd_calloc(nmemb, size, __FILE__, __LINE__)
 #define realloc(ptr, size) mrd_realloc(ptr, size, __FILE__, __LINE__)
 #define free(ptr) mrd_free(ptr, __FILE__, __LINE__)
+
+#define custom_alloc(ptr, size)                                                \
+	mrd_custom_allocation(ptr, size, __FILE__, __LINE__)
+#define custom_free(ptr) mrd_custom_free(ptr, __FILE__, __LINE__)
 
 #endif // !MRD_DEBUG_H
