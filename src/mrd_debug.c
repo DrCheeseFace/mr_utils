@@ -501,6 +501,11 @@ void *mrd_realloc(void *ptr, size_t size, unused const char *file_name,
 		}
 	}
 
+	if (!src_allocation) {
+		mrl_logln(&logger, MRL_SEVERITY_ERROR,
+			  "REALLOC ALLOCATION (%zu) NOT FOUND", ptr);
+	}
+
 #ifndef MRD_DEBUG_ONLY_CALLED_AND_ERR
 	mrd_log_command(MRD_COMMAND_REALLOC, size, src_allocation, file_name,
 			line);
@@ -762,6 +767,11 @@ void mrd_custom_free(void *ptr, unused const char *file_name, unused int line)
 			allocation = &active_allocations[i];
 			break;
 		}
+	}
+
+	if (!allocation) {
+		mrl_logln(&logger, MRL_SEVERITY_ERROR,
+			  "CUSTOM REALLOC ALLOCATION (%zu) NOT FOUND", ptr);
 	}
 
 #ifndef MRD_DEBUG_ONLY_CALLED_AND_ERR
