@@ -609,8 +609,8 @@ void *mrd_mmap(void *addr, size_t size, int prot, int flags, int fd,
 	return ptr;
 }
 
-void mrd_munmap(void *ptr, size_t size, unused const char *file_name,
-		unused int line)
+int mrd_munmap(void *ptr, size_t size, unused const char *file_name,
+	       unused int line)
 {
 	pthread_mutex_lock(&mutex);
 	if (logger.out == NULL) {
@@ -643,9 +643,11 @@ void mrd_munmap(void *ptr, size_t size, unused const char *file_name,
 	mrl_logln(&logger, MRL_SEVERITY_DEFAULT, "");
 #endif
 
-	munmap(ptr, size);
+	int err = munmap(ptr, size);
 
 	allocation->active = FALSE;
 
 	pthread_mutex_unlock(&mutex);
+
+	return err;
 }

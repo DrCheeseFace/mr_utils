@@ -39,9 +39,9 @@ void mrd_free(void *ptr, const char *file_name, int line);
 
 void *mrd_mmap(void *addr, size_t size, int prot, int flags, int fd,
 	       __off_t offset, const char *file_name, int line);
-void mrd_munmap(void *ptr, size_t size, const char *file_name, int line);
+int mrd_munmap(void *ptr, size_t size, const char *file_name, int line);
 
-#endif // !DEBUG
+#endif // !MRD_DEBUG_H
 
 #ifdef DEBUG
 
