@@ -38,6 +38,7 @@ typedef enum {
 	MRD_COMMAND_MMAP,
 	MRD_COMMAND_MUNMAP,
 	MRD_COMMAND_CUSTOM_ALLOCATION,
+	MRD_COMMAND_CUSTOM_REALLOC,
 	MRD_COMMAND_CUSTOM_FREE,
 } MrdCommand;
 
@@ -338,7 +339,8 @@ internal_function void unused mrd_log_command(
 	const char *file_name, int line)
 {
 	mrl_log(&logger, MRL_SEVERITY_INFO, DEBUG_LOG_HEAD);
-	if (command == MRD_COMMAND_REALLOC) {
+	if (command == MRD_COMMAND_REALLOC ||
+	    command == MRD_COMMAND_CUSTOM_REALLOC) {
 		mrl_log(&logger, MRL_SEVERITY_DEFAULT,
 			"allocation (%zu>%zu) of ", realloc_free_src->id,
 			current_allocation_id);
@@ -353,7 +355,8 @@ internal_function void unused mrd_log_command(
 			current_allocation_id);
 	}
 
-	if (command == MRD_COMMAND_REALLOC) {
+	if (command == MRD_COMMAND_REALLOC ||
+	    command == MRD_COMMAND_CUSTOM_REALLOC) {
 		mrl_log(&logger, MRL_SEVERITY_OK, "[%lu>%lu] ",
 			realloc_free_src->size, size);
 	} else {
@@ -382,6 +385,10 @@ internal_function void unused mrd_log_command(
 		break;
 	case MRD_COMMAND_CUSTOM_ALLOCATION:
 		mrl_log(&logger, MRL_SEVERITY_INFO, "custom allocated ");
+		break;
+	case MRD_COMMAND_CUSTOM_REALLOC:
+		mrl_log(&logger, MRL_SEVERITY_ALT_INFO,
+			"custom realloc allocated ");
 		break;
 	case MRD_COMMAND_CUSTOM_FREE:
 		mrl_log(&logger, MRL_SEVERITY_WARNING, "custom free'd ");
@@ -693,6 +700,54 @@ void mrd_custom_allocation(void *ptr, size_t size, unused const char *file_name,
 	pthread_mutex_unlock(&mutex);
 }
 
+void mrd_custom_realloc(void *old_ptr, void *new_ptr, size_t size,
+			unused const char *file_name, unused int line)
+{
+	pthread_mutex_lock(&mutex);
+
+	if (logger.out == NULL) {
+		mrd_init();
+	}
+
+	struct MrdAllocation *src_allocation = NULL;
+	for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {
+		if (old_ptr == active_allocations[i].ptr &&
+		    active_allocations[i].active) {
+			src_allocation = &active_allocations[i];
+			break;
+		}
+	}
+
+#ifndef MRD_DEBUG_ONLY_CALLED_AND_ERR
+	mrd_log_command(MRD_COMMAND_REALLOC, size, src_allocation, file_name,
+			line);
+#endif
+
+#ifdef MRD_DEBUG_BACKTRACE
+	mrd_log_backtrace();
+#endif
+
+	if (src_allocation) {
+		src_allocation->active = FALSE;
+		if (new_ptr != old_ptr) {
+			src_allocation->reallocated_to = new_ptr;
+		}
+	}
+
+	mrd_add_allocation_to_active_allocations(
+		(struct MrdAllocation){ .ptr = new_ptr,
+					.size = size,
+					.id = current_allocation_id,
+					.active = TRUE,
+					.reallocated_to = NULL });
+
+#ifndef MRD_DEBUG_ONLY_CALLED_AND_ERR
+	mrl_logln(&logger, MRL_SEVERITY_DEFAULT, "");
+#endif
+
+	pthread_mutex_unlock(&mutex);
+}
+
 void mrd_custom_free(void *ptr, unused const char *file_name, unused int line)
 {
 	pthread_mutex_lock(&mutex);
@@ -721,6 +776,17 @@ void mrd_custom_free(void *ptr, unused const char *file_name, unused int line)
 #ifndef MRD_DEBUG_ONLY_CALLED_AND_ERR
 	mrl_logln(&logger, MRL_SEVERITY_DEFAULT, "");
 #endif
+
+	// if the pointer to free is ever realloced somewhere, we need to set this to NULL
+	if (allocation != NULL) {
+		for (size_t i = 0; i < MAX_ACTIVE_ALLOCATIONS; i++) {
+			if (allocation->ptr ==
+			    active_allocations[i].reallocated_to) {
+				active_allocations[i].reallocated_to = NULL;
+				break;
+			}
+		}
+	}
 
 	allocation->active = FALSE;
 

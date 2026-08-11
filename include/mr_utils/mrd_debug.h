@@ -43,6 +43,8 @@ int mrd_munmap(void *ptr, size_t size, const char *file_name, int line);
 
 void mrd_custom_allocation(void *ptr, size_t size, const char *file_name,
 			   int line);
+void mrd_custom_realloc(void *old_ptr, void *new_ptr, size_t size,
+			const char *file_name, int line);
 void mrd_custom_free(void *ptr, const char *file_name, int line);
 
 #endif // !MRD_DEBUG_H
@@ -62,6 +64,8 @@ void mrd_custom_free(void *ptr, const char *file_name, int line);
 
 #define custom_alloc(ptr, size)                                                \
 	mrd_custom_allocation(ptr, size, __FILE__, __LINE__)
+#define custom_realloc(old_ptr, new_ptr, size)                                 \
+	mrd_custom_realloc(old_ptr, new_ptr, size, __FILE__, __LINE__)
 #define custom_free(ptr) mrd_custom_free(ptr, __FILE__, __LINE__)
 
 #endif // !MRD_DEBUG_H
