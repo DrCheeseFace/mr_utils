@@ -57,8 +57,8 @@
  * \
  */
 
-typedef void MrtContext;
-typedef void MrtGroup;
+typedef struct MrtContext MrtContext;
+typedef struct MrtGroup MrtGroup;
 
 MrtContext *mrt_ctx_create(MrlLogger *logger);
 void mrt_ctx_destroy(MrtContext *ctx);
