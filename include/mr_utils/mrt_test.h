@@ -57,6 +57,10 @@
  * \
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct MrtContext MrtContext;
 typedef struct MrtGroup MrtGroup;
 
@@ -82,5 +86,10 @@ void mrt_group_append_case(MrtGroup *t_ctx, const char *description, Bool pass,
 #ifdef __cplusplus
 #define MRT_BOOL(expr) ((expr) ? TRUE : FALSE)
 #endif
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif // !MRT_TEST_H
