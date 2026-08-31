@@ -91,5 +91,4 @@ void mrt_group_append_case(MrtGroup *t_ctx, const char *description, Bool pass,
 }
 #endif
 
-
 #endif // !MRT_TEST_H
